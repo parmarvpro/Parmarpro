@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Welcome to My World</title>
+  <meta charset="UTF-8">
+  <style>
+    body { background-color: #111; color: #fff; font-family: sans-serif; padding: 40px; }
+    h1 { color: #00ff99; }
+    a { color: #00d4ff; }
+  </style>
+</head>
+<body>
+  <h1>Hello, I’m Vivek.</h1>
+  <p>This is my official site — where I build my empire, one day at a time.</p>
+  <p>📬 <a href="mailto:your@email.com">Contact me</a></p>
+</body>
+</html>
