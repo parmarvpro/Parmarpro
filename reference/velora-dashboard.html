@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Velora · Overview</title>
+<!--
+  PLAN
+  Subject: Velora, a cycle & wellness subscription app. User: the founder, every morning, 10 seconds.
+  Primary job: answer "is revenue healthy, and what moved it?"
+  The one bold thing: the answer written as a sentence at the top, which rewrites itself when the platform filter changes.
+  Everything else stays quiet: one KPI strip (not five cards), one line chart, honest small charts.
+  Palette: page #F7F6F3, surface #FFFFFF, ink #1C1A22, secondary #4D4957, line #E4E1E8,
+           brand plum #7B2D5E (MRR line + active nav only), good #1E7A4F, bad #B3261E.
+  Charts: plan mix uses validated categorical slots (#2a78d6, #eb6834, #1baf7a) with direct labels;
+          cohort heatmap uses a single-hue blue ramp.
+  Type: IBM Plex Sans for UI and numbers (tabular figures); Newsreader for the summary sentence only.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F6F3; --surface: #FFFFFF; --ink: #1C1A22; --ink-2: #4D4957; --muted: #625E6B;
+    --line: #E4E1E8; --line-2: #D2CED8; --accent: #7B2D5E; --accent-soft: #F5E9F0;
+    --good: #1E7A4F; --bad: #B3261E; --warn-bg: #FFF5E6; --warn-line: #E2A33B;
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+    --ui: "IBM Plex Sans", system-ui, sans-serif; --serif: "Newsreader", Georgia, serif;
+    --r: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--ui); font-variant-numeric: tabular-nums; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+
+  .app { display: grid; grid-template-columns: 224px 1fr; min-height: 100vh; }
+  .side { border-right: 1px solid var(--line); background: var(--surface); padding: 20px 12px; position: sticky; top: 0; height: 100vh; }
+  .brand { display: flex; align-items: center; gap: 10px; padding: 4px 12px 24px; font-weight: 600; font-size: 17px; }
+  .brand svg { flex: none; }
+  .nav { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .nav a { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--ink-2); font-weight: 500; }
+  .nav a:hover { background: var(--bg); color: var(--ink); }
+  .nav a[aria-current="page"] { background: var(--accent-soft); color: var(--accent); }
+  .nav svg { width: 18px; height: 18px; flex: none; }
+
+  main { padding: 20px 32px 48px; max-width: 1240px; width: 100%; min-width: 0; }
+  .grid > *, .app > * { min-width: 0; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .top h1 { font-size: 15px; font-weight: 600; margin: 0; color: var(--ink-2); }
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  select, .seg button { font: inherit; color: var(--ink); }
+  select { height: 36px; padding: 0 32px 0 12px; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%234D4957' stroke-width='1.5'/%3E%3C/svg%3E") no-repeat right 12px center; appearance: none; }
+  .seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 8px; background: var(--surface); padding: 2px; }
+  .seg button { border: 0; background: none; height: 30px; padding: 0 14px; border-radius: 6px; cursor: pointer; color: var(--ink-2); font-weight: 500; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+
+  .summary { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; margin-bottom: 20px; }
+  .summary p { margin: 0; font: 400 26px/1.3 var(--serif); letter-spacing: -0.01em; max-width: 46ch; text-wrap: pretty; }
+  .summary p b { font-weight: 500; }
+  .date { color: var(--muted); font-size: 13px; white-space: nowrap; padding-top: 6px; }
+  .alert { display: flex; gap: 12px; align-items: flex-start; background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: var(--r); padding: 12px 16px; margin-bottom: 24px; }
+  .alert svg { flex: none; margin-top: 2px; }
+  .alert strong { font-weight: 600; }
+  .alert a { font-weight: 500; white-space: nowrap; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+  .kpis { display: grid; grid-template-columns: repeat(5, 1fr); margin-bottom: 24px; }
+  .kpi { padding: 16px 20px; border-left: 1px solid var(--line); }
+  .kpi:first-child { border-left: 0; }
+  .kpi .label { color: var(--ink-2); font-size: 13px; }
+  .kpi .value { font-size: 28px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; margin: 4px 0 2px; }
+  .kpi.lead .value { color: var(--ink); }
+  .delta { font-size: 13px; font-weight: 500; }
+  .delta.good { color: var(--good); } .delta.bad { color: var(--bad); }
+  .delta span { color: var(--muted); font-weight: 400; }
+
+  .grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .grid.halves { grid-template-columns: 1fr 1fr; }
+  .panel header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 16px 20px 0; }
+  .panel h2 { font-size: 15px; font-weight: 600; margin: 0; }
+  .panel header small { color: var(--muted); font-size: 13px; }
+  .body { padding: 12px 20px 20px; }
+
+  #mrr { position: relative; }
+  #mrr svg { display: block; width: 100%; height: 280px; overflow: visible; }
+  .tip { position: absolute; pointer-events: none; background: var(--ink); color: #fff; font-size: 13px; padding: 6px 10px; border-radius: 6px; white-space: nowrap; transform: translate(-50%, -120%); opacity: 0; transition: opacity .1s; }
+  .tip b { font-weight: 600; }
+  details.table-view { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+  details.table-view summary { cursor: pointer; width: max-content; }
+
+  .stack { display: flex; gap: 2px; height: 14px; margin: 8px 0 16px; }
+  .stack i { display: block; height: 100%; border-radius: 4px; }
+  .plans { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  .plans li { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: baseline; }
+  .sw { width: 12px; height: 12px; border-radius: 3px; align-self: center; }
+  .plans .name { font-weight: 500; }
+  .plans .meta { color: var(--muted); font-size: 13px; }
+  .plans .pct { font-weight: 600; text-align: right; }
+  .plans .pct small { display: block; color: var(--muted); font-weight: 400; font-size: 13px; }
+  .split { border-top: 1px solid var(--line); margin-top: 20px; padding-top: 16px; }
+  .split .row { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-2); }
+  .split .bar { display: flex; gap: 2px; height: 8px; margin-top: 8px; }
+  .split .bar i { border-radius: 3px; }
+
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th { text-align: left; color: var(--muted); font-weight: 500; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  td { padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; }
+  .cohort td.cell { text-align: center; font-weight: 500; min-width: 52px; border: 2px solid var(--surface); border-radius: 6px; }
+  .cohort td.empty { background: none; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid currentColor; }
+  .pill.new { color: var(--good); } .pill.renew { color: var(--ink-2); } .pill.refund { color: #8A5A00; } .pill.cancel { color: var(--bad); }
+  .amt.neg { color: var(--bad); }
+
+  @media (max-width: 1100px) {
+    .kpis { grid-template-columns: repeat(3, 1fr); }
+    .kpi:nth-child(4) { border-left: 0; }
+    .kpi:nth-child(n+4) { border-top: 1px solid var(--line); }
+    .grid, .grid.halves { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    .app { grid-template-columns: 1fr; }
+    .side { position: static; height: auto; padding: 12px 16px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+    .brand { padding: 4px 0 12px; }
+    .nav { display: flex; overflow-x: auto; gap: 4px; padding-bottom: 8px; }
+    .nav a { white-space: nowrap; padding: 8px 12px; }
+    .nav svg { display: none; }
+    main { padding: 16px 16px 40px; }
+    .summary { grid-template-columns: 1fr; gap: 8px; }
+    .summary p { font-size: 21px; }
+    .date { order: -1; padding: 0; }
+    .kpis { grid-template-columns: 1fr 1fr; }
+    .kpi { border-left: 0 !important; border-top: 1px solid var(--line); }
+    .kpi:nth-child(odd) { border-right: 1px solid var(--line); }
+    .kpi:nth-child(-n+2) { border-top: 0; }
+    .kpi .value { font-size: 24px; }
+    .alert { flex-wrap: wrap; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><circle cx="13" cy="13" r="12" fill="#7B2D5E"/><path d="M13 5a8 8 0 1 0 8 8" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><circle cx="21" cy="13" r="2" fill="#fff"/></svg>
+      Velora
+    </div>
+    <nav aria-label="Dashboard sections">
+      <ul class="nav">
+        <li><a href="#" aria-current="page"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>Overview</a></li>
+        <li><a href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 15l4-5 3 3 6-8"/></svg>Revenue</a></li>
+        <li><a href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="7" r="3"/><path d="M4 17c1-3.5 3.3-5 6-5s5 1.5 6 5"/></svg>Subscribers</a></li>
+        <li><a href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 4h14M3 8h11M3 12h8M3 16h5"/></svg>Cohorts</a></li>
+        <li><a href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h12M4 10h12M4 15h7"/><circle cx="15" cy="15" r="1.5"/></svg>Events</a></li>
+        <li><a href="#"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="2.5"/><path d="M10 2.5v2M10 15.5v2M2.5 10h2M15.5 10h2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4"/></svg>Settings</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="top">
+      <h1>Overview</h1>
+      <div class="filters">
+        <label class="sr" for="range" style="position:absolute;left:-9999px">Date range</label>
+        <select id="range"><option>Last 30 days</option><option>Last 90 days</option><option>Last 12 months</option></select>
+        <div class="seg" role="group" aria-label="Platform">
+          <button type="button" data-p="all" aria-pressed="true">All</button>
+          <button type="button" data-p="ios" aria-pressed="false">iOS</button>
+          <button type="button" data-p="android" aria-pressed="false">Android</button>
+        </div>
+      </div>
+    </div>
+
+    <section class="summary" aria-live="polite">
+      <p id="sentence"></p>
+      <div class="date">Tue 6 Oct · updated 07:30</div>
+    </section>
+
+    <div class="alert" role="status">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M9 1.5l8 14H1z" fill="#E2A33B"/><path d="M9 6.5v4" stroke="#1C1A22" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="13" r="1" fill="#1C1A22"/></svg>
+      <div><strong>Android trial conversion dropped 1.4 pts after v3.2.</strong> It fell from 9.8% to 8.4% in the 9 days since release on 27 Sep; iOS held steady. <a href="#">See the funnel</a></div>
+    </div>
+
+    <section class="panel kpis" aria-label="Key metrics" id="kpis"></section>
+
+    <div class="grid">
+      <section class="panel">
+        <header><h2>Monthly recurring revenue</h2><small>₹ lakh · last 12 months</small></header>
+        <div class="body" id="mrr"><div class="tip" id="tip"></div></div>
+      </section>
+      <section class="panel">
+        <header><h2>Plan mix</h2><small id="subsLabel">of 12,480 subscribers</small></header>
+        <div class="body">
+          <div class="stack" id="stack" role="img" aria-label="Monthly 58%, Annual 37%, Lifetime 5%"></div>
+          <ul class="plans" id="plans"></ul>
+          <div class="split">
+            <div class="row"><span>iOS <b>61%</b></span><span>Android <b>39%</b></span></div>
+            <div class="bar" aria-hidden="true"><i style="flex:61;background:#1C1A22"></i><i style="flex:39;background:#A9A4B1"></i></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="grid halves">
+      <section class="panel">
+        <header><h2>Cohort retention</h2><small>% of subscribers still paying</small></header>
+        <div class="body scroll" tabindex="0" aria-label="Cohort retention table"><table class="cohort" id="cohort"></table></div>
+      </section>
+      <section class="panel">
+        <header><h2>Recent events</h2><small>today</small></header>
+        <div class="body scroll" tabindex="0" aria-label="Recent events table"><table id="events"></table></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+const D = {
+  all:     { share: 1,     mrr: 18.4, mrrD: 6.2, subs: 12480, subsD: 410, t2p: 9.8,  t2pD: -0.7, churn: 4.1, churnD: 0.3, arpu: 147, arpuD: 2 },
+  ios:     { share: 0.647, mrr: 11.9, mrrD: 7.0, subs: 7613,  subsD: 300, t2p: 10.6, t2pD: -0.2, churn: 3.7, churnD: 0.1, arpu: 156, arpuD: 3 },
+  android: { share: 0.353, mrr: 6.5,  mrrD: 4.8, subs: 4867,  subsD: 110, t2p: 8.4,  t2pD: -1.4, churn: 4.7, churnD: 0.6, arpu: 133, arpuD: 0 },
+};
+const MONTHS = ['Nov','Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+const MRR = [11.2, 11.9, 12.4, 12.8, 13.9, 14.6, 15.1, 15.8, 16.3, 16.9, 17.3, 18.4];
+const SENT = {
+  all: `MRR is <b>₹18.4L</b>, up 6.2% on September. Growth is coming from iOS; on Android, trial conversion fell after v3.2 and churn edged up to 4.1%.`,
+  ios: `iOS MRR is <b>₹11.9L</b>, up 7.0%. Conversion and churn are steady, so this is the healthy half of the business today.`,
+  android: `Android MRR is <b>₹6.5L</b>, up only 4.8%. Trial conversion fell 1.4 pts after v3.2 and churn rose to 4.7%: this is what to look at first.`,
+};
+let platform = 'all';
+
+const fmt = n => n.toLocaleString('en-IN');
+function kpis() {
+  const d = D[platform];
+  // good/bad depends on the metric's direction, and every delta carries a sign, not colour alone
+  const item = (label, value, delta, good, unit, lead) => `
+    <div class="kpi${lead ? ' lead' : ''}"><div class="label">${label}</div><div class="value">${value}</div>
+    <div class="delta ${good ? 'good' : 'bad'}">${delta >= 0 ? '▲' : '▼'} ${delta >= 0 ? '+' : '−'}${Math.abs(delta)}${unit} <span>vs Sep</span></div></div>`;
+  document.getElementById('kpis').innerHTML =
+    item('MRR', `₹${d.mrr}L`, d.mrrD, d.mrrD >= 0, '%', true) +
+    item('Active subscribers', fmt(d.subs), d.subsD, d.subsD >= 0, '') +
+    item('Trial to paid', `${d.t2p}%`, d.t2pD, d.t2pD >= 0, ' pts') +
+    item('Monthly churn', `${d.churn}%`, d.churnD, d.churnD <= 0, ' pts') +
+    item('ARPU', `₹${d.arpu}`, d.arpuD, d.arpuD >= 0, '');
+  document.getElementById('sentence').innerHTML = SENT[platform];
+}
+
+function chart() {
+  const box = document.getElementById('mrr'), tip = document.getElementById('tip');
+  const k = D[platform].share, data = MRR.map(v => +(v * k).toFixed(1));
+  box.querySelectorAll('svg, details').forEach(n => n.remove());
+  const W = Math.max(box.clientWidth - 40, 280), H = 280, L = 36, R = 56, T = 12, B = 28;
+  const lo = Math.floor(Math.min(...data) / 2) * 2 - 2, hi = Math.ceil(Math.max(...data) / 2) * 2;
+  const x = i => L + (i / (data.length - 1)) * (W - L - R);
+  const y = v => T + (1 - (v - lo) / (hi - lo)) * (H - T - B);
+  const step = (hi - lo) > 10 ? 4 : 2;
+  let grid = '';
+  for (let v = lo; v <= hi; v += step) grid += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#ECE9EF"/><text x="${L - 8}" y="${y(v) + 4}" text-anchor="end" font-size="12" fill="#625E6B">${v}</text>`;
+  const xl = MONTHS.map((m, i) => (i % (W < 520 ? 2 : 1) === 0 || i === 11) ? `<text x="${x(i)}" y="${H - 6}" text-anchor="middle" font-size="12" fill="#625E6B">${m}</text>` : '').join('');
+  const path = data.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join('');
+  const area = `${path}L${x(11)},${y(lo)}L${x(0)},${y(lo)}Z`;
+  const last = data[11];
+  box.insertAdjacentHTML('afterbegin', `
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="MRR rose from ₹${data[0]} lakh in November to ₹${last} lakh in October">
+      <defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7B2D5E" stop-opacity=".14"/><stop offset="1" stop-color="#7B2D5E" stop-opacity="0"/></linearGradient></defs>
+      ${grid}${xl}
+      <path d="${area}" fill="url(#fill)"/>
+      <path d="${path}" fill="none" stroke="#7B2D5E" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="${x(11)}" cy="${y(last)}" r="4.5" fill="#7B2D5E" stroke="#fff" stroke-width="2"/>
+      <text x="${x(11) + 10}" y="${y(last) + 4}" font-size="13" font-weight="600" fill="#1C1A22">₹${last}L</text>
+      <g id="hover" opacity="0"><line id="hl" y1="${T}" y2="${H - B}" stroke="#A9A4B1" stroke-dasharray="3 3"/><circle id="hc" r="5" fill="#7B2D5E" stroke="#fff" stroke-width="2"/></g>
+      <rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}" fill="transparent" id="hit"/>
+    </svg>
+    <details class="table-view"><summary>View as table</summary><table><tr>${MONTHS.map(m => `<th class="num">${m}</th>`).join('')}</tr><tr>${data.map(v => `<td class="num">${v}</td>`).join('')}</tr></table></details>`);
+  const svg = box.querySelector('svg'), hov = svg.querySelector('#hover');
+  svg.querySelector('#hit').addEventListener('pointermove', e => {
+    const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) * (W / r.width);
+    const i = Math.max(0, Math.min(11, Math.round((px - L) / ((W - L - R) / 11))));
+    hov.setAttribute('opacity', 1);
+    svg.querySelector('#hl').setAttribute('x1', x(i)); svg.querySelector('#hl').setAttribute('x2', x(i));
+    svg.querySelector('#hc').setAttribute('cx', x(i)); svg.querySelector('#hc').setAttribute('cy', y(data[i]));
+    const mom = i ? ((data[i] / data[i - 1] - 1) * 100).toFixed(1) : null;
+    tip.innerHTML = `<b>${MONTHS[i]} ${i < 2 ? 2025 : 2026}</b> · ₹${data[i]}L${mom !== null ? ` · ${mom >= 0 ? '+' : ''}${mom}%` : ''}`;
+    tip.style.left = (x(i) * r.width / W + 20) + 'px'; tip.style.top = (y(data[i]) * r.height / H + 12) + 'px'; tip.style.opacity = 1;
+  });
+  svg.querySelector('#hit').addEventListener('pointerleave', () => { hov.setAttribute('opacity', 0); tip.style.opacity = 0; });
+}
+
+function plans() {
+  const subs = D[platform].subs;
+  const P = [['Monthly', '₹199 / month', 58, 'var(--s1)'], ['Annual', '₹1,499 / year', 37, 'var(--s2)'], ['Lifetime', '₹3,999 once', 5, 'var(--s3)']];
+  document.getElementById('stack').innerHTML = P.map(p => `<i style="flex:${p[2]};background:${p[3]}" title="${p[0]} ${p[2]}%"></i>`).join('');
+  document.getElementById('plans').innerHTML = P.map(p => `<li><span class="sw" style="background:${p[3]}"></span><span><span class="name">${p[0]}</span><br><span class="meta">${p[1]}</span></span><span class="pct">${p[2]}%<small>${fmt(Math.round(subs * p[2] / 100))} subs</small></span></li>`).join('');
+  document.getElementById('subsLabel').textContent = `of ${fmt(subs)} subscribers`;
+}
+
+function cohort() {
+  const rows = [['May', [100, 71, 62, 57, 53, 50]], ['Jun', [100, 70, 61, 55, 52]], ['Jul', [100, 72, 63, 58]], ['Aug', [100, 69, 60]], ['Sep', [100, 66]], ['Oct', [100]]];
+  const ramp = ['#cde2fb', '#b7d3f6', '#9ec5f4', '#86b6ef', '#6da7ec', '#5598e7', '#3987e5', '#2a78d6', '#256abf'];
+  const bg = v => ramp[Math.max(0, Math.min(8, Math.round((v - 45) / 55 * 8)))];
+  const ink = v => v >= 80 ? '#fff' : '#1C1A22';
+  let h = `<tr><th>Cohort</th>${[0, 1, 2, 3, 4, 5].map(m => `<th class="num">M${m}</th>`).join('')}</tr>`;
+  for (const [c, vals] of rows) {
+    h += `<tr><td>${c} 2026</td>` + [0, 1, 2, 3, 4, 5].map(i => vals[i] == null ? '<td class="empty"></td>' :
+      `<td class="cell" style="background:${bg(vals[i])};color:${ink(vals[i])}" title="${c} cohort, month ${i}: ${vals[i]}% still paying">${vals[i]}</td>`).join('') + '</tr>';
+  }
+  document.getElementById('cohort').innerHTML = h;
+}
+
+function events() {
+  const E = [
+    ['07:12', 'new', 'New subscription', 'u_48213', 'Annual', 'iOS', 1499],
+    ['07:05', 'renew', 'Renewal', 'u_19077', 'Monthly', 'Android', 199],
+    ['06:58', 'cancel', 'Cancellation', 'u_33502', 'Monthly', 'Android', 0],
+    ['06:41', 'new', 'New subscription', 'u_48209', 'Monthly', 'iOS', 199],
+    ['06:30', 'refund', 'Refund', 'u_47110', 'Annual', 'Android', -1499],
+    ['06:12', 'renew', 'Renewal', 'u_08834', 'Annual', 'iOS', 1499],
+    ['05:47', 'new', 'New subscription', 'u_48198', 'Lifetime', 'iOS', 3999],
+    ['05:20', 'cancel', 'Cancellation', 'u_29961', 'Monthly', 'iOS', 0],
+  ].filter(e => platform === 'all' || e[5].toLowerCase() === platform);
+  document.getElementById('events').innerHTML = `<tr><th>Time</th><th>Event</th><th>User</th><th>Plan</th><th>Platform</th><th class="num">Amount</th></tr>` +
+    E.map(e => `<tr><td>${e[0]}</td><td><span class="pill ${e[1]}">${e[2]}</span></td><td>${e[3]}</td><td>${e[4]}</td><td>${e[5]}</td><td class="num amt ${e[6] < 0 ? 'neg' : ''}">${e[6] === 0 ? '—' : (e[6] < 0 ? '−₹' : '₹') + fmt(Math.abs(e[6]))}</td></tr>`).join('');
+}
+
+function render() { kpis(); chart(); plans(); events(); }
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  platform = b.dataset.p;
+  document.querySelectorAll('.seg button').forEach(o => o.setAttribute('aria-pressed', o === b));
+  render();
+}));
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(chart, 120); });
+cohort(); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kinara Dental Care · Dentist in Borivali West</title>
+<meta name="description" content="Pain-free dental care on S.V. Road, Borivali West. Prices shown before treatment. Book a check-up on WhatsApp.">
+<!--
+  PLAN
+  Subject: a neighbourhood dental clinic on S.V. Road, Borivali West. Audience: price-aware families, often scared of pain, on phones.
+  Primary job: book a check-up on WhatsApp (or call) within 30 seconds.
+  The one bold thing: the clinic's printed RATE CARD as the hero visual. Honest prices are the reason to trust this clinic,
+  so the hero shows them instead of a stock smile photo.
+  Palette: paper #FBFAF7, ink (deep sea green) #13302E, secondary #3E5652, mint surface #E6F0EB, line #DDE5E1,
+           action green #157347 (bookings only), marigold #E9A21B (rating stars only).
+  Type: Bricolage Grotesque for headings; Figtree for body, tabular figures for prices.
+  Layout: left-aligned hero, headline + actions on the left and the rate card on the right. On a phone the order is
+  headline → actions → open-now status → rate card. Sticky WhatsApp bar on mobile. No motion beyond hover/focus.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #FBFAF7; --surface: #FFFFFF; --ink: #13302E; --ink-2: #3E5652; --mint: #E6F0EB; --line: #DDE5E1;
+    --act: #157347; --act-dark: #0F5C38; --star: #E9A21B;
+    --display: "Bricolage Grotesque", Georgia, serif; --body: "Figtree", system-ui, sans-serif;
+    --wrap: 1160px;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.6 var(--body); }
+  img, svg { display: block; }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--act); outline-offset: 3px; border-radius: 6px; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 650; line-height: 1.1; letter-spacing: -0.02em; margin: 0; }
+  p { margin: 0; }
+  .wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* header */
+  .head { position: sticky; top: 0; z-index: 10; background: rgba(251,250,247,.94); backdrop-filter: saturate(1.2) blur(6px); border-bottom: 1px solid var(--line); }
+  .head .wrap { display: flex; align-items: center; gap: 32px; height: 68px; }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--display); font-weight: 650; font-size: 19px; letter-spacing: -0.01em; }
+  .menu { display: flex; gap: 24px; margin-left: auto; font-weight: 500; font-size: 15px; }
+  .menu a { text-decoration: none; color: var(--ink-2); padding: 8px 0; }
+  .menu a:hover { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 48px; padding: 0 22px; border-radius: 999px; font: 600 16px/1 var(--body); text-decoration: none; border: 2px solid transparent; cursor: pointer; transition: background .15s; }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .btn-act { background: var(--act); color: #fff; }
+  .btn-act:hover { background: var(--act-dark); }
+  .btn-line { border-color: var(--ink); color: var(--ink); background: transparent; }
+  .btn-line:hover { background: var(--ink); color: #fff; }
+  .head .btn { min-height: 42px; padding: 0 18px; font-size: 15px; }
+
+  /* hero */
+  .hero { padding: 72px 0 96px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 64px; align-items: center; }
+  .hero h1 { font-size: clamp(40px, 5.4vw, 68px); max-width: 13ch; }
+  .lede { font-size: 19px; color: var(--ink-2); max-width: 34rem; margin-top: 24px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 24px; font-size: 15px; color: var(--ink-2); }
+  .facts span { display: inline-flex; align-items: center; gap: 8px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--act); box-shadow: 0 0 0 4px rgba(21,115,71,.15); }
+  .dot.closed { background: #9AA8A4; box-shadow: none; }
+  .stars { color: var(--star); letter-spacing: 1px; }
+
+  /* the rate card */
+  .card { background: var(--surface); padding: 32px 32px 28px; position: relative; box-shadow: 0 1px 0 var(--line), 0 18px 40px -24px rgba(19,48,46,.35);
+    --perf: radial-gradient(circle at 8px 0, transparent 6px, #000 6.5px);
+    -webkit-mask: var(--perf) top / 16px 51% repeat-x, radial-gradient(circle at 8px 100%, transparent 6px, #000 6.5px) bottom / 16px 51% repeat-x;
+            mask: var(--perf) top / 16px 51% repeat-x, radial-gradient(circle at 8px 100%, transparent 6px, #000 6.5px) bottom / 16px 51% repeat-x; }
+  .card-top { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 2px solid var(--ink); padding-bottom: 12px; margin-bottom: 8px; }
+  .card-top h2 { font-size: 24px; }
+  .card-top small { color: var(--ink-2); font-size: 14px; }
+  .rates { list-style: none; margin: 0; padding: 0; }
+  .rates li { display: flex; align-items: baseline; gap: 8px; padding: 11px 0; border-bottom: 1px dashed var(--line); font-size: 16px; }
+  .rates li:last-child { border-bottom: 0; }
+  .rates .lead { flex: 1; border-bottom: 2px dotted #C9D4CF; transform: translateY(-4px); min-width: 16px; }
+  .rates .from { color: var(--ink-2); font-size: 13px; margin-right: 2px; }
+  .rates b { font-weight: 600; font-variant-numeric: tabular-nums; }
+  .card-foot { margin-top: 16px; padding-top: 16px; border-top: 2px solid var(--ink); font-size: 14px; color: var(--ink-2); }
+
+  /* sections */
+  section.block { padding: 96px 0; border-top: 1px solid var(--line); }
+  .block h2 { font-size: clamp(30px, 3.6vw, 44px); max-width: 26ch; text-wrap: balance; }
+  .intro { color: var(--ink-2); max-width: 36rem; margin-top: 16px; }
+
+  .promises { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px 64px; margin-top: 48px; }
+  .promise { display: grid; grid-template-columns: 48px 1fr; gap: 16px; }
+  .promise .ic { width: 48px; height: 48px; border-radius: 12px; background: var(--mint); display: grid; place-items: center; }
+  .promise h3 { font-size: 21px; margin-bottom: 6px; }
+  .promise p { color: var(--ink-2); }
+
+  .docs { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 48px; }
+  .doc { background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: grid; grid-template-columns: 88px 1fr; gap: 24px; align-items: start; }
+  .mono { width: 88px; height: 88px; border-radius: 50%; background: var(--mint); display: grid; place-items: center; font: 650 30px/1 var(--display); color: var(--ink); }
+  .doc h3 { font-size: 24px; }
+  .cred { color: var(--ink-2); font-size: 15px; margin: 4px 0 12px; }
+  .doc blockquote { margin: 0; font-size: 16px; }
+
+  .reviews { display: grid; grid-template-columns: 280px 1fr; gap: 64px; margin-top: 48px; align-items: start; }
+  .score .big { font: 650 88px/1 var(--display); letter-spacing: -0.04em; }
+  .score p { color: var(--ink-2); margin-top: 8px; }
+  .score .stars { font-size: 22px; margin-top: 8px; }
+  .quotes { display: grid; gap: 32px; }
+  .quotes figure { margin: 0; padding-left: 24px; border-left: 3px solid var(--mint); }
+  .quotes blockquote { margin: 0; font-size: 19px; line-height: 1.5; }
+  .quotes figcaption { margin-top: 8px; color: var(--ink-2); font-size: 15px; }
+
+  .visit { display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; margin-top: 48px; align-items: start; }
+  .hours { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  .hours th, .hours td { text-align: left; padding: 12px 8px; border-bottom: 1px solid var(--line); font-weight: 400; }
+  .hours th { font-weight: 500; width: 40%; }
+  .hours tr.today { background: var(--mint); }
+  .hours tr.today th::after { content: " · today"; color: var(--act); font-weight: 600; }
+  address { font-style: normal; margin-top: 32px; line-height: 1.7; }
+  .map { border-radius: 20px; overflow: hidden; border: 1px solid var(--line); background: #EEF2EF; }
+  .map figcaption { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; background: var(--surface); border-top: 1px solid var(--line); font-size: 15px; color: var(--ink-2); }
+  .map figcaption a { font-weight: 600; color: var(--act); }
+
+  .faq { max-width: 760px; margin-top: 40px; }
+  .faq details { border-bottom: 1px solid var(--line); }
+  .faq summary { list-style: none; cursor: pointer; padding: 20px 40px 20px 0; position: relative; font: 600 19px/1.4 var(--body); }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: ""; position: absolute; right: 8px; top: 50%; width: 12px; height: 12px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); transform: translateY(-75%) rotate(45deg); transition: transform .2s; }
+  .faq details[open] summary::after { transform: translateY(-25%) rotate(-135deg); }
+  .faq p { padding: 0 0 24px; color: var(--ink-2); max-width: 62ch; }
+
+  .cta-end { background: var(--ink); color: #fff; padding: 72px 0; }
+  .cta-end .wrap { display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
+  .cta-end h2 { font-size: clamp(28px, 3.4vw, 40px); max-width: 18ch; }
+  .cta-end .btn-line { border-color: #fff; color: #fff; }
+  .cta-end .btn-line:hover { background: #fff; color: var(--ink); }
+  footer { padding: 32px 0 40px; font-size: 14px; color: var(--ink-2); }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+  .bar { display: none; }
+  @media (max-width: 900px) {
+    .menu { display: none; }
+    .head .wrap { justify-content: space-between; height: 60px; }
+    .hero { padding: 40px 0 64px; }
+    .hero .wrap, .reviews, .visit { grid-template-columns: 1fr; gap: 40px; }
+    .promises, .docs { grid-template-columns: 1fr; }
+    section.block { padding: 64px 0; }
+  }
+  @media (max-width: 560px) {
+    body { font-size: 16px; padding-bottom: 76px; }
+    .wrap { padding: 0 20px; }
+    .logo span { display: none; }
+    .head .btn { padding: 0 14px; }
+    .lede { font-size: 17px; }
+    .actions .btn { width: 100%; }
+    .card { padding: 28px 20px 24px; }
+    .doc { grid-template-columns: 1fr; padding: 24px; }
+    .mono { width: 64px; height: 64px; font-size: 22px; }
+    .score .big { font-size: 64px; }
+    .quotes blockquote { font-size: 17px; }
+    .bar { display: flex; gap: 8px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--line); }
+    .bar .btn-act { flex: 1; }
+    .bar .btn-line { width: 52px; padding: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<header class="head">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="Kinara Dental Care, home">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="16" fill="#13302E"/><path d="M7 20c3-3 6-3 9 0s7 3 11-1" fill="none" stroke="#E6F0EB" stroke-width="2.4" stroke-linecap="round"/><path d="M9 14c2.5-2 5-2 7.5 0s5.5 2 8.5-.5" fill="none" stroke="#E6F0EB" stroke-width="1.6" stroke-linecap="round" opacity=".6"/></svg>
+      <span>Kinara Dental Care</span>
+    </a>
+    <nav class="menu" aria-label="Main">
+      <a href="#prices">Prices</a><a href="#dentists">Dentists</a><a href="#reviews">Reviews</a><a href="#visit">Visit</a><a href="#faq">FAQ</a>
+    </nav>
+    <a class="btn btn-line" href="tel:+919820041762"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>Call 98200 41762</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <h1>The Borivali dentist who tells you the price first.</h1>
+        <p class="lede">Pain-free check-ups, single-sitting root canals and implants on S.V. Road. Dr. Ananya Kulkarni and Dr. Rohan Shah write down your treatment cost before anything starts.</p>
+        <div class="actions">
+          <a class="btn btn-act" href="https://wa.me/919820041762?text=Hi%2C%20I%27d%20like%20to%20book%20a%20check-up%20at%20Kinara%20Dental%20Care." rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.4.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3Z"/></svg>
+            Book a check-up on WhatsApp
+          </a>
+          <a class="btn btn-line" href="tel:+919820041762">Call 98200 41762</a>
+        </div>
+        <div class="facts">
+          <span id="openNow"><i class="dot"></i>Open today 10:00–14:00 and 17:00–21:00</span>
+          <span><span class="stars" aria-hidden="true">★★★★★</span> 4.9 from 612 Google reviews</span>
+        </div>
+      </div>
+
+      <aside class="card" id="prices" aria-labelledby="rate-title">
+        <div class="card-top"><h2 id="rate-title">Rate card</h2><small>October 2026</small></div>
+        <ul class="rates num">
+          <li><span>Kids' dentistry</span><i class="lead"></i><span class="from">from</span><b>₹800</b></li>
+          <li><span>Cleaning &amp; polishing</span><i class="lead"></i><b>₹1,200</b></li>
+          <li><span>Tooth-coloured filling</span><i class="lead"></i><span class="from">from</span><b>₹1,500</b></li>
+          <li><span>Single-sitting root canal</span><i class="lead"></i><span class="from">from</span><b>₹5,500</b></li>
+          <li><span>Dental implant</span><i class="lead"></i><span class="from">from</span><b>₹28,000</b></li>
+          <li><span>Clear aligners</span><i class="lead"></i><span class="from">from</span><b>₹65,000</b></li>
+        </ul>
+        <p class="card-foot">Your exact price is written on your treatment plan before we start. Implants and aligners can be paid in monthly EMIs.</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="block" aria-labelledby="why">
+    <div class="wrap">
+      <h2 id="why">What happens when you visit</h2>
+      <div class="promises">
+        <div class="promise"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#13302E" stroke-width="1.8" aria-hidden="true"><path d="M4 12c4-1 6-4 8-8 2 4 4 7 8 8-4 1-6 4-8 8-2-4-4-7-8-8Z"/></svg></div>
+          <div><h3>We numb before we start</h3><p>A numbing gel goes on before every injection, and we stop whenever you raise your hand. Most root canals here finish in one sitting.</p></div></div>
+        <div class="promise"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#13302E" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></div>
+          <div><h3>The price, in writing, first</h3><p>After your check-up you get a written plan with the full cost. The bill matches it. No surprise charges on the day.</p></div></div>
+        <div class="promise"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#13302E" stroke-width="1.8" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="2"/><path d="M9 7V5h6v2M4 12h16"/></svg></div>
+          <div><h3>A fresh kit, opened in front of you</h3><p>Every patient gets a sterilised, single-use kit. You will see us open the seal.</p></div></div>
+        <div class="promise"><div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#13302E" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M8 11c1-2 2-2 3 0s2 2 3 0 2-2 3 0"/></svg></div>
+          <div><h3>Digital X-rays, on screen</h3><p>Lower radiation than film, and we show you the image while we explain what we see.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="dentists" aria-labelledby="docs-h">
+    <div class="wrap">
+      <h2 id="docs-h">Your dentists</h2>
+      <div class="docs">
+        <article class="doc"><div class="mono" aria-hidden="true">AK</div>
+          <div><h3>Dr. Ananya Kulkarni</h3><p class="cred">BDS, MDS Endodontics · 11 years</p>
+          <blockquote>"Most people who come to me are scared of root canals. My job is to make sure the numbing is the only thing you feel."</blockquote></div></article>
+        <article class="doc"><div class="mono" aria-hidden="true">RS</div>
+          <div><h3>Dr. Rohan Shah</h3><p class="cred">BDS, MDS Prosthodontics · 9 years</p>
+          <blockquote>"I plan implants and smile makeovers with you on screen, so you know what your teeth will look like, and cost, before we begin."</blockquote></div></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="reviews" aria-labelledby="rev-h">
+    <div class="wrap">
+      <h2 id="rev-h">What patients from the area say</h2>
+      <div class="reviews">
+        <div class="score"><div class="big num">4.9</div><div class="stars" aria-label="4.9 out of 5 stars">★★★★★</div><p>612 reviews on Google</p></div>
+        <div class="quotes">
+          <figure><blockquote>"I had put off my root canal for two years out of fear. Dr. Ananya finished it in one sitting and I only felt the numbing gel."</blockquote><figcaption>Sneha, Kandivali West</figcaption></figure>
+          <figure><blockquote>"They told me the implant cost before the X-ray was even done, and the final bill matched it to the rupee."</blockquote><figcaption>Mahesh, Borivali East</figcaption></figure>
+          <figure><blockquote>"My six-year-old now asks when she can go back. They are so patient with kids."</blockquote><figcaption>Farah, Dahisar</figcaption></figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="visit" aria-labelledby="visit-h">
+    <div class="wrap">
+      <h2 id="visit-h">Visit us on S.V. Road</h2>
+      <div class="visit">
+        <div>
+          <table class="hours" id="hours">
+            <caption style="position:absolute;left:-9999px">Opening hours</caption>
+            <tr data-d="1"><th>Monday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="2"><th>Tuesday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="3"><th>Wednesday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="4"><th>Thursday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="5"><th>Friday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="6"><th>Saturday</th><td>10:00–14:00, 17:00–21:00</td></tr>
+            <tr data-d="0"><th>Sunday</th><td>By appointment</td></tr>
+          </table>
+          <address>
+            <strong>Kinara Dental Care</strong><br>
+            Shop 4, Gokul Arcade, S.V. Road<br>
+            Borivali West, Mumbai 400092<br>
+            <a href="tel:+919820041762">+91 98200 41762</a> (call or WhatsApp)
+          </address>
+        </div>
+        <figure class="map">
+          <svg viewBox="0 0 560 300" width="100%" role="img" aria-label="Map: the clinic is on S.V. Road, a short walk from Borivali station (West)">
+            <rect width="560" height="300" fill="#EEF2EF"/>
+            <path d="M0 210 L560 120" stroke="#fff" stroke-width="26"/><path d="M0 210 L560 120" stroke="#DDE5E1" stroke-width="1"/>
+            <text x="360" y="128" font-size="13" fill="#3E5652" font-family="Figtree" transform="rotate(-9 360 128)">S.V. Road</text>
+            <path d="M120 0 L200 300" stroke="#fff" stroke-width="14"/>
+            <path d="M440 0 L470 300" stroke="#9AA8A4" stroke-width="4" stroke-dasharray="14 8"/>
+            <text x="482" y="40" font-size="13" fill="#3E5652" font-family="Figtree">Western line</text>
+            <rect x="430" y="196" width="60" height="28" rx="6" fill="#13302E"/><text x="460" y="215" font-size="12" fill="#fff" text-anchor="middle" font-family="Figtree">Station</text>
+            <circle cx="300" cy="158" r="28" fill="#157347" opacity=".15"/>
+            <path d="M300 128c-11 0-19 8-19 19 0 14 19 31 19 31s19-17 19-31c0-11-8-19-19-19Z" fill="#157347"/><circle cx="300" cy="147" r="6" fill="#fff"/>
+            <text x="300" y="200" font-size="14" font-weight="600" fill="#13302E" text-anchor="middle" font-family="Figtree">Kinara Dental Care</text>
+          </svg>
+          <figcaption><span>About 6 minutes' walk from Borivali station (West)</span><a href="https://www.google.com/maps/search/?api=1&query=Gokul+Arcade+S.V.+Road+Borivali+West" rel="noopener">Open in Google Maps</a></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <h2 id="faq-h">Questions people ask before booking</h2>
+      <div class="faq">
+        <details><summary>Will it hurt?</summary><p>We numb the area with gel before any injection and use a fine needle, so most patients feel only a light pinch. You can stop us at any point by raising your hand.</p></details>
+        <details><summary>How much will my treatment cost?</summary><p>Starting prices are on the rate card above. After your check-up and X-ray, we give you the exact cost in writing before any treatment starts.</p></details>
+        <details><summary>Can I pay in EMIs?</summary><p>Yes. Implants and clear aligners can be paid in monthly instalments. Message us on WhatsApp and we will share a plan for your treatment.</p></details>
+        <details><summary>How long does the first visit take?</summary><p>About 30 minutes: a check-up, a digital X-ray if needed, and a written treatment plan with prices.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-end">
+    <div class="wrap">
+      <h2>Book a check-up today. It takes one WhatsApp message.</h2>
+      <div class="actions" style="margin:0">
+        <a class="btn btn-act" href="https://wa.me/919820041762?text=Hi%2C%20I%27d%20like%20to%20book%20a%20check-up%20at%20Kinara%20Dental%20Care." rel="noopener">Book on WhatsApp</a>
+        <a class="btn btn-line" href="tel:+919820041762">Call 98200 41762</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span>Kinara Dental Care · Shop 4, Gokul Arcade, S.V. Road, Borivali West, Mumbai 400092</span><span>© 2026</span></div>
+</footer>
+
+<nav class="bar" aria-label="Quick booking">
+  <a class="btn btn-act" href="https://wa.me/919820041762?text=Hi%2C%20I%27d%20like%20to%20book%20a%20check-up%20at%20Kinara%20Dental%20Care." rel="noopener">Book on WhatsApp</a>
+  <a class="btn btn-line" href="tel:+919820041762" aria-label="Call 98200 41762"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></a>
+</nav>
+
+<script>
+// Open-now line and today's row, in Mumbai time
+(() => {
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
+  const d = now.getDay(), m = now.getHours() * 60 + now.getMinutes();
+  document.querySelector(`#hours tr[data-d="${d}"]`)?.classList.add('today');
+  const el = document.getElementById('openNow');
+  let text, open = false;
+  if (d === 0) text = 'Sunday: by appointment. Message us to book';
+  else if (m >= 600 && m < 840) { open = true; text = 'Open now, until 2:00 pm'; }
+  else if (m >= 1020 && m < 1260) { open = true; text = 'Open now, until 9:00 pm'; }
+  else if (m < 600) text = 'Opens today at 10:00 am';
+  else if (m < 1020) text = 'Closed for lunch, opens 5:00 pm';
+  else text = d === 6 ? 'Closed now. Sunday by appointment' : 'Closed now, opens 10:00 am tomorrow';
+  el.innerHTML = `<i class="dot${open ? '' : ' closed'}"></i>${text}`;
+})();
+</script>
+</body>
+</html>
