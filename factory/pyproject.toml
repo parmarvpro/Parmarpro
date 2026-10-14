@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unit-economics"
+version = "0.1.0"
+description = "Pricing and unit-economics engine for physical products, with Excel workbooks verified against the engine"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+workbook = ["openpyxl>=3.1"]
+
+[project.scripts]
+unit-economics = "unit_economics.cli:main"
+
+[tool.setuptools]
+packages = ["unit_economics"]

@@ -1,0 +1,50 @@
+name: factory tests
+
+on:
+  push:
+    paths:
+      - "factory/**"
+      - ".github/workflows/factory-tests.yml"
+  pull_request:
+    paths:
+      - "factory/**"
+      - ".github/workflows/factory-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11" # the oldest supported version (tomllib)
+
+      - name: Install LibreOffice Calc (workbook recalculation tests)
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q --no-install-recommends libreoffice-calc
+
+      - name: Install the package with workbook support
+        run: pip install "./factory[workbook]"
+
+      - name: Unit tests
+        working-directory: factory
+        run: python -m unittest discover -s tests -v
+
+      - name: Command-line smoke test
+        working-directory: factory
+        run: |
+          unit-economics report examples/example_product.toml --out "$RUNNER_TEMP/report.md"
+          unit-economics verify examples/example_product.toml
+          # the example contains a deliberate pricing error, so `check` must exit 1
+          set +e
+          unit-economics check examples/example_product.toml
+          status=$?
+          set -e
+          test "$status" -eq 1

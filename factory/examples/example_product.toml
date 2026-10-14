@@ -1,0 +1,220 @@
+# FICTIONAL example used by the tests and as a template for new products.
+# None of these numbers describe a real business.
+#
+# Every number can be written plainly (`mrp = 100`) or with its provenance:
+#   mrp = { value = 100, status = "quote", source = "Supplier quote #123, 2026-10-01" }
+# status is one of: report, assumption, research, quote, actual, unspecified.
+# In lists (components, routes, costs, offers, opex) `status` and `source` can be
+# given once for the item instead.
+
+[meta]
+name = "Example Co. sample pack (FICTIONAL)"
+unit = "pack"
+currency_symbol = "₹"
+confidential = false
+notes = "Fictional numbers for tests and demos. Not data about any real business."
+
+[product]
+mrp = { value = 100, status = "assumption", source = "example" }
+landed_cost = { value = 40, status = "assumption", source = "example" }
+gst_rate = 0.0                      # output GST on the product; prices are tax-inclusive
+planning_cost_min = 48              # stated planning range for the fully loaded cost
+planning_cost_max = 52
+
+# Per-unit allocations on top of the landed cost. `channels` says which routes carry them.
+[[product.components]]
+id = "freight"
+name = "Inbound freight"
+amount = 2
+channels = ["offline", "online"]
+status = "assumption"
+source = "example"
+
+[[product.components]]
+id = "field_sales"
+name = "Field sales and travel"
+amount = 5
+channels = ["offline"]
+
+[[product.components]]
+id = "admin"
+name = "Admin allocation"
+amount = 3
+
+# ----------------------------------------------------------------------------- offline
+# via = "direct": `price` is what the retailer pays the brand.
+# via = "distributor": `price` is what the distributor pays; `retailer_price` is what
+# the retailer pays the distributor. `scheme = "10+1"` gives 1 free unit per 10 bought.
+
+[[offline.routes]]
+id = "direct_70"
+name = "Direct to retailer @ 70"
+via = "direct"
+price = 70
+
+[[offline.routes]]
+id = "dist_60"
+name = "Distributor @ 60, retailer @ 70"
+via = "distributor"
+price = 60
+retailer_price = 70
+
+[[offline.routes]]
+id = "direct_70_scheme"
+name = "Direct @ 70 with 10+1"
+via = "direct"
+price = 70
+scheme = "10+1"
+
+# ----------------------------------------------------------------------------- online
+
+[[online]]
+id = "web"
+name = "Web store"
+unit_cost_basis = "landed"          # or "loaded": landed + components that apply to "online"
+irrecoverable_input_gst = 0.0       # GST you pay on flagged cost lines and cannot reclaim
+customer_shipping_fee = 30          # charged on orders below the threshold
+free_shipping_threshold = 250
+
+[[online.costs]]
+id = "shipping"
+name = "Shipping and fulfilment"
+kind = "shipping"
+basis = "per_order"
+amount = 50
+input_gst = true
+
+[[online.costs]]
+id = "packaging"
+name = "Packaging"
+basis = "per_order"
+amount = 5
+
+[[online.costs]]
+id = "payment"
+name = "Payment gateway"
+kind = "payment"
+basis = "pct_of_order_value"
+amount = 0.02
+input_gst = true
+
+[[online.costs]]
+id = "cac"
+name = "Customer acquisition"
+kind = "marketing"
+basis = "per_order"
+amount = 40
+input_gst = true
+
+[[online.costs]]
+id = "returns"
+name = "Returns reserve"
+basis = "per_unit"
+amount = 1
+
+[[online.offers]]
+id = "single"
+name = "Single"
+units = 1
+price = 99
+
+[[online.offers]]
+id = "trio"
+name = "3-pack"
+units = 3
+price = 270
+
+[[online.offers]]
+id = "six"
+name = "6-pack"
+units = 6
+price = 520
+
+[[online.offers]]
+id = "twelve"
+name = "12-pack"
+units = 12
+price = 1050
+
+# Offers sold together. The ladder check asks: is each pack cheaper than any
+# mix of smaller packs on the same card?
+[[online.price_cards]]
+id = "full"
+name = "Full range"
+offers = ["single", "trio", "six", "twelve"]
+
+[[online.price_cards]]
+id = "core"
+name = "Core range"
+offers = ["single", "trio", "six"]
+
+# ----------------------------------------------------------------------------- scenarios
+
+[[scenarios]]
+id = "month"
+name = "Example month (mix-based)"
+units = 1000
+
+[[scenarios.mix]]
+name = "Distributor"
+share = 0.5
+realization = 60
+
+[[scenarios.mix]]
+name = "Web store"
+share = 0.5
+realization = 90
+
+[[scenarios.opex]]
+id = "marketing"
+name = "Marketing"
+kind = "marketing"
+amount = 10000
+
+[[scenarios.opex]]
+id = "logistics"
+name = "Logistics"
+amount = 5000
+
+[[scenarios.opex]]
+id = "admin"
+name = "Admin and software"
+amount = 4000
+
+[[scenarios]]
+id = "small"
+name = "Example month (blended input)"
+units = 500
+blended_realization = 70
+
+[[scenarios.opex]]
+id = "admin"
+name = "Admin and software"
+amount = 2000
+
+# ----------------------------------------------------------------------------- targets
+
+[targets]
+retailer_margin_min = 0.25          # fraction of MRP
+retailer_margin_max = 0.32
+min_gross_margin = 0.35             # on landed cost
+min_offline_contribution = 15       # per unit, after the loaded offline cost
+min_online_contribution = 0         # per order, after acquisition cost
+
+# ----------------------------------------------------------------------------- sensitivities
+# Each one re-runs the whole model with some inputs changed.
+
+[[sensitivities]]
+id = "gst18"
+name = "18% input GST not recoverable"
+set = { "online.web.irrecoverable_input_gst" = 0.18 }
+
+[[sensitivities]]
+id = "cac80"
+name = "Acquisition cost 80"
+set = { "online.web.costs.cac.amount" = 80 }
+
+[[sensitivities]]
+id = "landed_plus10"
+name = "Landed cost +10%"
+scale = { "product.landed_cost" = 1.1 }

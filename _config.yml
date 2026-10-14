@@ -1,0 +1,4 @@
+# GitHub Pages build settings for parmarpro.in.
+# Internal tooling in this repository is not part of the website.
+exclude:
+  - factory
