@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Base44 Spot Recreation</title>
+  <meta name="description" content="A code-only, frame-by-frame recreation of the Base44 agency spot, with a chapter timeline.">
+  <link rel="stylesheet" href="css/film.css">
+</head>
+<body>
+  <main class="player" id="player">
+    <div class="frame" id="frame">
+      <div class="stage" id="stage"></div>
+      <button class="frame-hit" id="frameHit" aria-label="Play or pause"></button>
+      <div class="paused" id="paused" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+      </div>
+    </div>
+    <div class="timeline" id="timeline" role="slider" tabindex="0" aria-label="Timeline" aria-valuemin="0" aria-valuemax="51.7" aria-valuenow="0">
+      <div class="chapters" id="chapters"></div>
+      <div class="playhead" id="playhead"><i></i></div>
+    </div>
+    <button class="sound" id="sound" aria-pressed="false" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path class="wave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="mute" d="M16 9.5l5 5m0-5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <span>Sound</span>
+    </button>
+  </main>
+
+  <script src="js/engine.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/photos.js"></script>
+  <script src="js/components.js"></script>
+  <script src="js/scenes-intro.js"></script>
+  <script src="js/scenes-problem.js"></script>
+  <script src="js/scenes-features.js"></script>
+  <script src="js/scenes-demo.js"></script>
+  <script src="js/scenes-outro.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
