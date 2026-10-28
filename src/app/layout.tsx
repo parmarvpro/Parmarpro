@@ -1,6 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { Toaster } from "sonner";
 
 import { publicEnv } from "@/lib/env";
@@ -9,6 +9,7 @@ import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const instrumentSerif = Instrument_Serif({ variable: "--font-instrument-serif", subsets: ["latin"], weight: "400", style: "italic" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.NEXT_PUBLIC_APP_URL),
@@ -56,7 +57,7 @@ const clerkAppearance = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <ClerkProvider afterSignOutUrl="/" signInUrl="/sign-in" signUpUrl="/sign-up" appearance={clerkAppearance}>
-      <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+      <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full`}>
         <body className="flex min-h-full flex-col font-sans">
           {children}
           <Toaster richColors closeButton position="top-right" toastOptions={{ classNames: { toast: "rounded-2xl" } }} />

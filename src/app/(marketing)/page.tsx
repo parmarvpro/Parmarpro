@@ -9,12 +9,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-import { BrowserFrame } from "@/components/brand/browser-frame";
 import { EyebrowTag } from "@/components/brand/eyebrow-tag";
 import { Halftone } from "@/components/brand/halftone";
 import { Sparkle } from "@/components/brand/sparkle";
 import { StepCard } from "@/components/brand/step-card";
-import { Badge } from "@/components/ui/badge";
+import { CounterFlowStage } from "@/components/motion/counter-flow-stage";
+import { IntroCurtain } from "@/components/motion/intro-curtain";
+import { SplitWords } from "@/components/motion/split-words";
 import { Button } from "@/components/ui/button";
 import { TRIAL_DAYS } from "@/lib/plans";
 
@@ -28,35 +29,39 @@ const FEATURES = [
 export default function HomePage() {
   return (
     <>
-      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-brand-500/30 bg-white">
-          <Halftone map="band" className="absolute inset-0 hidden lg:block" />
-          <div className="relative grid items-center gap-10 p-6 sm:p-10 lg:grid-cols-[1.1fr_1fr] lg:p-12">
-            <div className="space-y-6">
-              <EyebrowTag>For dental clinics in Mumbai</EyebrowTag>
-              <h1 className="headline text-4xl text-brand-500 sm:text-5xl lg:text-6xl">
-                Stop losing patients between the first call and the first visit.
-              </h1>
-              <p className="max-w-xl text-lg text-ink-700 text-pretty">
-                ParmarPro gives your front desk one place to track inquiries, follow-ups, appointments and team tasks,
-                so no interested patient is forgotten.
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Button asChild size="lg">
-                  <Link href="/sign-up">
-                    Start your {TRIAL_DAYS}-day trial <ArrowRightIcon />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline">
-                  <Link href="/contact">Talk to us</Link>
-                </Button>
-              </div>
-              <p className="text-sm text-ink-500">No card required to start the trial.</p>
-            </div>
-            <BrowserFrame>
-              <ProductPreview />
-            </BrowserFrame>
+      <IntroCurtain />
+      <section className="relative overflow-hidden">
+        <div
+          aria-hidden="true"
+          className="glow-blob pointer-events-none absolute -top-32 left-[4%] -z-10 size-[34rem] bg-[radial-gradient(closest-side,rgb(142_173_255/0.45),transparent)]"
+        />
+        <div
+          aria-hidden="true"
+          className="glow-blob pointer-events-none absolute top-24 -right-24 -z-10 size-[30rem] bg-[radial-gradient(closest-side,rgb(186_205_255/0.55),transparent)] [animation-delay:-9s]"
+        />
+        <div className="mx-auto max-w-6xl px-4 pt-12 text-center sm:px-6 sm:pt-16">
+          <EyebrowTag>For dental clinics in Mumbai</EyebrowTag>
+          <h1 className="headline mx-auto mt-6 max-w-6xl text-[clamp(2.3rem,5.6vw,5rem)] text-brand-500 [--base:450ms]">
+            <SplitWords text="Stop losing patients between the first call and the first visit." accent={["patients"]} />
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-700 text-pretty sm:text-xl">
+            ParmarPro gives your front desk one place to track inquiries, follow-ups, appointments and team tasks, so no
+            interested patient is forgotten.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button asChild size="lg">
+              <Link href="/sign-up">
+                Start your {TRIAL_DAYS}-day trial <ArrowRightIcon />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="/contact">Talk to us</Link>
+            </Button>
           </div>
+          <p className="mt-4 text-sm text-ink-500">No card required to start the trial.</p>
+        </div>
+        <div className="mx-auto mt-10 max-w-6xl px-4 pb-4 sm:mt-12 sm:px-6">
+          <CounterFlowStage />
         </div>
       </section>
 
@@ -154,42 +159,5 @@ export default function HomePage() {
         </div>
       </section>
     </>
-  );
-}
-
-/** Static illustration with clearly labelled sample data; not real clinic metrics. */
-function ProductPreview() {
-  const rows = [
-    { name: "Sample inquiry 1", source: "WhatsApp", status: "Follow-up today" },
-    { name: "Sample inquiry 2", source: "Phone call", status: "Appointment booked" },
-    { name: "Sample inquiry 3", source: "Walk-in", status: "New" },
-  ];
-  return (
-    <figure className="space-y-3">
-      <div className="flex items-center justify-between">
-        <p className="eyebrow">Leads &amp; inquiries</p>
-        <Badge variant="warning">Illustration · sample data</Badge>
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        {["Inquiries", "Follow-ups due", "Appointments"].map((label) => (
-          <div key={label} className="rounded-xl border bg-linear-to-b from-white to-brand-50 p-3">
-            <p className="text-[11px] text-ink-500">{label}</p>
-            <div className="mt-2 h-4 w-8 rounded bg-brand-100" />
-          </div>
-        ))}
-      </div>
-      <div className="space-y-2">
-        {rows.map((row) => (
-          <div key={row.name} className="flex items-center justify-between rounded-xl border bg-white px-3 py-2.5 text-sm">
-            <div>
-              <p className="font-medium text-ink-900">{row.name}</p>
-              <p className="text-xs text-ink-500">{row.source}</p>
-            </div>
-            <Badge variant={row.status === "New" ? "default" : "secondary"}>{row.status}</Badge>
-          </div>
-        ))}
-      </div>
-      <figcaption className="sr-only">Illustration of the ParmarPro inquiry list using sample data.</figcaption>
-    </figure>
   );
 }
