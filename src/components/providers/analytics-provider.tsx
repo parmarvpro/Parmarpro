@@ -5,7 +5,7 @@ import posthog from "posthog-js";
 import { useEffect, useRef } from "react";
 
 import { track } from "@/lib/analytics/client";
-import { routeTemplate } from "@/lib/analytics/events";
+import { routeTemplate, sanitizeCapture } from "@/lib/analytics/events";
 
 type Props = {
   apiKey: string | undefined;
@@ -49,6 +49,7 @@ export function AnalyticsProvider({ apiKey, apiHost, analyticsUserId, clinicId, 
       person_profiles: "identified_only",
       persistence: "localStorage",
       property_denylist: ["$current_url", "$pathname", "$referrer", "$referring_domain", "$initial_referrer", "$initial_current_url", "$initial_pathname"],
+      before_send: (capture) => sanitizeCapture(capture),
     });
     posthog.identify(analyticsUserId);
     if (clinicId) posthog.group("clinic", clinicId);

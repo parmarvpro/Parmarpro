@@ -54,3 +54,43 @@ export function routeTemplate(pathname: string): string {
     .replace(/[^a-z0-9\-/[\]]/g, "")
     .slice(0, 80) || "/";
 }
+
+const SYSTEM_EVENTS = new Set(["$identify", "$groupidentify", "$opt_in", "$create_alias"]);
+const URL_PROPERTY = /^\$(current_url|pathname|host|referrer|referring_domain|search_engine|initial_.*|prev_pageview_.*|session_entry_.*)$/;
+
+type CaptureLike = {
+  event: string;
+  properties?: Record<string, unknown>;
+  $set?: Record<string, unknown>;
+  $set_once?: Record<string, unknown>;
+};
+
+function stripUrlProperties(properties: Record<string, unknown> | undefined): Record<string, unknown> | undefined {
+  if (!properties) return properties;
+  const out: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(properties)) {
+    if (URL_PROPERTY.test(key) || /^utm_|^gclid$|^fbclid$/.test(key)) continue;
+    if (key === "$set" || key === "$set_once") {
+      out[key] = stripUrlProperties(value as Record<string, unknown>);
+      continue;
+    }
+    out[key] = value;
+  }
+  return out;
+}
+
+/**
+ * Last line of defence before an event leaves the browser (PostHog
+ * `before_send`): drops events outside the schema and removes URL,
+ * referrer and campaign properties, which could carry search terms.
+ */
+export function sanitizeCapture<T extends CaptureLike>(capture: T | null): T | null {
+  if (!capture) return null;
+  if (!(capture.event in ANALYTICS_EVENTS) && !SYSTEM_EVENTS.has(capture.event)) return null;
+  return {
+    ...capture,
+    properties: stripUrlProperties(capture.properties),
+    $set: stripUrlProperties(capture.$set),
+    $set_once: stripUrlProperties(capture.$set_once),
+  };
+}

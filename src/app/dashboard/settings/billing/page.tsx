@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { BillingViewed } from "@/components/billing/billing-viewed";
 import { PayButton } from "@/components/billing/pay-button";
+import { NoAccess } from "@/components/dashboard/no-access";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +13,14 @@ import { formatDate, formatDateTime, humanize } from "@/lib/format";
 import { formatInr, PLANS, priceBreakdown } from "@/lib/plans";
 import { hasPermission } from "@/server/auth/permissions";
 import { getBilling } from "@/server/dal/billing";
+import { loadUnlessForbidden } from "@/server/page-guards";
 
 export const metadata: Metadata = { title: "Billing" };
 
 export default async function BillingPage() {
-  const billing = await getBilling();
+  const result = await loadUnlessForbidden(getBilling);
+  if (!result.allowed) return <NoAccess what="billing" />;
+  const billing = result.data;
   const plan = PLANS.parmarpro_clinic_monthly;
   const price = priceBreakdown(plan);
   const canPay = hasPermission(billing.role, "billing:pay");

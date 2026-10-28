@@ -45,7 +45,10 @@ export class AppError extends Error {
   readonly fieldErrors?: Record<string, string[]>;
 
   constructor(code: AppErrorCode, options?: { cause?: unknown; fieldErrors?: Record<string, string[]> }) {
-    super(MESSAGE[code], { cause: options?.cause });
+    // Only the cause's name and code are kept. Raw database or provider errors
+    // can carry personal data ("Failing row contains (...)", invited emails)
+    // and an uncaught error's cause is printed in server logs.
+    super(MESSAGE[code], options?.cause === undefined ? undefined : { cause: summarizeCause(options.cause) });
     this.name = "AppError";
     this.code = code;
     this.status = STATUS[code];
@@ -55,6 +58,13 @@ export class AppError extends Error {
   get publicMessage(): string {
     return MESSAGE[this.code];
   }
+}
+
+export function summarizeCause(cause: unknown): { name: string; code: string } {
+  const raw = (typeof cause === "object" && cause !== null ? cause : {}) as { name?: unknown; code?: unknown; status?: unknown };
+  const name = typeof raw.name === "string" ? raw.name : typeof cause === "object" && cause !== null ? "Error" : typeof cause;
+  const code = typeof raw.code === "string" || typeof raw.code === "number" ? String(raw.code) : typeof raw.status === "number" ? String(raw.status) : "unknown";
+  return { name, code };
 }
 
 export function isAppError(error: unknown): error is AppError {

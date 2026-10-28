@@ -27,8 +27,14 @@ export function createRateLimiter(options: { limit: number; windowMs: number; ma
   };
 }
 
+/**
+ * Client IP as set by the hosting platform. On Vercel, `x-real-ip` is set by
+ * the edge network and cannot be supplied by the client; `x-forwarded-for` is
+ * only a fallback for other hosts.
+ */
 export function clientIp(request: Request): string {
+  const real = request.headers.get("x-real-ip")?.trim();
+  if (real) return real;
   const forwarded = request.headers.get("x-forwarded-for");
-  const first = forwarded?.split(",")[0]?.trim();
-  return first || request.headers.get("x-real-ip") || "unknown";
+  return forwarded?.split(",")[0]?.trim() || "unknown";
 }
