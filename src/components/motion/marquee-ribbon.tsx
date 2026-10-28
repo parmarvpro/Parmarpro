@@ -15,7 +15,7 @@ function Group({ words, outline, hidden }: { words: string[]; outline?: boolean;
     <div className="flex shrink-0 items-center" aria-hidden={hidden || undefined}>
       {words.map((word) => (
         <span key={word} className="flex items-center gap-6 pr-6 sm:gap-10 sm:pr-10">
-          <span className={`headline whitespace-nowrap text-[clamp(2.75rem,9vw,7.5rem)] ${outline ? "outline-text" : "text-brand-500"}`}>{word}</span>
+          <span className={`headline whitespace-nowrap text-[clamp(2.5rem,9vw,7.5rem)] ${outline ? "outline-text" : "text-brand-500"}`}>{word}</span>
           <Sparkle tone="blue" className="size-7 shrink-0 sm:size-10" />
         </span>
       ))}

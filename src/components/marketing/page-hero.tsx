@@ -13,7 +13,7 @@ export function PageHero({
 }: {
   eyebrow: string;
   title: string;
-  /** Lower-case words in the title to set in the italic serif accent. */
+  /** Lower-case words in the title to set in the light-weight accent. */
   accent?: string[];
   children?: React.ReactNode;
   className?: string;
@@ -32,7 +32,7 @@ export function PageHero({
         />
         <div className="relative max-w-2xl space-y-5 p-8 md:p-12">
           <EyebrowTag>{eyebrow}</EyebrowTag>
-          <h1 className="headline text-4xl text-brand-500 sm:text-5xl md:text-6xl">
+          <h1 className="headline text-[clamp(1.75rem,4.2vw+0.4rem,3.75rem)] text-brand-500">
             <SplitWords text={title} accent={accent} />
           </h1>
           {children ? <div className="max-w-xl text-lg text-ink-600">{children}</div> : null}

@@ -87,7 +87,7 @@ export default function HomePage() {
         />
         <div className="mx-auto max-w-6xl px-4 pt-12 text-center sm:px-6 sm:pt-16">
           <EyebrowTag>For dental clinics in Mumbai</EyebrowTag>
-          <h1 className="headline mx-auto mt-6 max-w-6xl text-[clamp(2.3rem,5.6vw,5rem)] text-brand-500 [--base:450ms]">
+          <h1 className="headline mx-auto mt-6 max-w-6xl text-[clamp(1.9rem,6.1vw+0.2rem,4.5rem)] text-brand-500 [--base:450ms]">
             <SplitWords text="Stop losing patients between the first call and the first visit." accent={["patients"]} />
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-ink-700 text-pretty sm:text-xl">
@@ -118,7 +118,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-6xl px-4 pt-20 sm:px-6 sm:pt-28">
         <Reveal className="max-w-3xl space-y-4">
           <p className="eyebrow">How it works</p>
-          <h2 className="headline text-3xl text-brand-500 sm:text-5xl">
+          <h2 className="headline text-[clamp(1.6rem,3.4vw,3rem)] text-brand-500">
             <SplitWords text="From first call to first visit, sorted." accent={["sorted"]} />
           </h2>
         </Reveal>
@@ -139,7 +139,7 @@ export default function HomePage() {
         <Reveal className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div className="space-y-4">
             <p className="eyebrow">Product</p>
-            <h2 className="headline text-3xl text-brand-500 sm:text-5xl">
+            <h2 className="headline text-[clamp(1.6rem,3.4vw,3rem)] text-brand-500">
               <SplitWords text="Everything the front desk needs" accent={["needs"]} />
             </h2>
             <p className="max-w-2xl text-ink-600">
@@ -176,7 +176,7 @@ export default function HomePage() {
               <span className="flex size-12 items-center justify-center rounded-2xl bg-white text-brand-500 ring-1 ring-brand-200">
                 <ShieldCheckIcon className="size-6" />
               </span>
-              <h2 className="headline text-3xl text-brand-500 sm:text-4xl">
+              <h2 className="headline text-[clamp(1.6rem,3.4vw,3rem)] text-brand-500">
                 <SplitWords text="Clinic data kept separate and minimal" accent={["separate"]} />
               </h2>
               <ul className="space-y-4 text-sm text-ink-700">
@@ -215,13 +215,13 @@ export default function HomePage() {
           <Sparkle tone="white" className="spin-slow absolute -right-16 -bottom-20 hidden size-96 opacity-95 md:block" />
           <div className="relative flex flex-col items-start gap-6 p-8 md:p-14">
             <EyebrowTag tone="inverse">{TRIAL_DAYS}-day free trial</EyebrowTag>
-            <h2 className="headline max-w-2xl text-3xl text-white sm:text-5xl">
+            <h2 className="headline max-w-2xl text-[clamp(1.6rem,3.4vw,3rem)] text-white">
               <SplitWords text={`Try it with your team for ${TRIAL_DAYS} days.`} accent={["days"]} />
             </h2>
             <p className="max-w-lg text-white">Set up takes a few minutes. Invite your front desk when you are ready.</p>
             <p className="text-white">
               After the trial:{" "}
-              <span className="text-2xl font-extrabold">
+              <span className="text-2xl font-bold">
                 ₹<CountUp to={plan.basePaise / 100} />
               </span>{" "}
               per clinic per month, plus 18% GST.

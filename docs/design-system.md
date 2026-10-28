@@ -36,11 +36,15 @@ Re-run the check whenever a token changes.
 
 ## Type
 
-Geist, self-hosted by `next/font`, so there is no external font request and no CSP change.
+One family: **Archivo**, a single self-hosted variable file (`src/fonts/archivo-var.woff2`, about 49 KB, weights 300 to 800, widths 100 to 125%, Latin plus the rupee sign), loaded with `next/font/local`. No external font request and no CSP change. The full rationale, rejected options, scale and rules are in [`typography.md`](typography.md); the short version:
 
-- **`headline` utility:** uppercase, weight 800, leading 0.95, tight tracking. Use it for marketing and auth headlines and step-card words. Uppercase is CSS only; the DOM text stays sentence case for screen readers and tests.
-- **`eyebrow` utility:** 11px uppercase label in `brand-600`. Use it above titles, for table headers and for stat labels.
+- **Display voice (`headline` utility):** weight 800, width 112%, uppercase, leading 0.95, tracking -0.03em. Marketing and auth headlines, step-card words, the price. Uppercase is CSS only; the DOM text stays sentence case for screen readers and tests.
+- **Text voice:** width 100%, weights 400 to 700. Body, UI, dashboard, tables, forms.
+- **Accent (`accent` utility):** one word per headline in weight 300 of the same face. No serif, no italics.
+- **`eyebrow` utility:** 12px, weight 700, uppercase, tracking 0.1em, in `brand-600`. Above titles, table headers, stat labels.
 - **Dashboard titles:** sentence case, `text-2xl font-bold`. The app is calmer than the marketing site.
+- **Numerals:** lining by default; `tabular-nums` only in tables, stat numbers, step numbers and the animated count-up, never on a static display price.
+- **Monospace:** system stack, only for payment IDs.
 
 ## Shape
 

@@ -1,6 +1,6 @@
 # Typography: proposed system
 
-**Status: proposed. Not applied to the code yet.** Everything below was rendered and measured on ParmarPro's real copy (hero, step cards, price, dashboard table) before being written down. Replaces the "Type" section of `design-system.md` once applied.
+**Status: applied.** Everything below was rendered and measured on ParmarPro's real copy (hero, step cards, price, dashboard table) before being written down. The "Type" section of `design-system.md` summarises it.
 
 ## 1. What is wrong today
 
@@ -163,7 +163,7 @@ Remove `Geist`, `Geist_Mono`, `Instrument_Serif` and `--font-instrument-serif`.
 }
 ```
 
-Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Rule: tracking no tighter than `-0.04em` at any size, because adjacent glyph outlines overlap below that.
+Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Rule: outlined words (the ribbon) use `font-kerning: none` and tracking `+0.03em`; with kerning and the display `-0.03em`, and even at `-0.01em` or `0`, the outlines of pairs such as T and Y touch or overlap (seen in zoomed renders of "ACTIVITY"). The footer wordmark may use `-0.04em` only because none of the pairs in "PARMARPRO" collide (checked zoomed).
 
 ## 5. Scale and rules
 
@@ -201,7 +201,7 @@ Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Ru
 3. **Accent:** at most one word per headline, weight 300, never italic, never a serif.
 4. **No italics anywhere.** `font-synthesis: none` backs this up.
 5. **Minimum size 12px.** Exception: the aria-hidden sample cards inside the hero illustration may use 11px on phones.
-6. **Numerals:** lining by default. `tabular-nums` only in table cells, stat numbers, date/time columns and the 01/02/03 step numbers. **Never on display prices or any figure with a comma or decimal point** (in testing, Schibsted Grotesk set a price as "75 , 000" with tabular figures; Archivo did not, but the rule keeps this safe if the font ever changes). Phone and date cells get `whitespace-nowrap`.
+6. **Numerals:** lining by default. `tabular-nums` only in table cells, stat numbers, date/time columns and the 01/02/03 step numbers. **Never on a static display price or any figure with a comma or decimal point** (the animated count-up keeps tabular figures so its width does not jitter; checked in Archivo) (in testing, Schibsted Grotesk set a price as "75 , 000" with tabular figures; Archivo did not, but the rule keeps this safe if the font ever changes). Phone and date cells get `whitespace-nowrap`.
 7. **Uppercase is visual only.** DOM text stays sentence case (tests rely on it).
 8. **`₹` always comes from Archivo**, never a fallback. Price text keeps `₹` and digits in one element.
 9. **Replace arbitrary sizes** with the scale: `text-[9px]`, `[10px]`, `[11px]` become `text-xs` (12px) except in the hero illustration; `text-[12px]` becomes `text-xs`; `text-[15px]` becomes `text-sm` or `text-base`, whichever the surrounding text uses.
@@ -218,6 +218,20 @@ Edit: `src/app/layout.tsx`, `src/app/globals.css`, `src/app/(marketing)/page.tsx
 - **Screenshots** at 390, 768, 1024 and 1440 for `/`, `/features`, `/pricing`, `/contact`, `/sign-in`, checking the outlined ribbon and footer wordmark for inner-contour artifacts.
 - **Measured before and after:** font bytes and request count, CLS (fallback metrics are adjusted to Arial), Lighthouse mobile.
 - Existing checks unchanged: lint, typecheck, unit, build, public-env, no-bypass, E2E, gitleaks, CI.
+
+## 7a. Measured after applying (2026-10-28)
+
+| | Before (Geist, Geist Mono, Instrument Serif) | After (Archivo) |
+|---|---|---|
+| Font requests on the home page (Lighthouse) | 4 requests, 85.3 KB | **1 request, 50.2 KB** |
+| Font files in the production build | 13 files (all subsets) | **1 file, 49.5 KB**, preloaded |
+| Lighthouse mobile, home (3 runs, same flags) | perf 56-59, LCP 4.9-5.0 s, TBT 0.92-1.19 s, CLS 0-0.004 | perf 60-66, LCP 4.6-4.7 s, TBT 0.62-0.88 s, CLS 0 |
+| Accessibility (Lighthouse) | 100 | 100 |
+| Horizontal overflow, clipped headings | none | none (home, features, pricing, contact, sign-in at 390, 768, 1024, 1440) |
+
+The LCP and TBT targets from the motion work (2.5 s and 200 ms) are **still not met** in this sandbox; the font change helps but is not the main cause (see the performance notes in `design-system.md`). Numbers come from a CPU-only container with placeholder Clerk keys and are not real-device results.
+
+Checked in zoomed renders: the outlined ribbon needed `font-kerning: none` and `+0.03em` tracking (section 4) because the T and Y outlines touched; the footer wordmark outline is clean.
 
 ## 8. What I could not verify
 

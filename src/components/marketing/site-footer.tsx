@@ -29,7 +29,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div aria-hidden="true" className="overflow-hidden border-t border-hairline select-none">
-        <p className="outline-text-soft text-center text-[clamp(3rem,13.6vw,15rem)] leading-[0.82] font-extrabold tracking-[-0.05em] uppercase">
+        <p className="outline-text-soft text-center text-[clamp(2.5rem,12.8vw,14rem)] leading-[0.82] font-extrabold font-stretch-[112%] tracking-[-0.04em] uppercase">
           ParmarPro
         </p>
       </div>

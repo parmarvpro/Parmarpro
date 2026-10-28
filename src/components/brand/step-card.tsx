@@ -45,7 +45,7 @@ export function StepCard({
           </>
         ) : null}
         <div className="relative">
-          <h3 className="headline text-3xl text-white sm:text-4xl">{word}</h3>
+          <h3 className="headline text-[clamp(1.6rem,2.6vw,2.25rem)] text-white">{word}</h3>
           <p className="mt-3 text-sm leading-relaxed text-white">{children}</p>
         </div>
         <div className="relative flex items-center gap-3">
@@ -75,7 +75,7 @@ export function StepCard({
         <p className="eyebrow mt-1">{label}</p>
         <p className="mt-3 max-w-xs text-sm leading-relaxed text-brand-800">{children}</p>
       </div>
-      <h3 className="headline relative mt-8 text-3xl text-white sm:text-4xl">{word}</h3>
+      <h3 className="headline relative mt-8 text-[clamp(1.6rem,2.6vw,2.25rem)] text-white">{word}</h3>
     </article>
   );
 }

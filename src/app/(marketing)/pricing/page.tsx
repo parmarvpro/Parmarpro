@@ -27,10 +27,10 @@ export default function PricingPage() {
             <Sparkle tone="white" className="absolute -right-8 -bottom-10 hidden size-56 md:block" />
             <div className="relative space-y-6">
               <EyebrowTag tone="inverse">{TRIAL_DAYS}-day free trial</EyebrowTag>
-              <h2 className="headline text-3xl sm:text-4xl">{plan.name}</h2>
+              <h2 className="headline text-[clamp(1.6rem,3.4vw,3rem)]">{plan.name}</h2>
               <div>
                 <p className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="text-5xl font-extrabold tracking-tight tabular-nums">{formatInr(price.basePaise)}</span>
+                  <span className="headline text-[clamp(2rem,5vw,3.5rem)]">{formatInr(price.basePaise)}</span>
                   <span>per clinic / month</span>
                 </p>
                 <p className="mt-2 text-sm">

@@ -20,7 +20,7 @@ export function PauseMotion({ className }: { className?: string }) {
       aria-pressed={paused}
       onClick={() => setMotionPaused(!paused)}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white/90 px-3 py-1.5 text-[11px] font-semibold tracking-[0.06em] text-ink-700 uppercase transition-colors hover:bg-brand-50 hover:text-brand-700 focus-visible:ring-[3px] focus-visible:ring-ring/60 focus-visible:outline-none",
+        "inline-flex items-center gap-1.5 rounded-full border border-hairline bg-white/90 px-3 py-1.5 text-xs font-semibold tracking-[0.06em] text-ink-700 uppercase transition-colors hover:bg-brand-50 hover:text-brand-700 focus-visible:ring-[3px] focus-visible:ring-ring/60 focus-visible:outline-none",
         className,
       )}
     >

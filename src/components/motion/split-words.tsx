@@ -12,7 +12,7 @@ export function SplitWords({
   startAt = 0,
 }: {
   text: string;
-  /** Lower-case words (without punctuation) to set in the italic serif accent. */
+  /** Lower-case words (without punctuation) to set in the light-weight accent. */
   accent?: string[];
   /** Index offset, so several lines can share one stagger. */
   startAt?: number;

@@ -67,8 +67,8 @@
 }
 
 @theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: var(--font-archivo), Arial, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -109,28 +109,33 @@
   }
   body {
     @apply bg-background text-foreground antialiased;
+    font-variant-numeric: lining-nums;
+    font-kerning: normal;
+    /* Never fake a bold or an italic the font does not have. */
+    font-synthesis: none;
   }
   ::selection {
     @apply bg-brand-200 text-brand-950;
   }
 }
 
-/* Large uppercase display headline (marketing and auth only). Uppercase is visual; the DOM text stays sentence case. */
+/* Display voice (marketing and auth only): Archivo 800 at 112% width. Uppercase is visual; the DOM text stays sentence case. */
 @utility headline {
   text-transform: uppercase;
   font-weight: 800;
+  font-stretch: 112%;
   line-height: 0.95;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 /* Small uppercase label above titles. */
 @utility eyebrow {
   text-transform: uppercase;
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
   line-height: 1rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   color: var(--color-brand-600);
 }
 
@@ -201,18 +206,9 @@
   --ease-in-out-expo: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-@theme inline {
-  --font-accent: var(--font-instrument-serif), Georgia, "Times New Roman", serif;
-}
-
-/* Italic serif accent for one word per headline: sentence case, not uppercase. */
+/* Accent for one word per headline: the same face and case, in a light weight. Weight contrast, never a serif or italic. */
 @utility accent {
-  font-family: var(--font-accent);
-  font-style: italic;
-  font-weight: 400;
-  font-size: 1.08em;
-  text-transform: none;
-  letter-spacing: -0.02em;
+  font-weight: 300;
 }
 
 @keyframes cf-flow {
@@ -568,6 +564,9 @@ html.lenis body {
 .outline-text {
   color: transparent;
   -webkit-text-stroke: 1.5px var(--color-brand-500);
+  /* Outlines need room: kerning and tight tracking pull neighbours together until their strokes overlap (the T and Y of ACTIVITY). */
+  font-kerning: none;
+  letter-spacing: 0.03em;
 }
 .outline-text-soft {
   color: transparent;

@@ -61,7 +61,7 @@ function SampleCard({ card }: { card: CardDef }) {
           <Icon className="size-4" />
         </span>
         <div className="min-w-0">
-          <p className="text-[11px] leading-[14px] font-semibold [overflow-wrap:anywhere] text-ink-900 @[9rem]:text-[12px] @[9rem]:leading-4">
+          <p className="text-[11px] leading-[14px] font-semibold [overflow-wrap:anywhere] text-ink-900 @[9rem]:text-xs @[9rem]:leading-4">
             {card.title}
           </p>
           <p className="hidden truncate text-[11px] leading-4 text-ink-500 @[8.5rem]:block">{card.meta}</p>
@@ -69,7 +69,7 @@ function SampleCard({ card }: { card: CardDef }) {
       </div>
       <Badge
         variant={card.tone}
-        className="mt-1.5 max-w-full px-1.5 text-left text-[9px] leading-3 whitespace-normal @[9rem]:mt-2 @[9rem]:px-2.5 @[9rem]:text-[10px]"
+        className="mt-1.5 max-w-full px-1.5 text-left text-[11px] leading-3 whitespace-normal @[9rem]:mt-2 @[9rem]:px-2.5"
       >
         {card.badge}
       </Badge>
