@@ -1,5 +1,6 @@
 import type { Page } from "@playwright/test";
 
+import { appErrors } from "./app-errors";
 import { expect, test } from "./fixtures";
 
 /**
@@ -23,19 +24,6 @@ async function runningAnimations(page: Page, selector: string): Promise<number> 
     if (!root) return -1;
     return root.getAnimations({ subtree: true }).filter((animation) => animation.playState === "running").length;
   }, selector);
-}
-
-function appErrors(page: Page): string[] {
-  const errors: string[] = [];
-  // Clerk's script cannot load from a placeholder instance in local runs; that is not an app error.
-  const ignorable = /clerk|Content Security Policy|net::ERR/i;
-  page.on("pageerror", (error) => {
-    if (!ignorable.test(String(error))) errors.push(String(error));
-  });
-  page.on("console", (message) => {
-    if (message.type() === "error" && !ignorable.test(message.text())) errors.push(message.text());
-  });
-  return errors;
 }
 
 test.describe("counter-flow stage", () => {
@@ -132,8 +120,8 @@ test.describe("counter-flow stage", () => {
     expect(await runningAnimations(page, STAGE)).toBeGreaterThan(0);
   });
 
-  test("without WebGL the CSS fallback shows and nothing errors", async ({ page }) => {
-    const errors = appErrors(page);
+  test("without WebGL the CSS fallback shows and nothing errors", async ({ page, baseURL }) => {
+    const errors = appErrors(page, baseURL);
     await page.addInitScript(() => {
       const original = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function (this: HTMLCanvasElement, type: string, ...rest: unknown[]) {
@@ -167,8 +155,8 @@ test.describe("counter-flow stage", () => {
 test.describe("reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("nothing loops, the pause control is hidden and the content is all there", async ({ page }) => {
-    const errors = appErrors(page);
+  test("nothing loops, the pause control is hidden and the content is all there", async ({ page, baseURL }) => {
+    const errors = appErrors(page, baseURL);
     await page.goto("/");
     await expect(page.locator("html")).toHaveAttribute("data-motion", "off");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(/Stop losing patients/i);
