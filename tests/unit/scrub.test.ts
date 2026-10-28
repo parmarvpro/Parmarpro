@@ -7,7 +7,7 @@ const SYNTHETIC = {
   email: "synthetic.patient@example.com",
   phone: "+919812345678",
   localPhone: "98123 45678",
-  jwt: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.c2lnbmF0dXJlc2lnbmF0dXJl",
+  jwt: "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyXzEyMyJ9.c2lnbmF0dXJlc2lnbmF0dXJl", // gitleaks:allow synthetic test token
 };
 
 describe("scrubString", () => {
@@ -16,7 +16,7 @@ describe("scrubString", () => {
     [`call ${SYNTHETIC.phone} now`, "call [phone] now"],
     [`call ${SYNTHETIC.localPhone}`, "call [phone]"],
     [`token ${SYNTHETIC.jwt}`, "token [jwt]"],
-    ["key sk_live_abcdefghijklmnop", "key [key]"],
+    ["key sk_test_FAKEFAKEFAKEFAKE", "key [key]"], // gitleaks:allow synthetic test value
     ["key sb_secret_abcdefghijkl", "key [key]"],
     ["key rzp_live_abcdefghij", "key [key]"],
     ["Authorization: Bearer abc.def.ghijklmnop", "Authorization: Bearer [token]"],

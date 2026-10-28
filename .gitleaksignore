@@ -1,0 +1,5 @@
+# Reviewed gitleaks findings (see docs/security-test-results.md).
+# Synthetic fixtures in the Sentry scrubber unit test, committed before inline
+# `gitleaks:allow` markers were added. They are not real credentials.
+24d89f13ae54d0c78fd4d0d4441d050a41d25341:tests/unit/scrub.test.ts:jwt:10
+24d89f13ae54d0c78fd4d0d4441d050a41d25341:tests/unit/scrub.test.ts:stripe-access-token:19
