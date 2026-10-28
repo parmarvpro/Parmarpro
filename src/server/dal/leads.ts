@@ -39,7 +39,13 @@ export async function listLeads(rawFilters: unknown) {
 
   const { data, error, count } = await query.range(from, to);
   throwIfDbError(error);
-  return { rows: data ?? [], total: count ?? 0, filters };
+  const now = Date.now();
+  const rows = (data ?? []).map((lead) => ({
+    ...lead,
+    followUpOverdue:
+      lead.next_follow_up_at !== null && Date.parse(lead.next_follow_up_at) < now && !["converted", "lost"].includes(lead.status),
+  }));
+  return { rows, total: count ?? 0, filters };
 }
 
 export async function getLead(rawId: unknown) {

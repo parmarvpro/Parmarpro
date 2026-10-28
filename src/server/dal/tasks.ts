@@ -40,7 +40,12 @@ export async function listTasks(rawFilters: unknown) {
   else if (filters.assignee) query = query.eq("assigned_to", filters.assignee);
   const { data, error, count } = await query.range(from, to);
   throwIfDbError(error);
-  return { rows: data ?? [], total: count ?? 0, filters, role: ctx.role };
+  const now = Date.now();
+  const rows = (data ?? []).map((task) => ({
+    ...task,
+    isOverdue: task.status === "open" && task.due_at !== null && Date.parse(task.due_at) < now,
+  }));
+  return { rows, total: count ?? 0, filters, role: ctx.role };
 }
 
 function toRow(input: ReturnType<typeof taskInputSchema.parse>) {
