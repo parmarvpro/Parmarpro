@@ -141,6 +141,13 @@ export type DitherController = {
   stats(): DitherStats;
 };
 
+const SOFTWARE_RENDERER = /swiftshader|llvmpipe|softpipe|software|basic render/i;
+
+/** True for GPU names that mean the browser is drawing WebGL on the CPU. */
+export function isSoftwareRenderer(rendererName: string): boolean {
+  return SOFTWARE_RENDERER.test(rendererName);
+}
+
 function compile(gl: WebGLRenderingContext, type: number, source: string): WebGLShader | null {
   const shader = gl.createShader(type);
   if (!shader) return null;
@@ -162,8 +169,18 @@ export function createDitherRenderer(canvas: HTMLCanvasElement, options: DitherO
     depth: false,
     stencil: false,
     powerPreference: "low-power",
+    failIfMajorPerformanceCaveat: true,
   });
   if (!gl) return null;
+  // Browsers do not always treat SwiftShader or llvmpipe as a "major performance caveat", so
+  // check the renderer name too. A full-viewport shader on the CPU would block the page; those
+  // devices get the CSS fallback instead.
+  const rendererInfo = gl.getExtension("WEBGL_debug_renderer_info");
+  const rendererName = rendererInfo ? String(gl.getParameter(rendererInfo.UNMASKED_RENDERER_WEBGL)) : "";
+  if (isSoftwareRenderer(rendererName)) {
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+    return null;
+  }
   const precision = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
   if (!precision || precision.precision === 0) return null;
 

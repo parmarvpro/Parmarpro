@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FLOW_DIRECTIONS } from "@/lib/motion/counter-flow";
-import { FRAGMENT_SOURCE } from "@/lib/motion/dither-shader";
+import { FRAGMENT_SOURCE, isSoftwareRenderer } from "@/lib/motion/dither-shader";
 
 describe("dither shader source", () => {
   it("declares every uniform the renderer sets", () => {
@@ -47,5 +47,28 @@ describe("dither shader source", () => {
     expect(FLOW_DIRECTIONS).toHaveLength(3);
     expect(FLOW_DIRECTIONS[1]).toBe(-FLOW_DIRECTIONS[0]);
     expect(FLOW_DIRECTIONS[2]).toBe(FLOW_DIRECTIONS[0]);
+  });
+});
+
+describe("software renderer detection", () => {
+  it.each([
+    "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+    "llvmpipe (LLVM 15.0.7, 256 bits)",
+    "Microsoft Basic Render Driver",
+    "Google SwiftShader",
+    "Mesa softpipe",
+  ])("treats %s as software rendering", (name) => {
+    expect(isSoftwareRenderer(name)).toBe(true);
+  });
+
+  it.each([
+    "ANGLE (Apple, ANGLE Metal Renderer: Apple M2, Unspecified Version)",
+    "ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "ANGLE (Intel, Intel(R) UHD Graphics 620 Direct3D11 vs_5_0 ps_5_0, D3D11)",
+    "Adreno (TM) 740",
+    "Mali-G78",
+    "",
+  ])("treats %j as hardware or unknown", (name) => {
+    expect(isSoftwareRenderer(name)).toBe(false);
   });
 });

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from "react";
 
 import { createDitherRenderer, type DitherController, type DitherLayout } from "@/lib/motion/dither-shader";
+import { whenIdle } from "@/lib/motion/gsap";
 import { prefersReducedMotion, saveDataRequested, useMotionEnabled } from "@/lib/motion/motion-state";
 import { getScrollVelocity } from "@/lib/motion/scroll-velocity";
 
@@ -44,75 +45,85 @@ export function CounterFlowField() {
     const stage = host?.parentElement;
     if (!host || !stage) return;
 
-    // A fresh canvas for every mount: once a GPU context is released, the same
-    // canvas can never create another one (React strict mode mounts twice in development).
-    const canvas = document.createElement("canvas");
-    canvas.className = "cf-canvas";
-    canvas.setAttribute("aria-hidden", "true");
-    host.appendChild(canvas);
+    // The CSS fallback is already on screen, so the GPU work waits until the browser is idle
+    // (after hydration and first paint) instead of competing with them.
+    let teardown: (() => void) | undefined;
+    const cancelIdle = whenIdle(() => {
+      // A fresh canvas for every mount: once a GPU context is released, the same
+      // canvas can never create another one (React strict mode mounts twice in development).
+      const canvas = document.createElement("canvas");
+      canvas.className = "cf-canvas";
+      canvas.setAttribute("aria-hidden", "true");
+      host.appendChild(canvas);
 
-    const controller = createDitherRenderer(canvas, {
-      ...readLayout(stage),
-      speed: 0.083,
-      maxDpr: 1.5,
-      reducedMotion: prefersReducedMotion() || saveDataRequested(),
-      readScrollVelocity: getScrollVelocity,
-      onContextLost: () => {
-        stage.dataset.live = "false";
-      },
-    });
-    if (!controller) {
-      canvas.remove();
-      return;
-    }
-    controllerRef.current = controller;
-    stage.dataset.live = "true";
-    controller.start();
-    apply();
-
-    const resizeObserver = new ResizeObserver(() => {
-      controller.configure(readLayout(stage));
-      controller.resize();
-    });
-    resizeObserver.observe(canvas);
-
-    const intersection = new IntersectionObserver(
-      ([entry]) => {
-        gates.current.visible = entry?.isIntersecting ?? false;
-        apply();
-      },
-      { rootMargin: "120px" },
-    );
-    intersection.observe(canvas);
-
-    const onVisibility = () => {
-      gates.current.hidden = document.hidden;
-      apply();
-    };
-    document.addEventListener("visibilitychange", onVisibility);
-
-    let pointerFrame = 0;
-    const onPointerMove = (event: PointerEvent) => {
-      if (event.pointerType !== "mouse" || pointerFrame) return;
-      const { clientX, clientY } = event;
-      pointerFrame = requestAnimationFrame(() => {
-        pointerFrame = 0;
-        const rect = canvas.getBoundingClientRect();
-        controller.setPointer(clientX - rect.left, clientY - rect.top);
+      const controller = createDitherRenderer(canvas, {
+        ...readLayout(stage),
+        speed: 0.083,
+        maxDpr: 1.5,
+        reducedMotion: prefersReducedMotion() || saveDataRequested(),
+        readScrollVelocity: getScrollVelocity,
+        onContextLost: () => {
+          stage.dataset.live = "false";
+        },
       });
-    };
-    stage.addEventListener("pointermove", onPointerMove);
+      if (!controller) {
+        canvas.remove();
+        return;
+      }
+      controllerRef.current = controller;
+      stage.dataset.live = "true";
+      controller.start();
+      apply();
+
+      const resizeObserver = new ResizeObserver(() => {
+        controller.configure(readLayout(stage));
+        controller.resize();
+      });
+      resizeObserver.observe(canvas);
+
+      const intersection = new IntersectionObserver(
+        ([entry]) => {
+          gates.current.visible = entry?.isIntersecting ?? false;
+          apply();
+        },
+        { rootMargin: "120px" },
+      );
+      intersection.observe(canvas);
+
+      const onVisibility = () => {
+        gates.current.hidden = document.hidden;
+        apply();
+      };
+      document.addEventListener("visibilitychange", onVisibility);
+
+      let pointerFrame = 0;
+      const onPointerMove = (event: PointerEvent) => {
+        if (event.pointerType !== "mouse" || pointerFrame) return;
+        const { clientX, clientY } = event;
+        pointerFrame = requestAnimationFrame(() => {
+          pointerFrame = 0;
+          const rect = canvas.getBoundingClientRect();
+          controller.setPointer(clientX - rect.left, clientY - rect.top);
+        });
+      };
+      stage.addEventListener("pointermove", onPointerMove);
+
+      teardown = () => {
+        cancelAnimationFrame(pointerFrame);
+        stage.removeEventListener("pointermove", onPointerMove);
+        document.removeEventListener("visibilitychange", onVisibility);
+        intersection.disconnect();
+        resizeObserver.disconnect();
+        controller.dispose();
+        controllerRef.current = null;
+        canvas.remove();
+        stage.dataset.live = "false";
+      };
+    });
 
     return () => {
-      cancelAnimationFrame(pointerFrame);
-      stage.removeEventListener("pointermove", onPointerMove);
-      document.removeEventListener("visibilitychange", onVisibility);
-      intersection.disconnect();
-      resizeObserver.disconnect();
-      controller.dispose();
-      controllerRef.current = null;
-      canvas.remove();
-      stage.dataset.live = "false";
+      cancelIdle();
+      teardown?.();
     };
   }, [apply]);
 

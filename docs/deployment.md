@@ -18,6 +18,27 @@ Status markers used in this document:
 
 Production credentials are never placed in Preview or Development scopes.
 
+### 1.1 Keys at a glance: what, where to get it, where to keep it
+
+Never paste a key into chat, an issue, a commit or a screenshot. Each one goes in exactly one place. Anything marked **secret** is stored as a *Sensitive* variable in Vercel (Preview scope for staging, Production scope only at launch) and, where noted, as a GitHub Actions secret. Full per-variable detail is in `docs/environment-variables.md`.
+
+| What | Where to get it | Where to keep it |
+|---|---|---|
+| Clerk publishable key (`pk_test_…`) | Clerk dashboard → your ParmarPro app → **API keys** | Vercel `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (public by design) |
+| Clerk secret key (`sk_test_…`) **secret** | Same page | Vercel `CLERK_SECRET_KEY`; GitHub secret `E2E_CLERK_SECRET_KEY` for authenticated tests |
+| Clerk webhook signing secret (`whsec_…`) **secret** | Clerk → **Webhooks** → add the endpoint `/api/webhooks/clerk` → *Signing secret* | Vercel `CLERK_WEBHOOK_SIGNING_SECRET` |
+| Supabase URL and publishable key | Supabase dashboard → project → **Project settings → API keys** | Vercel `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` |
+| Supabase secret key **secret, bypasses RLS** | Same page, *Secret keys* | Vercel `SUPABASE_SECRET_KEY` only. Never in the browser, the repo or CI logs |
+| Razorpay test key id and secret **secret** | Razorpay dashboard (Test Mode) → **Account & Settings → API keys** | Vercel `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET` |
+| Razorpay webhook secret **secret** | Razorpay → **Webhooks** → add `/api/webhooks/razorpay`; you choose the secret | Vercel `RAZORPAY_WEBHOOK_SECRET` |
+| Sentry DSN | Sentry → project `parmarpro-web` → **Settings → Client Keys (DSN)** | Vercel `NEXT_PUBLIC_SENTRY_DSN` (public by design) |
+| Sentry auth token **secret** | Sentry → **Settings → Developer settings**, scope `project:releases` only | Vercel `SENTRY_AUTH_TOKEN` (build) |
+| PostHog project key and host | PostHog → **Project settings → Project API key** | Vercel `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` (public by design) |
+| Vercel access for deploys from your computer | Vercel → **Account settings → Tokens**, or `vercel login` | Your own machine only (never the repo) |
+| Local development values | Copy `.env.example` to `.env.local` and fill in dev values | `.env.local` (gitignored) |
+
+Production keys are different keys from different places (a Clerk production instance, a separate Supabase production project, Razorpay Live Mode). They are created at gate G7 and live only in Vercel's **Production** scope.
+
 ## 2. One-time provider setup
 
 ### 2.1 Supabase (staging)

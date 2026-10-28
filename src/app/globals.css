@@ -366,6 +366,11 @@ html.lenis body {
   width: 100%;
   height: 100%;
   display: block;
+  opacity: 0;
+  transition: opacity 0.7s ease-out;
+}
+.cf-stage[data-live="true"] .cf-canvas {
+  opacity: 1;
 }
 
 /* Panel frame geometry shared by the fallback and the live (card) layer. */
@@ -392,8 +397,14 @@ html.lenis body {
 }
 
 /* CSS-only fallback: same colours, same directions, drifting dots. */
+.cf-fallback {
+  transition:
+    opacity 0.7s ease-out,
+    visibility 0s linear 0.7s;
+}
 .cf-stage[data-live="true"] .cf-fallback {
-  display: none;
+  opacity: 0;
+  visibility: hidden;
 }
 .cf-fallback .cf-panel[data-tone="blue"] {
   background: var(--color-brand-500);
