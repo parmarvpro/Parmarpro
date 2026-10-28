@@ -81,6 +81,17 @@ const MATRIX: Record<Role, ReadonlySet<Permission>> = {
   viewer: new Set(READ),
 };
 
+/**
+ * Writes to operational records need an active trial or paid period. Reads,
+ * deletes, team management and billing itself never do, so a clinic can
+ * always see its data, remove data and renew.
+ */
+const ENTITLED: ReadonlySet<Permission> = new Set([...OPERATE, "patient:archive"]);
+
+export function requiresEntitlement(permission: Permission): boolean {
+  return ENTITLED.has(permission);
+}
+
 export function isRole(value: unknown): value is Role {
   return typeof value === "string" && (ROLES as readonly string[]).includes(value);
 }

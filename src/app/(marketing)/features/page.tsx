@@ -1,0 +1,121 @@
+import {
+  ActivityIcon,
+  BarChart3Icon,
+  CalendarCheck2Icon,
+  ClipboardListIcon,
+  InboxIcon,
+  ShieldCheckIcon,
+  UserRoundIcon,
+  UsersIcon,
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = { title: "Features" };
+
+const SECTIONS = [
+  {
+    icon: InboxIcon,
+    title: "Leads and inquiries",
+    points: [
+      "Record the source: phone call, WhatsApp, walk-in, website, Google, Instagram, Facebook, referral, Practo, Justdial or other",
+      "Move inquiries through new, contacted, qualified, appointment booked, converted or lost",
+      "Assign an owner and a next follow-up date; search and filter the list",
+      "See the follow-up history of every inquiry",
+    ],
+  },
+  {
+    icon: UserRoundIcon,
+    title: "Patient contact records",
+    points: [
+      "Name, phone and email, kept to what the front desk needs",
+      "Record WhatsApp, SMS and email consent, plus opt-outs",
+      "No clinical notes, diagnoses or prescriptions: ParmarPro is not an EHR",
+    ],
+  },
+  {
+    icon: CalendarCheck2Icon,
+    title: "Appointments",
+    points: [
+      "Book for a patient or directly from an inquiry",
+      "Confirm, reschedule, cancel, or mark as completed or no-show",
+      "Filter by date, status and team member",
+    ],
+  },
+  {
+    icon: ClipboardListIcon,
+    title: "Follow-up tasks",
+    points: ["Create and assign tasks with due dates", "Overdue view for the daily huddle", "Link tasks to an inquiry, patient or appointment"],
+  },
+  {
+    icon: BarChart3Icon,
+    title: "Dashboard",
+    points: [
+      "Counts of new inquiries, conversions, appointments and completed tasks for any date range",
+      "Every number is calculated from your clinic's own records",
+    ],
+  },
+  {
+    icon: UsersIcon,
+    title: "Team and roles",
+    points: [
+      "Invite your team by email",
+      "Owner, administrator, staff and read-only roles",
+      "Administrators manage staff; only the owner manages billing",
+    ],
+  },
+  {
+    icon: ActivityIcon,
+    title: "Activity history",
+    points: ["See who changed what and when, without copying personal details into the log"],
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Security by design",
+    points: [
+      "Clinic data isolated by database-level access rules",
+      "Sign-in powered by Clerk, with multi-factor authentication available",
+      "Payments handled by Razorpay; ParmarPro never sees card details",
+    ],
+  },
+];
+
+export default function FeaturesPage() {
+  return (
+    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <div className="max-w-2xl">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Features</h1>
+        <p className="mt-3 text-lg text-muted-foreground">
+          Everything ParmarPro does today. We list only features that exist in the product.
+        </p>
+      </div>
+      <div className="mt-10 grid gap-5 md:grid-cols-2">
+        {SECTIONS.map((section) => (
+          <section key={section.title} className="rounded-xl border bg-card p-6">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <section.icon className="size-5" />
+              </span>
+              <h2 className="text-lg font-semibold">{section.title}</h2>
+            </div>
+            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground marker:text-primary">
+              {section.points.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+      <div className="mt-12 flex flex-wrap gap-3">
+        <Button asChild size="lg">
+          <Link href="/sign-up">Start free trial</Link>
+        </Button>
+        <Button asChild size="lg" variant="outline">
+          <Link href="/pricing">See pricing</Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
