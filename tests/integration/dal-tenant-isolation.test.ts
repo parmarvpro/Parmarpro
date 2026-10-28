@@ -117,6 +117,14 @@ describe("tenant isolation through the DAL", () => {
     expect(tasks.rows.map((r) => r.id)).not.toContain(B.taskId);
   });
 
+  it("own patient detail returns only the selected columns", async () => {
+    await actAs(A.viewer);
+    const { patient } = await dal.patients.getPatient(A.patientId);
+    expect(patient.id).toBe(A.patientId);
+    expect(patient).not.toHaveProperty("clinic_id");
+    expect(patient).not.toHaveProperty("created_by");
+  });
+
   it("guessing a Clinic B id returns not_found (no existence leak)", async () => {
     await actAs(A.owner);
     await expect(dal.leads.getLead(B.leadId)).rejects.toMatchObject({ code: "not_found" });

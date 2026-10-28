@@ -158,7 +158,7 @@ The single plan, "ParmarPro Clinic", costs ₹75,000 per month plus 18% GST, so 
 
 Secrets are scoped per environment in Vercel. Production secrets are never placed in Preview or Development.
 
-## 6. Key source locations (target)
+## 6. Key source locations
 
 - `src/proxy.ts`: Clerk middleware; redirects only.
 - `src/server/auth/`: auth context, permission matrix, typed errors.
@@ -168,3 +168,12 @@ Secrets are scoped per environment in Vercel. Production secrets are never place
 - `src/server/billing/`: the provider interface, the Razorpay implementation, plans, and webhook processing.
 - `supabase/migrations/`: schema, RLS, grants, triggers, RPCs.
 - `tests/`: unit, database (RLS), integration (DAL → PostgREST → RLS), and end-to-end tests.
+
+## 7. Implementation notes
+
+- **Content Security Policy.** `clerkMiddleware` in `src/proxy.ts` sets a strict CSP with a per-request nonce and `'strict-dynamic'`. Extra origins are allowed only for Razorpay Checkout. Other headers come from `next.config.ts`: HSTS, `X-Frame-Options: DENY`, `nosniff`, Referrer-Policy, Permissions-Policy and COOP.
+- **Same-origin telemetry proxies.** PostHog traffic goes through `/ingest/*`, a rewrite in `next.config.ts`. Sentry events go through `/monitoring` (`tunnelRoute`). As a result the CSP `connect-src` needs no analytics origins, and ad blockers do not silently drop error reports. Both payloads are scrubbed in the browser before sending.
+- **Organization selection.** The Clerk application forces an active organization. A signed-in user without one is sent to `/onboarding`. The database denies everything when the `o.id` claim is missing (TI-12).
+- **`my_membership()`** runs as `SECURITY INVOKER`. It needs no elevated rights because RLS already limits `clinic_members` to the caller's own active clinic.
+- **Local test stack.** `scripts/local-db/start.sh` runs `supabase/postgres` and PostgREST in Docker and applies every migration. It writes `.env.test.local`, which contains a JWT secret generated for that run. Tests mint Clerk-shaped tokens with that secret, so the RLS tests use the same policies, grants and roles as the Supabase platform. CI uses the same script.
+- **Generated types.** `scripts/gen-db-types.mjs` introspects the local database. CI fails if `src/server/db/database.types.ts` differs from the migrations.

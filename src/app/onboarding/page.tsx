@@ -6,7 +6,11 @@ import { redirect } from "next/navigation";
 import { Logo } from "@/components/logo";
 import { ClaimInvitation } from "@/components/onboarding/claim-invitation";
 import { ClinicSetupForm } from "@/components/onboarding/clinic-setup-form";
+import { RegistrationTracker } from "@/components/onboarding/registration-tracker";
+import { AnalyticsProvider } from "@/components/providers/analytics-provider";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { publicEnv } from "@/lib/env";
+import { analyticsIdFor } from "@/server/analytics-id";
 import { getSessionState } from "@/server/auth/context";
 
 export const metadata: Metadata = { title: "Set up your clinic" };
@@ -20,6 +24,13 @@ export default async function OnboardingPage() {
   const isOrgAdmin = state.kind === "no_membership" && session.orgRole === "org:admin";
 
   return (
+    <AnalyticsProvider
+      apiKey={publicEnv.NEXT_PUBLIC_POSTHOG_KEY}
+      apiHost={publicEnv.NEXT_PUBLIC_POSTHOG_HOST}
+      analyticsUserId={analyticsIdFor(state.userId)}
+      clinicId={null}
+    >
+    {state.kind === "no_org" ? <RegistrationTracker /> : null}
     <div className="flex min-h-screen flex-col bg-muted/30">
       <header className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
         <Logo />
@@ -67,5 +78,6 @@ export default async function OnboardingPage() {
         </Card>
       </main>
     </div>
+    </AnalyticsProvider>
   );
 }

@@ -30,7 +30,11 @@ export async function listPatients(rawFilters: unknown) {
 export async function getPatient(rawId: unknown) {
   const ctx = await requirePermission("patient:read");
   const id = parseInput(uuidField, rawId);
-  const { data, error } = await ctx.db.from("patients").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await ctx.db
+    .from("patients")
+    .select("id, full_name, phone_e164, email, whatsapp_consent, sms_consent, email_consent, consent_recorded_at, opted_out_at, archived_at, created_at, updated_at")
+    .eq("id", id)
+    .maybeSingle();
   throwIfDbError(error);
   if (!data) throw new AppError("not_found");
   const [appointments, leads, tasks] = await Promise.all([
