@@ -11,11 +11,11 @@ import { test as base } from "@playwright/test";
 const usingPlaceholderClerk = !process.env.BASE_URL && !process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
 export const test = base.extend({
-  context: async ({ context, baseURL }, use) => {
+  context: async ({ context, baseURL }, provide) => {
     if (usingPlaceholderClerk && baseURL) {
       await context.addCookies([{ name: "__clerk_db_jwt", value: "local-e2e-placeholder", url: baseURL }]);
     }
-    await use(context);
+    await provide(context);
   },
 });
 
