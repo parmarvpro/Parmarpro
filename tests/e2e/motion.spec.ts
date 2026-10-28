@@ -89,6 +89,30 @@ test.describe("counter-flow stage", () => {
     expect(Math.sign(middle!)).toBe(-Math.sign(outerLeft!));
   });
 
+  test("the halftone tide inside the 01 / 02 / 03 cards follows the same rule", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/");
+    const layers = page.locator("[data-step] .flow-tide-layer");
+    // Two tones per card, three cards.
+    await expect(layers).toHaveCount(6);
+    const directions = await layers.evaluateAll((nodes) => nodes.map((node) => (node as unknown as SVGElement).dataset.direction));
+    expect(directions).toEqual(["normal", "normal", "reverse", "reverse", "normal", "normal"]);
+
+    const before = await translateY(page, "[data-step] .flow-tide-layer");
+    await page.waitForTimeout(1500);
+    const after = await translateY(page, "[data-step] .flow-tide-layer");
+    const [leftA, leftB, middleA, middleB, rightA, rightB] = after.map((value, index) => value - before[index]!);
+
+    expect(Math.abs(leftA!)).toBeGreaterThan(10);
+    // Both tones of one card move together; outer cards match each other; the middle is the opposite.
+    expect(leftB).toBeCloseTo(leftA!, 0);
+    expect(middleB).toBeCloseTo(middleA!, 0);
+    expect(rightA).toBeCloseTo(leftA!, 0);
+    expect(rightB).toBeCloseTo(leftA!, 0);
+    expect(Math.sign(middleA!)).toBe(-Math.sign(leftA!));
+    expect(Math.abs(Math.abs(middleA!) - Math.abs(leftA!))).toBeLessThan(3);
+  });
+
   test("the pause control stops every running animation on the stage and is remembered", async ({ page }) => {
     await page.goto("/");
     expect(await runningAnimations(page, STAGE)).toBeGreaterThan(0);

@@ -514,6 +514,39 @@ html.lenis body {
   animation-play-state: paused;
 }
 
+/* Halftone tide (step cards): dot sizes follow one wave per 400 px, and the layer travels exactly 400 px. */
+.flow-tide {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: #eef3ff;
+  -webkit-mask-image: var(--tide-mask, linear-gradient(to bottom, transparent, #000 60%));
+  mask-image: var(--tide-mask, linear-gradient(to bottom, transparent, #000 60%));
+}
+.flow-tide[data-tone="blue"] {
+  color: var(--color-brand-500);
+}
+.flow-tide-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  animation: tide-rise 10s linear infinite;
+  will-change: transform;
+}
+.flow-tide-layer[data-direction="reverse"] {
+  animation-direction: reverse;
+}
+@keyframes tide-rise {
+  to {
+    transform: translate3d(0, -400px, 0);
+  }
+}
+:root[data-motion="off"] .flow-tide-layer {
+  animation-play-state: paused;
+}
+
 /* Marquee track: the content is duplicated, so -50% is a seamless loop. */
 @keyframes marquee-left {
   to {
@@ -702,6 +735,7 @@ html.lenis body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .flow-tide-layer,
   .dot-drift::before,
   .marquee-track,
   [class*="art-"],

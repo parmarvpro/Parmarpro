@@ -75,7 +75,7 @@ The marketing site moves; the dashboard does not (only a button press scale and 
 Three separate blocks in a line. **The outer two move together, the middle one moves the opposite way**, at the same speed, with inverted tones (blue base with light dots, paper base with blue dots). The rule lives in one file, `src/lib/motion/counter-flow.ts` (`FLOW_DIRECTIONS = [1, -1, 1]`), and every layer reads it, so the directions cannot drift apart. It is used on:
 
 - the hero stage (dot field, sample cards, scroll parallax);
-- the 01 / 02 / 03 step cards (dot drift, and the cards cross each other as the row scrolls on screens from 768 px up);
+- the 01 / 02 / 03 step cards: a halftone "tide" (`FlowTide`, dots that swell and shrink as one wave travels through them) rises in the outer two cards and falls in the middle one, in two tones so it stays visible on both the light and the blue part of the card. The cards also cross each other as the row scrolls, on screens from 768 px up;
 - smaller echoes: the `DotDrift` panels on the page headers, call to action and sign-in panel.
 
 ### Layers of the hero stage

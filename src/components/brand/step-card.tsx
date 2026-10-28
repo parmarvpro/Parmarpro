@@ -1,6 +1,11 @@
-import { DotDrift } from "@/components/motion/dot-drift";
+import { FlowTide } from "@/components/motion/flow-tide";
 import type { PanelIndex } from "@/lib/motion/counter-flow";
 import { cn } from "@/lib/utils";
+
+/** Keeps the tide inside the band between the copy and the big word. */
+function tideMask(stops: string): React.CSSProperties {
+  return { "--tide-mask": `linear-gradient(to bottom, ${stops})` } as React.CSSProperties;
+}
 
 /**
  * Numbered step card (01 / 02 / 03). Regular cards fade from white to brand blue
@@ -34,7 +39,10 @@ export function StepCard({
         )}
       >
         {flow !== undefined ? (
-          <DotDrift index={flow} className="opacity-40" style={{ "--dot-mask": "linear-gradient(to bottom, #000, transparent 62%)" } as React.CSSProperties} />
+          <>
+            <FlowTide index={flow} tone="light" style={tideMask("transparent 41%, #000 49%, #000 58%, transparent 67%")} />
+            <FlowTide index={flow} tone="blue" style={tideMask("transparent 60%, #000 69%, #000 79%, transparent 87%")} />
+          </>
         ) : null}
         <div className="relative">
           <h3 className="headline text-3xl text-white sm:text-4xl">{word}</h3>
@@ -57,11 +65,10 @@ export function StepCard({
       )}
     >
       {flow !== undefined ? (
-        <DotDrift
-          index={flow}
-          className="opacity-45"
-          style={{ "--dot-mask": "linear-gradient(to bottom, transparent 22%, #000 52%, transparent 84%)" } as React.CSSProperties}
-        />
+        <>
+          <FlowTide index={flow} tone="blue" style={tideMask("transparent 50%, #000 57%, #000 62%, transparent 68%")} />
+          <FlowTide index={flow} tone="light" style={tideMask("transparent 56%, #000 64%, #000 78%, transparent 87%")} />
+        </>
       ) : null}
       <div className="relative">
         <span className="text-3xl font-bold tracking-tight text-brand-500 tabular-nums">{number}</span>
