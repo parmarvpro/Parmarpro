@@ -28,6 +28,11 @@ export function SiteFooter() {
           </ul>
         </div>
       </div>
+      <div aria-hidden="true" className="overflow-hidden border-t border-hairline select-none">
+        <p className="outline-text-soft text-center text-[clamp(3rem,13.6vw,15rem)] leading-[0.82] font-extrabold tracking-[-0.05em] uppercase">
+          ParmarPro
+        </p>
+      </div>
       <div className="border-t border-hairline">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-4 py-5 text-xs text-ink-500 sm:px-6">
           <p>© {new Date().getFullYear()} ParmarPro. All rights reserved.</p>

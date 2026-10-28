@@ -6,6 +6,7 @@ import { EyebrowTag } from "@/components/brand/eyebrow-tag";
 import { Halftone } from "@/components/brand/halftone";
 import { Sparkle } from "@/components/brand/sparkle";
 import { PageHero } from "@/components/marketing/page-hero";
+import { Tilt } from "@/components/motion/tilt";
 import { Button } from "@/components/ui/button";
 import { formatInr, PLANS, priceBreakdown, TRIAL_DAYS } from "@/lib/plans";
 
@@ -16,11 +17,11 @@ export default function PricingPage() {
   const price = priceBreakdown(plan);
   return (
     <>
-      <PageHero eyebrow="Pricing" title="Simple pricing, one plan">
+      <PageHero eyebrow="Pricing" title="Simple pricing, one plan" accent={["plan"]}>
         Every feature is included. Pay month by month, with no long-term contract.
       </PageHero>
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-        <div className="grid overflow-hidden rounded-3xl border border-brand-500/30 bg-white md:grid-cols-[1fr_1.15fr]">
+        <Tilt className="overflow-hidden rounded-3xl"><div className="grid overflow-hidden rounded-3xl border border-brand-500/30 bg-white md:grid-cols-[1fr_1.15fr]">
           <div className="relative overflow-hidden bg-brand-500 p-8 text-white md:p-10">
             <Halftone map="corner" inverse className="absolute inset-0" />
             <Sparkle tone="white" className="absolute -right-8 -bottom-10 hidden size-56 md:block" />
@@ -61,7 +62,7 @@ export default function PricingPage() {
               you can renew at any time.
             </p>
           </div>
-        </div>
+        </div></Tilt>
       </div>
     </>
   );
