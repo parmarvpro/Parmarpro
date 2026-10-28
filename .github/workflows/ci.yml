@@ -16,7 +16,7 @@ concurrency:
 env:
   # Placeholders for build-time only; real values come from repository secrets.
   NEXT_PUBLIC_APP_ENV: development
-  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY || 'pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk' }}
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.E2E_CLERK_PUBLISHABLE_KEY || 'pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk' }}  # gitleaks:allow placeholder key for example.clerk.accounts.dev (public by design)
   NEXT_TELEMETRY_DISABLED: "1"
 
 jobs:

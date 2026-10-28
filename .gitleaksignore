@@ -3,3 +3,6 @@
 # `gitleaks:allow` markers were added. They are not real credentials.
 24d89f13ae54d0c78fd4d0d4441d050a41d25341:tests/unit/scrub.test.ts:jwt:10
 24d89f13ae54d0c78fd4d0d4441d050a41d25341:tests/unit/scrub.test.ts:stripe-access-token:19
+# Placeholder Clerk publishable key (encodes example.clerk.accounts.dev); publishable keys are public by design.
+48fb8a0d36023889d47d646fbae83cbaa5556c9b:.github/workflows/ci.yml:generic-api-key:18
+48fb8a0d36023889d47d646fbae83cbaa5556c9b:tests/e2e/fixtures.ts:generic-api-key:11

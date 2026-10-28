@@ -8,7 +8,7 @@ import { test as base } from "@playwright/test";
  * This is test-side only: the app has no bypass, protected pages still
  * redirect to sign-in, and with real keys (CI/staging) this is not used.
  */
-export const PLACEHOLDER_CLERK_PUBLISHABLE_KEY = "pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk"; // example.clerk.accounts.dev
+export const PLACEHOLDER_CLERK_PUBLISHABLE_KEY = "pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk"; // gitleaks:allow placeholder for example.clerk.accounts.dev
 const configuredKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 const usingPlaceholderClerk = !process.env.BASE_URL && (!configuredKey || configuredKey === PLACEHOLDER_CLERK_PUBLISHABLE_KEY);
 

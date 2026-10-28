@@ -32,14 +32,14 @@ export default defineConfig({
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
         env: {
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? "pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk",
-          CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY ?? "sk_test_placeholder_for_e2e_only",
-          CLERK_WEBHOOK_SIGNING_SECRET: process.env.CLERK_WEBHOOK_SIGNING_SECRET ?? "whsec_ZTJlcGxhY2Vob2xkZXJzZWNyZXQ=",
-          SUPABASE_URL: process.env.SUPABASE_URL ?? "http://127.0.0.1:1",
-          SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY ?? "sb_publishable_e2e_placeholder",
-          RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID ?? "rzp_test_e2eplaceholder",
-          RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET ?? "e2e_placeholder_secret",
-          RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET ?? "whsec_e2e_placeholder",
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || "pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk", // gitleaks:allow placeholder
+          CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY || "sk_test_placeholder_for_e2e_only",
+          CLERK_WEBHOOK_SIGNING_SECRET: process.env.CLERK_WEBHOOK_SIGNING_SECRET || "whsec_ZTJlcGxhY2Vob2xkZXJzZWNyZXQ=",
+          SUPABASE_URL: process.env.SUPABASE_URL || "http://127.0.0.1:1",
+          SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY || "sb_publishable_e2e_placeholder",
+          RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || "rzp_test_e2eplaceholder",
+          RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || "e2e_placeholder_secret",
+          RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET || "whsec_e2e_placeholder",
         },
       },
 });
