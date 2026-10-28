@@ -3,6 +3,9 @@ import { auth } from "@clerk/nextjs/server";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+import { EyebrowTag } from "@/components/brand/eyebrow-tag";
+import { Halftone } from "@/components/brand/halftone";
+import { Sparkle } from "@/components/brand/sparkle";
 import { Logo } from "@/components/logo";
 import { ClaimInvitation } from "@/components/onboarding/claim-invitation";
 import { ClinicSetupForm } from "@/components/onboarding/clinic-setup-form";
@@ -31,11 +34,22 @@ export default async function OnboardingPage() {
       clinicId={null}
     >
     {state.kind === "no_org" ? <RegistrationTracker /> : null}
-    <div className="flex min-h-screen flex-col bg-muted/30">
+    <div className="flex min-h-screen flex-col bg-white">
       <header className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
         <Logo />
         <UserButton />
       </header>
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl bg-brand-500 text-white">
+          <Halftone map="corner" inverse className="absolute inset-0" />
+          <Sparkle tone="white" className="absolute -top-6 right-4 hidden size-44 sm:block" />
+          <div className="relative space-y-3 p-8 md:p-10">
+            <EyebrowTag tone="inverse">Welcome to ParmarPro</EyebrowTag>
+            <h1 className="headline max-w-xl text-3xl sm:text-4xl">Let&apos;s get your clinic set up</h1>
+            <p className="max-w-lg text-sm">Create your workspace, or join the clinic that invited you.</p>
+          </div>
+        </div>
+      </div>
       <main id="main" className="mx-auto grid w-full max-w-5xl flex-1 gap-6 px-4 pt-6 pb-16 sm:px-6 md:grid-cols-2">
         {state.kind === "no_membership" && !isOrgAdmin ? (
           <Card className="md:col-span-2">

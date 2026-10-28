@@ -30,7 +30,7 @@ export default async function TasksPage({ searchParams }: PageProps<"/dashboard/
 
   return (
     <>
-      <PageHeader title="Follow-up tasks" description="What the team needs to do next, and what is overdue." actions={canCreate ? <TaskFormDialog members={members} /> : null} />
+      <PageHeader eyebrow="Follow-ups" title="Follow-up tasks" description="What the team needs to do next, and what is overdue." actions={canCreate ? <TaskFormDialog members={members} /> : null} />
       <FilterBar
         selects={[
           {

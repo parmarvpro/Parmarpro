@@ -27,7 +27,7 @@ export default async function LeadsPage({ searchParams }: PageProps<"/dashboard/
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Front desk"
         title="Leads & inquiries"
         description="Everyone who has contacted the clinic, with source, status and next follow-up."
         actions={canCreate ? <LeadFormDialog members={members} /> : null}

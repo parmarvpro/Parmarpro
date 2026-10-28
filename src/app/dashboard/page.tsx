@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FilterBar } from "@/components/dashboard/filter-bar";
 import { sourceLabel } from "@/components/dashboard/options";
 import { PageHeader } from "@/components/dashboard/page-header";
+import { Stat } from "@/components/dashboard/stat-card";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,24 +19,6 @@ export const metadata: Metadata = { title: "Overview" };
 
 const RANGE_LABEL: Record<string, string> = { "7d": "last 7 days", "30d": "last 30 days", "90d": "last 90 days", month: "this month" };
 
-function Stat({ label, value, hint, icon: Icon, href }: { label: string; value: number; hint: string; icon: typeof InboxIcon; href?: string }) {
-  const body = (
-    <Card className="h-full transition-colors hover:border-primary/40">
-      <CardContent className="flex items-start justify-between p-5">
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight">{value}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
-        </div>
-        <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-4" />
-        </span>
-      </CardContent>
-    </Card>
-  );
-  return href ? <Link href={href}>{body}</Link> : body;
-}
-
 export default async function DashboardPage({ searchParams }: PageProps<"/dashboard">) {
   const params = flattenSearchParams(await searchParams);
   const data = await getDashboard(params);
@@ -44,7 +27,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 
   return (
     <>
-      <PageHeader title={data.clinicName} description="An overview built from your clinic's own records." />
+      <PageHeader eyebrow="Overview" title={data.clinicName} description="An overview built from your clinic's own records." />
       <FilterBar
         selects={[
           {

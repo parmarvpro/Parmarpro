@@ -1,65 +1,69 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+/*
+ * ParmarPro design tokens. Light only. Electric cobalt on white and paper,
+ * a blue scale, an ink (gray) scale and black. See docs/design-system.md.
+ */
+@theme {
+  --color-brand-50: #eef3ff;
+  --color-brand-100: #dce6ff;
+  --color-brand-200: #bacdff;
+  --color-brand-300: #8eadff;
+  --color-brand-400: #5b87ff;
+  --color-brand-500: #1f5bff;
+  --color-brand-600: #0d47e6;
+  --color-brand-700: #0b38b4;
+  --color-brand-800: #0a2a82;
+  --color-brand-900: #081c55;
+  --color-brand-950: #050e2b;
 
-:root {
-  --radius: 0.625rem;
-  --background: oklch(0.993 0.002 197);
-  --foreground: oklch(0.2 0.02 230);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.02 230);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.02 230);
-  --primary: oklch(0.52 0.105 195);
-  --primary-foreground: oklch(0.985 0.005 195);
-  --secondary: oklch(0.965 0.008 200);
-  --secondary-foreground: oklch(0.25 0.025 225);
-  --muted: oklch(0.965 0.006 210);
-  --muted-foreground: oklch(0.5 0.02 230);
-  --accent: oklch(0.955 0.02 195);
-  --accent-foreground: oklch(0.3 0.06 200);
-  --destructive: oklch(0.577 0.215 27);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.6 0.13 155);
-  --warning: oklch(0.75 0.15 75);
-  --border: oklch(0.915 0.01 215);
-  --input: oklch(0.9 0.012 215);
-  --ring: oklch(0.6 0.1 195);
-  --sidebar: oklch(0.98 0.005 200);
-  --sidebar-foreground: oklch(0.25 0.02 230);
-  --sidebar-accent: oklch(0.94 0.02 195);
-  --sidebar-accent-foreground: oklch(0.28 0.06 200);
-  --sidebar-border: oklch(0.92 0.01 215);
+  --color-ink-50: #f6f7f9;
+  --color-ink-100: #eceef2;
+  --color-ink-200: #d9dce3;
+  --color-ink-300: #b8bdc8;
+  --color-ink-400: #8a90a0;
+  --color-ink-500: #5e6575;
+  --color-ink-600: #474d5b;
+  --color-ink-700: #323743;
+  --color-ink-800: #1f232c;
+  --color-ink-900: #12151b;
+  --color-ink-950: #0a0c10;
+
+  --color-paper: #f4f3ef;
+  --color-hairline: #d3ddf5;
 }
 
-.dark {
-  --background: oklch(0.17 0.015 235);
-  --foreground: oklch(0.96 0.005 210);
-  --card: oklch(0.21 0.018 235);
-  --card-foreground: oklch(0.96 0.005 210);
-  --popover: oklch(0.21 0.018 235);
-  --popover-foreground: oklch(0.96 0.005 210);
-  --primary: oklch(0.72 0.11 190);
-  --primary-foreground: oklch(0.18 0.03 220);
-  --secondary: oklch(0.26 0.02 235);
-  --secondary-foreground: oklch(0.94 0.005 210);
-  --muted: oklch(0.26 0.018 235);
-  --muted-foreground: oklch(0.72 0.02 220);
-  --accent: oklch(0.29 0.03 210);
-  --accent-foreground: oklch(0.94 0.01 200);
-  --destructive: oklch(0.65 0.2 25);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.7 0.13 155);
-  --warning: oklch(0.8 0.14 80);
-  --border: oklch(1 0 0 / 11%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.1 190);
-  --sidebar: oklch(0.19 0.016 235);
-  --sidebar-foreground: oklch(0.94 0.005 210);
-  --sidebar-accent: oklch(0.27 0.025 215);
-  --sidebar-accent-foreground: oklch(0.96 0.01 200);
-  --sidebar-border: oklch(1 0 0 / 9%);
+:root {
+  color-scheme: light;
+  --radius: 0.875rem;
+  --background: #ffffff;
+  --foreground: var(--color-ink-900);
+  --card: #ffffff;
+  --card-foreground: var(--color-ink-900);
+  --popover: #ffffff;
+  --popover-foreground: var(--color-ink-900);
+  --primary: var(--color-brand-500);
+  --primary-hover: var(--color-brand-600);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-brand-50);
+  --secondary-foreground: var(--color-brand-700);
+  --muted: var(--color-ink-50);
+  --muted-foreground: var(--color-ink-500);
+  --accent: var(--color-brand-50);
+  --accent-foreground: var(--color-brand-700);
+  --destructive: #c4261a;
+  --destructive-foreground: #ffffff;
+  --success: #0e7a43;
+  --warning: #9a4a08;
+  --border: var(--color-hairline);
+  --input: #8a94ad;
+  --ring: var(--color-brand-400);
+  --sidebar: #ffffff;
+  --sidebar-foreground: var(--color-ink-700);
+  --sidebar-accent: var(--color-brand-50);
+  --sidebar-accent-foreground: var(--color-brand-700);
+  --sidebar-border: var(--color-hairline);
 }
 
 @theme inline {
@@ -72,6 +76,7 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -91,10 +96,11 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
 }
 
 @layer base {
@@ -105,6 +111,82 @@
     @apply bg-background text-foreground antialiased;
   }
   ::selection {
-    @apply bg-primary/20;
+    @apply bg-brand-200 text-brand-950;
   }
+}
+
+/* Large uppercase display headline (marketing and auth only). Uppercase is visual; the DOM text stays sentence case. */
+@utility headline {
+  text-transform: uppercase;
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* Small uppercase label above titles. */
+@utility eyebrow {
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-brand-600);
+}
+
+/*
+ * Halftone (dot screen). A soft dot field is multiplied with a grayscale
+ * density map, then thresholded with contrast(); darker map areas give larger
+ * dots. The black-on-white result is screened over the brand blue, which gives
+ * blue dots on white. `.halftone-inverse` gives white dots on blue.
+ * Decorative only: always aria-hidden.
+ */
+@utility halftone {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--color-brand-500);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    background:
+      radial-gradient(closest-side, #999, #fff) 0 0 / var(--ht-cell, 9px) var(--ht-cell, 9px) repeat,
+      var(--ht-map, radial-gradient(70% 80% at 50% 45%, #fff 30%, #6a6a6a 100%));
+    background-blend-mode: multiply;
+    filter: var(--ht-filter, contrast(18));
+    mix-blend-mode: screen;
+  }
+}
+
+@utility halftone-inverse {
+  --ht-filter: contrast(18) invert(1);
+}
+
+@utility ht-map-sweep {
+  --ht-map:
+    conic-gradient(from 210deg at 46% 55%, #fff 0deg, #8c8c8c 70deg, #fff 150deg, #9a9a9a 230deg, #fff 300deg, #8c8c8c 360deg),
+    radial-gradient(50% 55% at 46% 52%, #fff 25%, #b4b4b4 100%);
+}
+
+@utility ht-map-edge {
+  --ht-map: linear-gradient(to bottom, #fff 35%, #8c8c8c 100%);
+}
+
+@utility ht-map-corner {
+  --ht-map: radial-gradient(90% 90% at 100% 0%, #6e6e6e 0%, #fff 70%);
+}
+
+@utility ht-map-band {
+  --ht-map: linear-gradient(100deg, #fff 50%, #8a8a8a 76%, #fff 100%);
+}
+
+@utility ht-fine {
+  --ht-cell: 6px;
+}
+
+@utility ht-coarse {
+  --ht-cell: 12px;
 }

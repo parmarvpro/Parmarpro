@@ -41,10 +41,10 @@ export function EntitlementBanner({
 
   if (accessEndsSoon && accessEndsAt) {
     return (
-      <Alert variant="warning" className="rounded-none border-x-0 border-t-0">
+      <Alert variant="info" className="rounded-none border-x-0 border-t-0">
         <ClockIcon />
         <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <AlertDescription className="mt-0 text-foreground">
+          <AlertDescription className="mt-0 font-medium text-brand-800">
             {onTrial ? "Your free trial" : "Your paid period"} ends on {formatDate(accessEndsAt)}.
           </AlertDescription>
           {canManageBilling ? (

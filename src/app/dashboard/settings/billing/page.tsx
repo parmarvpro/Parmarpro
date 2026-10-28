@@ -28,7 +28,7 @@ export default async function BillingPage() {
   return (
     <>
       <BillingViewed />
-      <PageHeader title="Billing" description="Your plan, access period and payment history." />
+      <PageHeader eyebrow="Workspace" title="Billing" description="Your plan, access period and payment history." />
       <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
         <Card>
           <CardHeader>
@@ -47,7 +47,7 @@ export default async function BillingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            <div className="rounded-lg border bg-muted/30 p-4 text-sm">
+            <div className="rounded-xl border border-brand-200 bg-linear-to-b from-brand-50 to-white p-4 text-sm">
               <div className="flex justify-between">
                 <span>Plan (1 month)</span>
                 <span className="tabular-nums">{formatInr(price.basePaise)}</span>
@@ -56,7 +56,7 @@ export default async function BillingPage() {
                 <span>GST (18%)</span>
                 <span className="tabular-nums">{formatInr(price.gstPaise)}</span>
               </div>
-              <div className="mt-3 flex justify-between border-t pt-3 font-medium">
+              <div className="mt-3 flex justify-between border-t border-brand-200 pt-3 font-semibold text-brand-800">
                 <span>Total per month</span>
                 <span className="tabular-nums">{formatInr(price.totalPaise)}</span>
               </div>

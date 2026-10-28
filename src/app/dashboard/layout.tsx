@@ -8,7 +8,6 @@ import { NAV_ITEMS } from "@/components/dashboard/nav-items";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { Logo } from "@/components/logo";
 import { AnalyticsProvider } from "@/components/providers/analytics-provider";
-import { ThemeToggle } from "@/components/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 import { publicEnv } from "@/lib/env";
 import { humanize } from "@/lib/format";
@@ -32,10 +31,11 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
       clinicId={ctx.clinicId}
     >
       <div className="flex min-h-screen">
-        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r bg-sidebar lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar lg:flex">
           <div className="flex h-16 items-center px-5">
             <Logo href="/dashboard" />
           </div>
+          <p className="eyebrow truncate px-6 pt-2 pb-1 text-ink-500">{ctx.clinicName}</p>
           <div className="flex-1 overflow-y-auto px-3 py-2">
             <SidebarNav items={items} />
           </div>
@@ -43,8 +43,8 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
             <AnalyticsToggle />
           </div>
         </aside>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur sm:px-6">
+        <div className="flex min-w-0 flex-1 flex-col bg-brand-50/40">
+          <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-hairline bg-white/85 px-4 backdrop-blur sm:px-6">
             <MobileSidebar items={items} clinicName={ctx.clinicName} />
             <div className="min-w-0 flex-1">
               <OrganizationSwitcher
@@ -57,7 +57,6 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
             <Badge variant="secondary" className="hidden sm:inline-flex">
               {humanize(ctx.role)}
             </Badge>
-            <ThemeToggle />
             <UserButton />
           </header>
           <EntitlementBanner

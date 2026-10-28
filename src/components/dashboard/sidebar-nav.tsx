@@ -48,8 +48,9 @@ export function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              active && "bg-sidebar-accent text-sidebar-accent-foreground",
+              "relative flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-sidebar-foreground transition-colors hover:bg-ink-50 hover:text-ink-900",
+              active &&
+                "bg-sidebar-accent font-semibold text-sidebar-accent-foreground before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-brand-500 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
             )}
           >
             <Icon className="size-4" />

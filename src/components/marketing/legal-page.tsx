@@ -1,5 +1,6 @@
 import { AlertTriangleIcon } from "lucide-react";
 
+import { EyebrowTag } from "@/components/brand/eyebrow-tag";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 /**
@@ -10,11 +11,14 @@ export const LEGAL_TEXT_REVIEWED = false;
 
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: React.ReactNode }) {
   return (
-    <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="text-3xl font-semibold tracking-tight">{title}</h1>
-      <p className="mt-2 text-sm text-muted-foreground">Last updated {updated}</p>
+    <article className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+      <div className="space-y-4 border-b border-hairline pb-8">
+        <EyebrowTag tone="soft">Legal</EyebrowTag>
+        <h1 className="headline text-4xl text-brand-500 sm:text-5xl">{title}</h1>
+        <p className="text-sm text-ink-500">Last updated {updated}</p>
+      </div>
       {!LEGAL_TEXT_REVIEWED ? (
-        <Alert variant="warning" className="mt-6">
+        <Alert variant="warning" className="mt-8">
           <AlertTriangleIcon />
           <div>
             <AlertTitle>Draft pending legal review</AlertTitle>
@@ -25,7 +29,7 @@ export function LegalPage({ title, updated, children }: { title: string; updated
           </div>
         </Alert>
       ) : null}
-      <div className="mt-8 space-y-6 text-[15px] leading-relaxed [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-semibold [&_li]:mt-1.5 [&_p]:text-muted-foreground [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-muted-foreground">
+      <div className="mt-8 space-y-6 text-[15px] leading-relaxed text-ink-800 [&_h2]:mt-10 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-brand-700 [&_li]:mt-1.5 [&_p]:text-ink-600 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:text-ink-600 [&_ul]:marker:text-brand-500">
         {children}
       </div>
     </article>

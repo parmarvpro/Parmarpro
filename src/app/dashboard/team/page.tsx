@@ -31,7 +31,7 @@ export default async function TeamPage() {
 
   return (
     <>
-      <PageHeader title="Team" description="Who can access this clinic, and what they can do." actions={canInvite ? <InviteDialog roles={assignable} /> : null} />
+      <PageHeader eyebrow="Clinic" title="Team" description="Who can access this clinic, and what they can do." actions={canInvite ? <InviteDialog roles={assignable} /> : null} />
       <div className="grid gap-6 xl:grid-cols-[1fr_320px]">
         <div className="space-y-6">
           <div className="rounded-xl border bg-card">

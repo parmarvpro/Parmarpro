@@ -8,7 +8,7 @@ ParmarPro is **not** an electronic health record. It stores contact details and 
 
 ## Stack
 
-- **App:** Next.js 16 (App Router, `src/proxy.ts`), React 19, TypeScript (strict), Tailwind CSS 4, shadcn-style components, Lucide icons.
+- **App:** Next.js 16 (App Router, `src/proxy.ts`), React 19, TypeScript (strict), Tailwind CSS 4, shadcn-style components, Lucide icons. Light-only visual identity described in [`docs/design-system.md`](docs/design-system.md).
 - **Auth:** Clerk, where each clinic is a Clerk organization.
 - **Database:** Supabase Postgres with row-level security. It receives Clerk session tokens through native third-party auth.
 - **Payments:** Razorpay Orders. One plan, ₹75,000 + 18% GST per clinic per month, paid per period.
@@ -68,6 +68,7 @@ CI (`.github/workflows/ci.yml`) runs all of the above, plus gitleaks over the fu
 - [Incident response](docs/incident-response.md)
 - [Backup and recovery](docs/backup-and-recovery.md)
 - [Analytics events](docs/analytics-events.md)
+- [Design system](docs/design-system.md)
 
 ## Data rules
 

@@ -33,7 +33,7 @@ export default async function PatientsPage({ searchParams }: PageProps<"/dashboa
 
   return (
     <>
-      <PageHeader title="Patients" description="Contact details and communication preferences." actions={canCreate ? <PatientFormDialog /> : null} />
+      <PageHeader eyebrow="Records" title="Patients" description="Contact details and communication preferences." actions={canCreate ? <PatientFormDialog /> : null} />
       <FilterBar
         search={{ placeholder: "Search name or phone" }}
         selects={[{ name: "archived", label: "Active patients", options: [{ value: "include", label: "Active and archived" }, { value: "only", label: "Archived only" }] }]}

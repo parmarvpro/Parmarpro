@@ -82,7 +82,7 @@ export default function PrivacyPage() {
           Patients and inquirers should contact their clinic first. We will help the clinic respond to access,
           correction and erasure requests.
         </li>
-        <li>You can opt out of product analytics from the account menu inside the app.</li>
+        <li>You can switch off product analytics with the &quot;Product analytics&quot; control in the app&apos;s sidebar.</li>
       </ul>
 
       <h2>Contact</h2>

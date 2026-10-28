@@ -15,7 +15,7 @@ export default async function SettingsPage() {
   const { clinic, role } = await getClinic();
   return (
     <>
-      <PageHeader title="Settings" description="Clinic details and workspace preferences." />
+      <PageHeader eyebrow="Workspace" title="Settings" description="Clinic details and workspace preferences." />
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>

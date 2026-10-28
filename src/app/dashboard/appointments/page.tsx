@@ -33,7 +33,7 @@ export default async function AppointmentsPage({ searchParams }: PageProps<"/das
 
   return (
     <>
-      <PageHeader
+      <PageHeader eyebrow="Schedule"
         title="Appointments"
         description="Times shown in India Standard Time."
         actions={canCreate ? <AppointmentFormDialog members={members} patients={patients} /> : null}

@@ -13,9 +13,11 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
   }, [error]);
   return (
     <div className="mx-auto flex max-w-md flex-col items-center py-20 text-center">
-      <AlertTriangleIcon className="size-10 text-destructive" />
-      <h1 className="mt-4 text-xl font-semibold">Something went wrong</h1>
-      <p className="mt-2 text-sm text-muted-foreground">
+      <span className="flex size-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+        <AlertTriangleIcon className="size-5" />
+      </span>
+      <h1 className="mt-5 text-xl font-bold text-ink-900">Something went wrong</h1>
+      <p className="mt-2 text-sm text-ink-500">
         We couldn&apos;t load this page. You may not have access to it, or the service is briefly unavailable.
         {error.digest ? ` Reference: ${error.digest}` : null}
       </p>

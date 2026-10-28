@@ -11,6 +11,7 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageHero } from "@/components/marketing/page-hero";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Features" };
@@ -84,38 +85,42 @@ const SECTIONS = [
 
 export default function FeaturesPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
-      <div className="max-w-2xl">
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Features</h1>
-        <p className="mt-3 text-lg text-muted-foreground">
-          Everything ParmarPro does today. We list only features that exist in the product.
-        </p>
+    <>
+      <PageHero eyebrow="Product" title="Features">
+        Everything ParmarPro does today. We list only features that exist in the product.
+      </PageHero>
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+        <div className="grid gap-4 md:grid-cols-2">
+          {SECTIONS.map((section, index) => (
+            <section key={section.title} className="rounded-2xl border bg-white p-6 transition-colors hover:border-brand-300">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <span className="flex size-10 items-center justify-center rounded-xl bg-brand-500 text-white">
+                    <section.icon className="size-5" />
+                  </span>
+                  <h2 className="text-lg font-semibold text-ink-900">{section.title}</h2>
+                </div>
+                <span className="text-2xl font-bold tracking-tight text-brand-200 tabular-nums" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-ink-600 marker:text-brand-500">
+                {section.points.map((point) => (
+                  <li key={point}>{point}</li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+        <div className="mt-12 flex flex-wrap gap-3">
+          <Button asChild size="lg">
+            <Link href="/sign-up">Start free trial</Link>
+          </Button>
+          <Button asChild size="lg" variant="outline">
+            <Link href="/pricing">See pricing</Link>
+          </Button>
+        </div>
       </div>
-      <div className="mt-10 grid gap-5 md:grid-cols-2">
-        {SECTIONS.map((section) => (
-          <section key={section.title} className="rounded-xl border bg-card p-6">
-            <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                <section.icon className="size-5" />
-              </span>
-              <h2 className="text-lg font-semibold">{section.title}</h2>
-            </div>
-            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-muted-foreground marker:text-primary">
-              {section.points.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
-      </div>
-      <div className="mt-12 flex flex-wrap gap-3">
-        <Button asChild size="lg">
-          <Link href="/sign-up">Start free trial</Link>
-        </Button>
-        <Button asChild size="lg" variant="outline">
-          <Link href="/pricing">See pricing</Link>
-        </Button>
-      </div>
-    </div>
+    </>
   );
 }

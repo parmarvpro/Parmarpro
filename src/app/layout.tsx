@@ -3,7 +3,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 
-import { ThemeProvider } from "@/components/providers/theme-provider";
 import { publicEnv } from "@/lib/env";
 
 import "./globals.css";
@@ -23,21 +22,44 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fbfdfd" },
-    { media: "(prefers-color-scheme: dark)", color: "#141b22" },
-  ],
+  themeColor: "#ffffff",
+  colorScheme: "light",
+};
+
+/** Clerk's hosted components (sign-in, organization switcher, user menu) in the ParmarPro palette. */
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#1f5bff",
+    colorPrimaryForeground: "#ffffff",
+    colorForeground: "#12151b",
+    colorMutedForeground: "#5e6575",
+    colorBackground: "#ffffff",
+    colorInput: "#ffffff",
+    colorInputForeground: "#12151b",
+    colorBorder: "#d3ddf5",
+    colorRing: "#5b87ff",
+    colorDanger: "#c4261a",
+    colorSuccess: "#0e7a43",
+    colorWarning: "#9a4a08",
+    borderRadius: "0.75rem",
+    fontFamily: "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif",
+    fontFamilyButtons: "var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif",
+  },
+  elements: {
+    card: "shadow-none border border-hairline rounded-2xl",
+    formButtonPrimary: "rounded-full shadow-none",
+    socialButtonsBlockButton: "rounded-full",
+    footerActionLink: "text-brand-600",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <ClerkProvider afterSignOutUrl="/" signInUrl="/sign-in" signUpUrl="/sign-up">
-      <html lang="en-IN" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+    <ClerkProvider afterSignOutUrl="/" signInUrl="/sign-in" signUpUrl="/sign-up" appearance={clerkAppearance}>
+      <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
         <body className="flex min-h-full flex-col font-sans">
-          <ThemeProvider>
-            {children}
-            <Toaster richColors closeButton position="top-right" />
-          </ThemeProvider>
+          {children}
+          <Toaster richColors closeButton position="top-right" toastOptions={{ classNames: { toast: "rounded-2xl" } }} />
         </body>
       </html>
     </ClerkProvider>

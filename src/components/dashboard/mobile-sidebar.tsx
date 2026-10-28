@@ -3,6 +3,7 @@
 import { MenuIcon } from "lucide-react";
 import { useState } from "react";
 
+import { AnalyticsToggle } from "@/components/dashboard/analytics-toggle";
 import type { NavItem } from "@/components/dashboard/nav-items";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { Logo } from "@/components/logo";
@@ -18,12 +19,15 @@ export function MobileSidebar({ items, clinicName }: { items: NavItem[]; clinicN
           <MenuIcon />
         </Button>
       </SheetTrigger>
-      <SheetContent className="p-4">
+      <SheetContent className="bg-white p-4">
         <SheetTitle className="sr-only">Navigation</SheetTitle>
         <Logo href="/dashboard" />
-        <p className="mt-4 truncate px-3 text-xs font-medium tracking-wide text-muted-foreground uppercase">{clinicName}</p>
-        <div className="mt-2">
+        <p className="eyebrow mt-4 truncate px-3 text-ink-500">{clinicName}</p>
+        <div className="mt-2 flex-1">
           <SidebarNav items={items} onNavigate={() => setOpen(false)} />
+        </div>
+        <div className="border-t border-hairline pt-3">
+          <AnalyticsToggle />
         </div>
       </SheetContent>
     </Sheet>

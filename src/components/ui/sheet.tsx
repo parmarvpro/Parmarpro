@@ -14,7 +14,7 @@ const SheetTitle = SheetPrimitive.Title;
 function SheetContent({ className, children, ...props }: React.ComponentProps<typeof SheetPrimitive.Content>) {
   return (
     <SheetPrimitive.Portal>
-      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
+      <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-brand-950/40 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0" />
       <SheetPrimitive.Content
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex h-full w-72 max-w-[85vw] flex-col border-r bg-sidebar shadow-lg",
