@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
 /**
@@ -16,11 +17,15 @@ const securityHeaders = [
   { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
 ];
 
+const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+
 const nextConfig: NextConfig = {
   // Tenant data is never cached across requests: every authenticated route
   // renders dynamically per request. (Cache Components stays disabled.)
   poweredByHeader: false,
   reactStrictMode: true,
+  // PostHog is proxied through this origin so the CSP can stay 'self'.
+  skipTrailingSlashRedirect: true,
   turbopack: {
     rules: {
       "*.css": {
@@ -32,6 +37,22 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async rewrites() {
+    return [
+      { source: "/ingest/static/:path*", destination: `${posthogHost.replace("://us.i.", "://us-assets.i.").replace("://eu.i.", "://eu-assets.i.")}/static/:path*` },
+      { source: "/ingest/:path*", destination: `${posthogHost}/:path*` },
+    ];
+  },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  silent: !process.env.CI,
+  // Browser events go through this origin (keeps the CSP connect-src 'self').
+  tunnelRoute: "/monitoring",
+  widenClientFileUpload: true,
+  sourcemaps: { deleteSourcemapsAfterUpload: true },
+  telemetry: false,
+});

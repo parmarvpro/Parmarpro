@@ -8,14 +8,35 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
  *
  * API routes are deliberately not redirected here: handlers answer 401/403
  * JSON themselves, and webhook routes authenticate by signature.
+ *
+ * Content-Security-Policy: Clerk generates a per-request nonce with
+ * 'strict-dynamic'. Sentry (/monitoring) and PostHog (/ingest) are proxied
+ * through this origin, so only Razorpay Checkout needs extra origins.
  */
 const isAppPage = createRouteMatcher(["/dashboard(.*)", "/onboarding(.*)"]);
 
-export default clerkMiddleware(async (auth, request) => {
-  if (isAppPage(request)) {
-    await auth.protect();
-  }
-});
+export default clerkMiddleware(
+  async (auth, request) => {
+    if (isAppPage(request)) {
+      await auth.protect();
+    }
+  },
+  {
+    contentSecurityPolicy: {
+      strict: true,
+      directives: {
+        "connect-src": ["https://api.razorpay.com", "https://lumberjack.razorpay.com"],
+        "frame-src": ["https://api.razorpay.com", "https://checkout.razorpay.com"],
+        "script-src": ["https://checkout.razorpay.com"],
+        "img-src": ["data:", "https://cdn.razorpay.com"],
+        "base-uri": ["self"],
+        "object-src": ["none"],
+        "frame-ancestors": ["none"],
+        "form-action": ["self"],
+      },
+    },
+  },
+);
 
 export const config = {
   matcher: [

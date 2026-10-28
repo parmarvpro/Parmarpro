@@ -1,6 +1,6 @@
 import { createHmac } from "node:crypto";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { ReconcileDeps } from "@/server/billing/reconcile";
 import { processRazorpayWebhook, type WebhookStore } from "@/server/billing/webhook-processor";
@@ -15,7 +15,7 @@ function delivery(event: string, paymentId = "pay_P1", eventId = "evt_1") {
 let seen: Map<string, string>;
 let store: WebhookStore;
 let reconcile: ReconcileDeps;
-let applyPayment: ReturnType<typeof vi.fn>;
+let applyPayment: Mock<ReconcileDeps["applyPayment"]>;
 let signals: string[];
 
 beforeEach(() => {
@@ -34,7 +34,7 @@ beforeEach(() => {
       seen.set(eventId, status);
     }),
   };
-  applyPayment = vi.fn(async () => ({ applied: true, paidThrough: "2026-12-01T00:00:00Z" }));
+  applyPayment = vi.fn<ReconcileDeps["applyPayment"]>(async () => ({ applied: true, paidThrough: "2026-12-01T00:00:00Z" }));
   reconcile = {
     provider: {
       fetchPayment: vi.fn(async (id: string) => ({ id, orderId: "order_A1", status: "captured" as const, amountPaise: 8_850_000, currency: "INR", method: "upi", errorCode: null })),

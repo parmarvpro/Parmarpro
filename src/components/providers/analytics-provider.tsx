@@ -9,6 +9,7 @@ import { routeTemplate } from "@/lib/analytics/events";
 
 type Props = {
   apiKey: string | undefined;
+  /** PostHog UI host (for links only); events go through the same-origin /ingest proxy. */
   apiHost: string;
   /** SHA-256 of the Clerk user id: pseudonymous, never an email or name. */
   analyticsUserId: string;
@@ -31,7 +32,8 @@ export function AnalyticsProvider({ apiKey, apiHost, analyticsUserId, clinicId, 
     if (!apiKey || initialised.current) return;
     initialised.current = true;
     posthog.init(apiKey, {
-      api_host: apiHost,
+      api_host: "/ingest",
+      ui_host: apiHost.replace(".i.posthog.com", ".posthog.com"),
       autocapture: false,
       capture_pageview: false,
       capture_pageleave: false,

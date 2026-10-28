@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
 import type { ProviderPayment } from "@/server/billing/provider";
 import { reconcilePayment, type BillingOrderRecord, type ReconcileDeps } from "@/server/billing/reconcile";
@@ -17,14 +17,14 @@ function payment(overrides: Partial<ProviderPayment> = {}): ProviderPayment {
   return { id: "pay_P1", orderId: "order_A1", status: "captured", amountPaise: 8_850_000, currency: "INR", method: "upi", errorCode: null, ...overrides };
 }
 
-let deps: ReconcileDeps & { applyPayment: ReturnType<typeof vi.fn>; recordAttempt: ReturnType<typeof vi.fn> };
+let deps: ReconcileDeps & { applyPayment: Mock<ReconcileDeps["applyPayment"]>; recordAttempt: Mock<ReconcileDeps["recordAttempt"]> };
 
 beforeEach(() => {
   deps = {
     provider: { fetchPayment: vi.fn(async () => payment()) },
     findOrder: vi.fn(async (id: string) => (id === ORDER.provider_order_id ? ORDER : null)),
-    applyPayment: vi.fn(async () => ({ applied: true, paidThrough: "2026-12-28T00:00:00Z" })),
-    recordAttempt: vi.fn(async () => undefined),
+    applyPayment: vi.fn<ReconcileDeps["applyPayment"]>(async () => ({ applied: true, paidThrough: "2026-12-28T00:00:00Z" })),
+    recordAttempt: vi.fn<ReconcileDeps["recordAttempt"]>(async () => undefined),
   };
 });
 
