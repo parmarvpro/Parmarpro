@@ -1,0 +1,7 @@
+# Only packages listed here may run install scripts (supply-chain hardening).
+onlyBuiltDependencies:
+  - supabase
+ignoredBuiltDependencies:
+  - core-js
+  - sharp
+  - unrs-resolver
