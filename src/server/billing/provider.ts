@@ -22,5 +22,7 @@ export interface BillingProvider {
   publicKeyId(): string;
   createOrder(params: { receipt: string; amountPaise: number; currency: "INR"; notes: Record<string, string> }): Promise<ProviderOrder>;
   fetchPayment(paymentId: string): Promise<ProviderPayment>;
+  /** Every payment attempt made against one provider order. Used by the reconciliation job. */
+  fetchOrderPayments(orderId: string): Promise<ProviderPayment[]>;
   verifyCheckoutSignature(params: { orderId: string; paymentId: string; signature: string }): boolean;
 }

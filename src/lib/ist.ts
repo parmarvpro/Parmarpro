@@ -33,6 +33,15 @@ export function istDayStart(date: Date): Date {
   return new Date(Math.floor(shifted / DAY_MS) * DAY_MS - IST_OFFSET_MS);
 }
 
+/** 00:00 IST on the Monday of the IST week that contains `date`. */
+export function istWeekStart(date: Date): Date {
+  const dayStart = istDayStart(date);
+  // Day number since 1970-01-01 (a Thursday) in IST; Monday is 0.
+  const dayNumber = Math.floor((dayStart.getTime() + IST_OFFSET_MS) / DAY_MS);
+  const weekday = (dayNumber + 3) % 7;
+  return new Date(dayStart.getTime() - weekday * DAY_MS);
+}
+
 /** "YYYY-MM-DD" of the IST calendar day that contains `date`. */
 export function istDateKey(date: Date): string {
   return new Date(date.getTime() + IST_OFFSET_MS).toISOString().slice(0, 10);

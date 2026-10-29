@@ -29,6 +29,7 @@ const provider = {
   publicKeyId: () => "rzp_test_abc",
   createOrder: vi.fn(async ({ amountPaise }: { amountPaise: number }) => ({ id: "order_NEW1", amountPaise, currency: "INR", receipt: null })),
   fetchPayment: vi.fn(async (id: string) => ({ id, orderId: "order_A1", status: "captured" as const, amountPaise: 8_850_000, currency: "INR", method: "card", errorCode: null })),
+  fetchOrderPayments: vi.fn(async () => []),
   verifyCheckoutSignature: ({ orderId, paymentId, signature }: { orderId: string; paymentId: string; signature: string }) =>
     createHmac("sha256", SECRET).update(`${orderId}|${paymentId}`).digest("hex") === signature,
 };

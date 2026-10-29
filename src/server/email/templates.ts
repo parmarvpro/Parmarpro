@@ -340,7 +340,9 @@ export function staffDigestEmail(input: {
     rows.push(["Unassigned open tasks", String(c.unassignedOpenTasks)], ["Unassigned follow-ups", String(c.unassignedFollowUps)]);
   }
   return email({
-    subject: `Today at ${oneLine(input.clinicName)}: ${total} to do`,
+    subject: `Today at ${oneLine(input.clinicName)}: ${total} to do${
+      c.appointmentsToday > 0 ? `, ${c.appointmentsToday} appointment${c.appointmentsToday === 1 ? "" : "s"}` : ""
+    }`,
     blocks: [
       { type: "heading", text: `Today at ${input.clinicName}` },
       { type: "paragraph", text: "These are counts only. Open the dashboard for the details." },

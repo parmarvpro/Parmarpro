@@ -25,6 +25,20 @@ const paymentSchema = z.object({
   error_code: z.string().nullable().optional(),
 });
 
+const paymentsSchema = z.object({ items: z.array(paymentSchema) });
+
+function toProviderPayment(payment: z.infer<typeof paymentSchema>): ProviderPayment {
+  return {
+    id: payment.id,
+    orderId: payment.order_id ?? null,
+    status: payment.status,
+    amountPaise: payment.amount,
+    currency: payment.currency,
+    method: payment.method ?? null,
+    errorCode: payment.error_code ?? null,
+  };
+}
+
 export class RazorpayApiError extends Error {
   constructor(readonly status: number) {
     super(`razorpay_api_${status}`);
@@ -59,16 +73,12 @@ export function createRazorpayProvider(): BillingProvider {
     },
     async fetchPayment(paymentId: string): Promise<ProviderPayment> {
       if (!/^pay_[A-Za-z0-9]+$/.test(paymentId)) throw new RazorpayApiError(400);
-      const payment = paymentSchema.parse(await call(`/payments/${paymentId}`));
-      return {
-        id: payment.id,
-        orderId: payment.order_id ?? null,
-        status: payment.status,
-        amountPaise: payment.amount,
-        currency: payment.currency,
-        method: payment.method ?? null,
-        errorCode: payment.error_code ?? null,
-      };
+      return toProviderPayment(paymentSchema.parse(await call(`/payments/${paymentId}`)));
+    },
+    async fetchOrderPayments(orderId: string): Promise<ProviderPayment[]> {
+      if (!/^order_[A-Za-z0-9]+$/.test(orderId)) throw new RazorpayApiError(400);
+      const body = paymentsSchema.parse(await call(`/orders/${orderId}/payments`));
+      return body.items.map(toProviderPayment);
     },
     verifyCheckoutSignature({ orderId, paymentId, signature }) {
       return verifyCheckoutSignature({ orderId, paymentId, signature, keySecret: RAZORPAY_KEY_SECRET });

@@ -193,10 +193,16 @@ describe("payment receipt", () => {
 });
 
 describe("staff digest", () => {
-  it("counts only overdue and due-today tasks and follow-ups in the subject", () => {
+  it("counts overdue and due-today tasks and follow-ups as to-dos, and names today's appointments", () => {
     const email = staffDigestEmail({ clinicName: "Smile Clinic", isManager: false, counts: COUNTS, unsubscribeUrl: UNSUBSCRIBE });
-    // 2 + 3 + 1 + 4. Appointments and unassigned counts are not to-dos.
-    expect(email.subject).toBe("Today at Smile Clinic: 10 to do");
+    // 2 + 3 + 1 + 4. Unassigned counts are not in the subject.
+    expect(email.subject).toBe("Today at Smile Clinic: 10 to do, 6 appointments");
+  });
+
+  it("does not say '0 to do' without context when only appointments are due", () => {
+    const counts = { ...COUNTS, tasksDueToday: 0, tasksOverdue: 0, followUpsDueToday: 0, followUpsOverdue: 0, appointmentsToday: 1 };
+    const email = staffDigestEmail({ clinicName: "Smile Clinic", isManager: false, counts, unsubscribeUrl: UNSUBSCRIBE });
+    expect(email.subject).toBe("Today at Smile Clinic: 0 to do, 1 appointment");
   });
 
   it("shows unassigned lines only to owners and admins", () => {

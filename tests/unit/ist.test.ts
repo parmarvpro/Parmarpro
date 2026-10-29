@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatIstDate, formatIstDateTime, istDateKey, istDayStart } from "@/lib/ist";
+import { formatIstDate, formatIstDateTime, istDateKey, istDayStart, istWeekStart } from "@/lib/ist";
 
 describe("istDayStart", () => {
   it("is 00:00 IST of the IST day, which is still the previous UTC day", () => {
@@ -54,5 +54,18 @@ describe("IST formatting", () => {
   it("uses the IST day, not the UTC day, for the date", () => {
     // 20:00Z on 29 Oct is already 30 Oct in IST.
     expect(formatIstDate(new Date("2026-10-29T20:00:00Z"))).toBe("30 Oct 2026");
+  });
+});
+
+describe("istWeekStart", () => {
+  it("returns Monday 00:00 IST for any moment of that IST week", () => {
+    // Monday 2 Nov 2026 00:00 IST is 2026-11-01T18:30Z.
+    const monday = "2026-11-01T18:30:00.000Z";
+    expect(istWeekStart(new Date("2026-11-01T18:30:00Z")).toISOString()).toBe(monday);
+    expect(istWeekStart(new Date("2026-11-04T09:00:00Z")).toISOString()).toBe(monday);
+    // Sunday 8 Nov 2026, 23:59 IST still belongs to that week.
+    expect(istWeekStart(new Date("2026-11-08T18:29:00Z")).toISOString()).toBe(monday);
+    // Monday 9 Nov 2026, 00:00 IST starts the next one.
+    expect(istWeekStart(new Date("2026-11-08T18:30:00Z")).toISOString()).toBe("2026-11-08T18:30:00.000Z");
   });
 });
