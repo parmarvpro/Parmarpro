@@ -56,6 +56,27 @@ const razorpayWebhookSchema = z.object({
   RAZORPAY_WEBHOOK_SECRET: z.string().min(10),
 });
 
+const emailSchema = z.object({
+  RESEND_API_KEY: z.string().regex(/^re_[A-Za-z0-9_]{8,}$/),
+  // "Name <address@domain>" or "address@domain".
+  EMAIL_FROM: z
+    .string()
+    .min(5)
+    .regex(/<[^<>@\s]+@[^<>@\s]+>$|^[^<>@\s]+@[^<>@\s]+$/),
+});
+
+const founderAlertSchema = z.object({
+  FOUNDER_ALERT_EMAIL: z.email(),
+});
+
+const jobsSchema = z.object({
+  CRON_SECRET: z.string().min(32),
+});
+
+const linkSigningSchema = z.object({
+  LINK_SIGNING_SECRET: z.string().min(32),
+});
+
 export class MissingConfigurationError extends Error {
   constructor(area: string, issues: string) {
     super(`Missing or invalid configuration for ${area}: ${issues}`);
@@ -99,7 +120,50 @@ export function razorpayWebhookEnv() {
   return load("Razorpay webhook", razorpayWebhookSchema);
 }
 
-export function isConfigured(area: "supabase" | "razorpay" | "razorpayWebhook" | "clerk"): boolean {
+/** Server-only: transactional email (Resend). */
+export function emailEnv() {
+  return load("Email", emailSchema);
+}
+
+/** Server-only: where founder alerts and the daily digest are sent. */
+export function founderAlertEnv() {
+  return load("Founder alerts", founderAlertSchema);
+}
+
+/** Server-only: bearer secret that authenticates the scheduled job endpoints. */
+export function jobsEnv() {
+  return load("Scheduled jobs", jobsSchema);
+}
+
+/** Server-only: HMAC key for signed action and unsubscribe links. */
+export function linkSigningEnv() {
+  return load("Signed links", linkSigningSchema);
+}
+
+type ConfiguredArea = "supabase" | "razorpay" | "razorpayWebhook" | "clerk";
+
+/**
+ * True when the configuration is present and valid. Accepts a named area
+ * (existing callers) or a loader such as emailEnv. For a loader, only a
+ * MissingConfigurationError yields false; any other error is a bug and is
+ * rethrown.
+ */
+export function isConfigured(area: ConfiguredArea): boolean;
+export function isConfigured(loader: () => unknown): boolean;
+export function isConfigured(target: ConfiguredArea | (() => unknown)): boolean {
+  if (typeof target === "function") {
+    try {
+      target();
+      return true;
+    } catch (error) {
+      if (error instanceof MissingConfigurationError) return false;
+      throw error;
+    }
+  }
+  return isAreaConfigured(target);
+}
+
+function isAreaConfigured(area: ConfiguredArea): boolean {
   try {
     switch (area) {
       case "supabase":
