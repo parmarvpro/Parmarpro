@@ -96,6 +96,7 @@ The Razorpay API is mocked in these tests. **No real Razorpay test-mode payment 
 | `jwt` in `tests/unit/scrub.test.ts` (commit 24d89f1) | Synthetic token built to test that the Sentry scrubber redacts JWTs. Its claims are `{"sub":"user_123"}` and its signature segment is the base64 of the literal text `signaturesignature`, so it is not signed with any key | Inline `gitleaks:allow`, plus a fingerprint in `.gitleaksignore` for the historical commit |
 | `stripe-access-token` in `tests/unit/scrub.test.ts` (24d89f1) | A synthetic `sk_test_` prefix followed by the word FAKE repeated, used to test redaction. ParmarPro does not use Stripe | Same |
 | `generic-api-key` in `.github/workflows/ci.yml` and `tests/e2e/fixtures.ts` (48fb8a0) | `pk_test_ZXhh…` base64-decodes to `example.clerk.accounts.dev$`. It is a placeholder **publishable** key (public by design) that points at no real Clerk instance | Same |
+| `generic-api-key` in `tests/unit/email-send.test.ts`, `notifications-claim.test.ts` and `jobs-handler.test.ts` (368bb38) | Literal test strings `re_test_0123456789abcdef` and `cron_test_secret_0123456789abcdef0123456789`, made of sequential digits and hex; used only to exercise the Resend sender and the job endpoint's bearer check. No Resend account or deployment uses them | Same |
 
 `.gitleaksignore` lists fingerprints only, never directories or rules. A new finding anywhere still fails CI.
 

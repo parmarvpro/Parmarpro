@@ -6,3 +6,8 @@
 # Placeholder Clerk publishable key (encodes example.clerk.accounts.dev); publishable keys are public by design.
 48fb8a0d36023889d47d646fbae83cbaa5556c9b:.github/workflows/ci.yml:generic-api-key:18
 48fb8a0d36023889d47d646fbae83cbaa5556c9b:tests/e2e/fixtures.ts:generic-api-key:11
+# Synthetic Resend key and job secret in automation unit tests, committed before inline
+# `gitleaks:allow` markers were added. They are not real credentials.
+368bb38dbb5ad5ab203b1bb47b57cc7a2077c03d:tests/unit/notifications-claim.test.ts:generic-api-key:52
+368bb38dbb5ad5ab203b1bb47b57cc7a2077c03d:tests/unit/email-send.test.ts:generic-api-key:9
+368bb38dbb5ad5ab203b1bb47b57cc7a2077c03d:tests/unit/jobs-handler.test.ts:generic-api-key:10

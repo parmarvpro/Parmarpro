@@ -49,7 +49,7 @@ const PARAMS = {
 
 beforeEach(() => {
   // Test-only values, not real credentials.
-  vi.stubEnv("RESEND_API_KEY", "re_test_0123456789abcdef");
+  vi.stubEnv("RESEND_API_KEY", "re_test_0123456789abcdef"); // gitleaks:allow synthetic test value
   vi.stubEnv("EMAIL_FROM", "ParmarPro <hello@example.test>");
   db.state.insertError = null;
   db.state.inserted = [];

@@ -7,7 +7,7 @@ import type { JobFn } from "@/server/jobs/registry";
 vi.mock("@/lib/observability/report", () => ({ reportError: vi.fn() }));
 
 // Test-only value, not a real secret.
-const SECRET = "cron_test_secret_0123456789abcdef0123456789";
+const SECRET = "cron_test_secret_0123456789abcdef0123456789"; // gitleaks:allow synthetic test value
 const NOW = new Date("2026-10-29T20:00:00Z");
 
 function request(path: string, authorization?: string): Request {

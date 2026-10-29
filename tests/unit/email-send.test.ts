@@ -6,7 +6,7 @@ import { createEmailSender, sendEmail, type EmailContent } from "@/server/email/
 vi.mock("@/lib/observability/report", () => ({ reportError: vi.fn() }));
 
 // Test-only values, not real credentials.
-const API_KEY = "re_test_0123456789abcdef";
+const API_KEY = "re_test_0123456789abcdef"; // gitleaks:allow synthetic test value
 const FROM = "ParmarPro <hello@example.com>";
 const RECIPIENT = "jane.patient@example.com";
 const CONTENT: EmailContent = { subject: "Your reminder", text: "Text body", html: "<p>HTML body</p>" };
