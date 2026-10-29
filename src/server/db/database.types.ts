@@ -190,6 +190,72 @@ export type Database = {
           },
         ];
       };
+      clinic_automation_settings: {
+        Row: {
+          clinic_id: string;
+          morning_digest: boolean;
+          weekly_summary: boolean;
+          untouched_lead_tasks: boolean;
+          untouched_lead_hours: number;
+          no_show_tasks: boolean;
+          round_robin: boolean;
+          round_robin_last_member: string | null;
+          recall_tasks: boolean;
+          recall_months: number;
+          patient_email_reminders: boolean;
+          enquiry_form_enabled: boolean;
+          enquiry_form_key: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          clinic_id: string;
+          morning_digest?: boolean;
+          weekly_summary?: boolean;
+          untouched_lead_tasks?: boolean;
+          untouched_lead_hours?: number;
+          no_show_tasks?: boolean;
+          round_robin?: boolean;
+          round_robin_last_member?: string | null;
+          recall_tasks?: boolean;
+          recall_months?: number;
+          patient_email_reminders?: boolean;
+          enquiry_form_enabled?: boolean;
+          enquiry_form_key?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          clinic_id?: string;
+          morning_digest?: boolean;
+          weekly_summary?: boolean;
+          untouched_lead_tasks?: boolean;
+          untouched_lead_hours?: number;
+          no_show_tasks?: boolean;
+          round_robin?: boolean;
+          round_robin_last_member?: string | null;
+          recall_tasks?: boolean;
+          recall_months?: number;
+          patient_email_reminders?: boolean;
+          enquiry_form_enabled?: boolean;
+          enquiry_form_key?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "clinic_automation_settings_clinic_id_fkey";
+            columns: ["clinic_id"];
+            isOneToOne: true;
+            referencedRelation: "clinics";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "clinic_automation_settings_clinic_id_round_robin_last_memb_fkey";
+            columns: ["clinic_id", "round_robin_last_member"];
+            isOneToOne: false;
+            referencedRelation: "clinic_members";
+            referencedColumns: ["clinic_id", "id"];
+          },
+        ];
+      };
       clinic_entitlements: {
         Row: {
           clinic_id: string;
@@ -279,6 +345,7 @@ export type Database = {
           display_name: string | null;
           created_at: string;
           updated_at: string;
+          digest_opt_out: boolean;
         };
         Insert: {
           id?: string;
@@ -289,6 +356,7 @@ export type Database = {
           display_name?: string | null;
           created_at?: string;
           updated_at?: string;
+          digest_opt_out?: boolean;
         };
         Update: {
           id?: string;
@@ -299,6 +367,7 @@ export type Database = {
           display_name?: string | null;
           created_at?: string;
           updated_at?: string;
+          digest_opt_out?: boolean;
         };
         Relationships: [
           {
@@ -354,6 +423,8 @@ export type Database = {
           city: string | null;
           message: string | null;
           created_at: string;
+          handled_at: string | null;
+          follow_up_at: string | null;
         };
         Insert: {
           id?: string;
@@ -364,6 +435,8 @@ export type Database = {
           city?: string | null;
           message?: string | null;
           created_at?: string;
+          handled_at?: string | null;
+          follow_up_at?: string | null;
         };
         Update: {
           id?: string;
@@ -374,6 +447,8 @@ export type Database = {
           city?: string | null;
           message?: string | null;
           created_at?: string;
+          handled_at?: string | null;
+          follow_up_at?: string | null;
         };
         Relationships: [
         ];
@@ -451,6 +526,41 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "patients";
             referencedColumns: ["clinic_id", "id"];
+          },
+        ];
+      };
+      notification_log: {
+        Row: {
+          id: number;
+          kind: string;
+          clinic_id: string | null;
+          subject_key: string;
+          period_key: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: never;
+          kind: string;
+          clinic_id?: string | null;
+          subject_key: string;
+          period_key: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: never;
+          kind?: string;
+          clinic_id?: string | null;
+          subject_key?: string;
+          period_key?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_clinic_id_fkey";
+            columns: ["clinic_id"];
+            isOneToOne: false;
+            referencedRelation: "clinics";
+            referencedColumns: ["id"];
           },
         ];
       };
@@ -593,6 +703,7 @@ export type Database = {
           created_by: string;
           created_at: string;
           updated_at: string;
+          auto_kind: string | null;
         };
         Insert: {
           id?: string;
@@ -610,6 +721,7 @@ export type Database = {
           created_by?: string;
           created_at?: string;
           updated_at?: string;
+          auto_kind?: string | null;
         };
         Update: {
           id?: string;
@@ -627,6 +739,7 @@ export type Database = {
           created_by?: string;
           created_at?: string;
           updated_at?: string;
+          auto_kind?: string | null;
         };
         Relationships: [
           {
@@ -777,6 +890,70 @@ export type Database = {
         };
         Returns: undefined;
       };
+      job_entitlement_notices: {
+        Args: {
+          p_now: string;
+        };
+        Returns: {
+          clinic_id: string;
+          clinic_name: string;
+          notice: string;
+          days_left: number;
+          period_key: string;
+          owner_user_ids: string[];
+        }[];
+      };
+      job_founder_metrics: {
+        Args: {
+          p_from: string;
+          p_to: string;
+        };
+        Returns: Json;
+      };
+      job_patient_reminders: {
+        Args: {
+          p_now: string;
+        };
+        Returns: {
+          appointment_id: string;
+          clinic_id: string;
+          clinic_name: string;
+          first_name: string;
+          email: string;
+          starts_at: string;
+        }[];
+      };
+      job_staff_digest: {
+        Args: {
+          p_now: string;
+        };
+        Returns: {
+          clinic_id: string;
+          clinic_name: string;
+          member_id: string;
+          clerk_user_id: string;
+          member_role: Database["public"]["Enums"]["member_role"];
+          tasks_due_today: number;
+          tasks_overdue: number;
+          follow_ups_due_today: number;
+          follow_ups_overdue: number;
+          appointments_today: number;
+          unassigned_open_tasks: number;
+          unassigned_follow_ups: number;
+        }[];
+      };
+      job_weekly_summary: {
+        Args: {
+          p_from: string;
+          p_to: string;
+        };
+        Returns: {
+          clinic_id: string;
+          clinic_name: string;
+          owner_user_ids: string[];
+          summary: Json;
+        }[];
+      };
       my_membership: {
         Args: never;
         Returns: {
@@ -804,6 +981,10 @@ export type Database = {
         };
         Returns: undefined;
       };
+      regenerate_enquiry_form_key: {
+        Args: never;
+        Returns: string;
+      };
       remove_member: {
         Args: {
           p_member_id: string;
@@ -816,6 +997,12 @@ export type Database = {
         };
         Returns: string;
       };
+      set_my_digest_opt_out: {
+        Args: {
+          p_opt_out: boolean;
+        };
+        Returns: undefined;
+      };
       submit_contact_request: {
         Args: {
           p_full_name: string;
@@ -825,7 +1012,7 @@ export type Database = {
           p_city: string;
           p_message: string;
         };
-        Returns: undefined;
+        Returns: string;
       };
     };
     Enums: {
