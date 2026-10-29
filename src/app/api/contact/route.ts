@@ -1,5 +1,8 @@
+import { after } from "next/server";
+
 import { contactRequestSchema } from "@/lib/validation/contact";
 import { AppError } from "@/server/auth/errors";
+import { notifyEnquiry } from "@/server/automations/enquiry-notifications";
 import { createAnonDb } from "@/server/db/anon-client";
 import { throwIfDbError } from "@/server/db/errors";
 import { errorResponse, jsonResponse, readJsonBody } from "@/server/http";
@@ -16,7 +19,7 @@ export async function POST(request: Request) {
     const input = parseInput(contactRequestSchema, await readJsonBody(request, 8 * 1024));
     // Honeypot filled: pretend success, store nothing.
     if (input.website) return jsonResponse({ ok: true });
-    const { error } = await createAnonDb().rpc("submit_contact_request", {
+    const { data: enquiryId, error } = await createAnonDb().rpc("submit_contact_request", {
       p_full_name: input.fullName,
       p_clinic_name: input.clinicName ?? "",
       p_phone_e164: input.phone ?? "",
@@ -25,6 +28,20 @@ export async function POST(request: Request) {
       p_message: input.message ?? "",
     });
     throwIfDbError(error);
+    // Emails go out after the response. notifyEnquiry never throws, so they cannot change it.
+    if (enquiryId) {
+      after(() =>
+        notifyEnquiry({
+          id: enquiryId,
+          fullName: input.fullName,
+          clinicName: input.clinicName,
+          phone: input.phone,
+          email: input.email,
+          city: input.city,
+          message: input.message,
+        }),
+      );
+    }
     return jsonResponse({ ok: true });
   } catch (error) {
     return errorResponse(error, "api.contact");

@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from "vitest";
 
+import { reportError } from "@/lib/observability/report";
 import type { ProviderPayment } from "@/server/billing/provider";
 import { reconcilePayment, type BillingOrderRecord, type ReconcileDeps } from "@/server/billing/reconcile";
+
+vi.mock("@/lib/observability/report", () => ({ reportError: vi.fn() }));
 
 const ORDER: BillingOrderRecord = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -79,5 +82,51 @@ describe("reconcilePayment", () => {
   it("a callback whose payment belongs to a different order is a mismatch", async () => {
     await expect(reconcilePayment("pay_P1", { providerOrderId: "order_OTHER" }, deps)).resolves.toEqual({ kind: "mismatch", reason: "order" });
     expect(deps.findOrder).not.toHaveBeenCalled();
+  });
+});
+
+describe("reconcilePayment: onPaymentApplied", () => {
+  const APPLIED_THROUGH = "2026-12-28T00:00:00Z";
+
+  beforeEach(() => {
+    vi.mocked(reportError).mockClear();
+  });
+
+  it("is called once with the payment details when this call applies the payment", async () => {
+    const onPaymentApplied = vi.fn(async () => undefined);
+    await expect(reconcilePayment("pay_P1", {}, { ...deps, onPaymentApplied })).resolves.toMatchObject({ kind: "paid", applied: true });
+    expect(onPaymentApplied).toHaveBeenCalledTimes(1);
+    expect(onPaymentApplied).toHaveBeenCalledWith({
+      clinicId: ORDER.clinic_id,
+      providerPaymentId: "pay_P1",
+      amountPaise: 8_850_000,
+      paidThrough: APPLIED_THROUGH,
+    });
+  });
+
+  it("is not called when the payment was already applied by an earlier delivery", async () => {
+    deps.applyPayment = vi.fn<ReconcileDeps["applyPayment"]>(async () => ({ applied: false, paidThrough: APPLIED_THROUGH }));
+    const onPaymentApplied = vi.fn(async () => undefined);
+    await expect(reconcilePayment("pay_P1", {}, { ...deps, onPaymentApplied })).resolves.toEqual({
+      kind: "paid",
+      applied: false,
+      paidThrough: APPLIED_THROUGH,
+      planCode: ORDER.plan_code,
+    });
+    expect(onPaymentApplied).not.toHaveBeenCalled();
+  });
+
+  it("a failing hook never changes the outcome, and the failure is reported under billing.receipt", async () => {
+    const failure = new Error("receipt failed");
+    const onPaymentApplied = vi.fn(async () => {
+      throw failure;
+    });
+    await expect(reconcilePayment("pay_P1", {}, { ...deps, onPaymentApplied })).resolves.toEqual({
+      kind: "paid",
+      applied: true,
+      paidThrough: APPLIED_THROUGH,
+      planCode: ORDER.plan_code,
+    });
+    expect(reportError).toHaveBeenCalledWith(failure, { area: "billing.receipt" });
   });
 });

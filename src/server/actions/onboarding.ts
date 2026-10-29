@@ -5,6 +5,8 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { clinicSetupSchema } from "@/lib/validation/clinic";
 import { runAction, type ActionResult } from "@/server/actions/result";
 import { AppError } from "@/server/auth/errors";
+import { scheduleAfter } from "@/server/automations/schedule";
+import { sendWelcome } from "@/server/automations/welcome";
 import { throwIfDbError } from "@/server/db/errors";
 import { createUserDb } from "@/server/db/user-client";
 import { reconcileInvitedMembership } from "@/server/privileged/membership";
@@ -23,6 +25,7 @@ export async function completeClinicSetup(input: unknown): Promise<ActionResult<
     if (!session.orgId) throw new AppError("no_active_clinic");
     if (session.orgRole !== "org:admin") throw new AppError("forbidden");
 
+    const userId = session.userId;
     const { name, city } = parseInput(clinicSetupSchema, input);
     const user = await currentUser();
     const db = createUserDb(() => session.getToken());
@@ -32,7 +35,9 @@ export async function completeClinicSetup(input: unknown): Promise<ActionResult<
       p_display_name: user?.fullName ?? user?.firstName ?? undefined,
     });
     throwIfDbError(error);
-    return { clinicId: data as string };
+    const clinicId = data as string;
+    scheduleAfter(() => sendWelcome({ clinicId, userId, clinicName: name }));
+    return { clinicId };
   });
 }
 

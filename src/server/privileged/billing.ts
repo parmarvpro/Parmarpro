@@ -1,5 +1,7 @@
 import "server-only";
 
+import { sendPaymentReceipts } from "@/server/automations/receipts";
+import { scheduleAfter } from "@/server/automations/schedule";
 import type { BillingOrderRecord, ReconcileDeps } from "@/server/billing/reconcile";
 import type { WebhookStore } from "@/server/billing/webhook-processor";
 import { privilegedDb } from "@/server/privileged/client";
@@ -61,6 +63,10 @@ export async function recentOpenOrderCount(clinicId: string): Promise<number> {
 
 export const reconcileStore: Omit<ReconcileDeps, "provider"> = {
   findOrder: findBillingOrder,
+  onPaymentApplied(info) {
+    // Sent after the response, so the receipt never delays a webhook or a checkout.
+    scheduleAfter(() => sendPaymentReceipts(info));
+  },
   async applyPayment(params) {
     const { data, error } = await privilegedDb().rpc("apply_verified_payment", {
       p_billing_order_id: params.billingOrderId,

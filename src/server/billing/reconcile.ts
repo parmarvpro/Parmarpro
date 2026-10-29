@@ -1,3 +1,4 @@
+import { reportError } from "@/lib/observability/report";
 import type { BillingProvider } from "@/server/billing/provider";
 
 export type BillingOrderRecord = {
@@ -8,6 +9,14 @@ export type BillingOrderRecord = {
   currency: string;
   plan_code: string;
   status: string;
+};
+
+/** A payment this call has just applied: the clinic's access period was extended by it. */
+export type PaymentApplied = {
+  clinicId: string;
+  providerPaymentId: string;
+  amountPaise: number;
+  paidThrough: string | null;
 };
 
 export type ReconcileDeps = {
@@ -31,6 +40,11 @@ export type ReconcileDeps = {
     method: string | null;
     errorCode: string | null;
   }) => Promise<void>;
+  /**
+   * Called only when this call applied a payment, so a duplicate delivery does not repeat it.
+   * A failure is reported and never changes the outcome.
+   */
+  onPaymentApplied?: (info: PaymentApplied) => Promise<void> | void;
 };
 
 export type ReconcileOutcome =
@@ -75,6 +89,14 @@ export async function reconcilePayment(
   switch (payment.status) {
     case "captured": {
       const result = await deps.applyPayment(base);
+      if (result.applied) {
+        await notifyPaymentApplied(deps, {
+          clinicId: order.clinic_id,
+          providerPaymentId: payment.id,
+          amountPaise: payment.amountPaise,
+          paidThrough: result.paidThrough,
+        });
+      }
       return { kind: "paid", applied: result.applied, paidThrough: result.paidThrough, planCode: order.plan_code };
     }
     case "authorized":
@@ -87,5 +109,14 @@ export async function reconcilePayment(
       return { kind: "pending" };
     case "refunded":
       return { kind: "ignored", reason: "refunded" };
+  }
+}
+
+async function notifyPaymentApplied(deps: ReconcileDeps, info: PaymentApplied): Promise<void> {
+  if (!deps.onPaymentApplied) return;
+  try {
+    await deps.onPaymentApplied(info);
+  } catch (error) {
+    reportError(error, { area: "billing.receipt" });
   }
 }
