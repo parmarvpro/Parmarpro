@@ -16,7 +16,7 @@ import { pageRange } from "@/server/dal/shared";
 import { parseInput } from "@/server/validation";
 
 const LIST_COLUMNS =
-  "id, starts_at, duration_minutes, appointment_type, status, notes, cancel_reason, assigned_to, patient:patients(id, full_name, phone_e164), lead:leads(id, full_name, phone_e164), assignee:clinic_members(id, display_name, role)";
+  "id, starts_at, duration_minutes, appointment_type, status, notes, cancel_reason, assigned_to, patient:patients(id, full_name, phone_e164, whatsapp_consent, opted_out_at), lead:leads(id, full_name, phone_e164), assignee:clinic_members(id, display_name, role)";
 
 export async function listAppointments(rawFilters: unknown) {
   const ctx = await requirePermission("appointment:read");
@@ -43,7 +43,18 @@ export async function listAppointments(rawFilters: unknown) {
   else if (filters.assignee) query = query.eq("assigned_to", filters.assignee);
   const { data, error, count } = await query.range(from, to);
   throwIfDbError(error);
-  return { rows: data ?? [], total: count ?? 0, filters, role: ctx.role };
+  const now = Date.now();
+  const rows = (data ?? []).map((appointment) => {
+    const upcoming =
+      (appointment.status === "scheduled" || appointment.status === "confirmed") && Date.parse(appointment.starts_at) > now;
+    const patient = appointment.patient;
+    // A WhatsApp reminder is offered only for an upcoming visit whose patient has a phone and agreed to WhatsApp.
+    const whatsappReminderDue = Boolean(
+      upcoming && patient?.phone_e164 && patient.whatsapp_consent && patient.opted_out_at === null,
+    );
+    return { ...appointment, whatsappReminderDue };
+  });
+  return { rows, total: count ?? 0, filters, role: ctx.role };
 }
 
 export async function createAppointment(rawInput: unknown): Promise<{ id: string; appointmentType: string; fromLead: boolean }> {

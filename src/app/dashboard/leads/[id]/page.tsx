@@ -1,4 +1,4 @@
-import { ArrowLeftIcon, Trash2Icon, UserPlusIcon } from "lucide-react";
+import { ArrowLeftIcon, MessageCircleIcon, Trash2Icon, UserPlusIcon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -13,9 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { describeActivity } from "@/lib/activity";
 import { formatDateTime, formatPhone, humanize } from "@/lib/format";
+import { firstNameOf, inquiryFollowUpText, whatsappLink } from "@/lib/whatsapp";
 import { isAppError } from "@/server/auth/errors";
 import { hasPermission } from "@/server/auth/permissions";
 import { convertLeadAction, deleteLeadAction } from "@/server/actions/leads";
+import { getClinic } from "@/server/dal/clinic";
 import { getLead } from "@/server/dal/leads";
 import { memberLabel } from "@/server/dal/shared";
 import { listAssignableMembers } from "@/server/dal/team";
@@ -33,7 +35,14 @@ async function load(id: string) {
 
 export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[id]">) {
   const { id } = await params;
-  const [{ lead, history, tasks, appointments, role }, members] = await Promise.all([load(id), listAssignableMembers()]);
+  const [{ lead, history, tasks, appointments, role }, members, { clinic }] = await Promise.all([
+    load(id),
+    listAssignableMembers(),
+    getClinic(),
+  ]);
+  const followUpHref = lead.phone_e164
+    ? whatsappLink(lead.phone_e164, inquiryFollowUpText({ firstName: firstNameOf(lead.full_name), clinicName: clinic.name }))
+    : null;
   const canUpdate = hasPermission(role, "lead:update");
   const canDelete = hasPermission(role, "lead:delete");
   const canBook = hasPermission(role, "appointment:create");
@@ -58,6 +67,14 @@ export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          {followUpHref ? (
+            <Button asChild variant="outline">
+              <a href={followUpHref} target="_blank" rel="noopener noreferrer">
+                <MessageCircleIcon />
+                Open WhatsApp
+              </a>
+            </Button>
+          ) : null}
           {canUpdate ? <LeadFormDialog members={members} lead={lead} /> : null}
           {canBook ? <AppointmentFormDialog members={members} presetLead={{ id: lead.id, full_name: lead.full_name }} /> : null}
           {canTask ? <TaskFormDialog members={members} compact link={{ leadId: lead.id, label: lead.full_name }} /> : null}

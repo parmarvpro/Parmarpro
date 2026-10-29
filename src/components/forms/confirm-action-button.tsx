@@ -43,7 +43,7 @@ export function ConfirmActionButton({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={variant} size={size} aria-label={size === "icon" ? label : undefined}>
+        <Button type="button" variant={variant} size={size} aria-label={size === "icon" ? label : undefined}>
           {icon}
           {size === "icon" ? null : label}
         </Button>

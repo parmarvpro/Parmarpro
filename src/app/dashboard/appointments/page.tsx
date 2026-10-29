@@ -1,4 +1,4 @@
-import { CalendarIcon, Trash2Icon } from "lucide-react";
+import { CalendarIcon, MessageCircleIcon, Trash2Icon } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -11,12 +11,15 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Pagination } from "@/components/dashboard/pagination";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { ConfirmActionButton } from "@/components/forms/confirm-action-button";
+import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatDate, formatPhone, formatTime, humanize } from "@/lib/format";
 import { flattenSearchParams } from "@/lib/search-params";
+import { appointmentReminderText, firstNameOf, whatsappLink } from "@/lib/whatsapp";
 import { deleteAppointmentAction } from "@/server/actions/appointments";
 import { hasPermission } from "@/server/auth/permissions";
 import { listAppointments } from "@/server/dal/appointments";
+import { getClinic } from "@/server/dal/clinic";
 import { listPatientOptions } from "@/server/dal/patients";
 import { memberLabel } from "@/server/dal/shared";
 import { listAssignableMembers } from "@/server/dal/team";
@@ -25,7 +28,11 @@ export const metadata: Metadata = { title: "Appointments" };
 
 export default async function AppointmentsPage({ searchParams }: PageProps<"/dashboard/appointments">) {
   const params = flattenSearchParams(await searchParams);
-  const [{ rows, total, filters, role }, members] = await Promise.all([listAppointments(params), listAssignableMembers()]);
+  const [{ rows, total, filters, role }, members, { clinic }] = await Promise.all([
+    listAppointments(params),
+    listAssignableMembers(),
+    getClinic(),
+  ]);
   const canCreate = hasPermission(role, "appointment:create");
   const canUpdate = hasPermission(role, "appointment:update");
   const canDelete = hasPermission(role, "appointment:delete");
@@ -78,6 +85,17 @@ export default async function AppointmentsPage({ searchParams }: PageProps<"/das
                 const person = appointment.patient ?? appointment.lead;
                 const href = appointment.patient ? `/dashboard/patients/${appointment.patient.id}` : appointment.lead ? `/dashboard/leads/${appointment.lead.id}` : null;
                 const open = appointment.status === "scheduled" || appointment.status === "confirmed";
+                const reminderHref =
+                  appointment.whatsappReminderDue && appointment.patient?.phone_e164
+                    ? whatsappLink(
+                        appointment.patient.phone_e164,
+                        appointmentReminderText({
+                          firstName: firstNameOf(appointment.patient.full_name),
+                          clinicName: clinic.name,
+                          startsAt: new Date(appointment.starts_at),
+                        }),
+                      )
+                    : null;
                 return (
                   <TableRow key={appointment.id}>
                     <TableCell className="whitespace-nowrap">
@@ -106,6 +124,14 @@ export default async function AppointmentsPage({ searchParams }: PageProps<"/das
                     </TableCell>
                     <TableCell>
                       <div className="flex justify-end gap-2">
+                        {reminderHref ? (
+                          <Button asChild variant="ghost" size="sm">
+                            <a href={reminderHref} target="_blank" rel="noopener noreferrer">
+                              <MessageCircleIcon />
+                              WhatsApp reminder
+                            </a>
+                          </Button>
+                        ) : null}
                         {canUpdate && open ? (
                           <>
                             <AppointmentFormDialog members={members} appointment={appointment} />

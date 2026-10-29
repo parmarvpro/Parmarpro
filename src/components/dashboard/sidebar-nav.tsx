@@ -9,6 +9,7 @@ import {
   SettingsIcon,
   UsersIcon,
   UsersRoundIcon,
+  ZapIcon,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -25,6 +26,7 @@ const ICONS: Record<string, LucideIcon> = {
   "list-checks": ListChecksIcon,
   users: UsersIcon,
   settings: SettingsIcon,
+  zap: ZapIcon,
   "credit-card": CreditCardIcon,
 };
 
