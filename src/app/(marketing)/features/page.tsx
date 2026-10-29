@@ -12,7 +12,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageHero } from "@/components/marketing/page-hero";
-import { Reveal } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Features" };
@@ -93,8 +92,7 @@ export default function FeaturesPage() {
       <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
         <div className="grid gap-4 md:grid-cols-2">
           {SECTIONS.map((section, index) => (
-            <Reveal key={section.title} delay={(index % 2) * 90}>
-            <section className="h-full rounded-2xl border bg-white p-6 transition-colors hover:border-brand-300">
+            <section key={section.title} className="h-full rounded-2xl border bg-white p-6 transition-colors hover:border-brand-300">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <span className="flex size-10 items-center justify-center rounded-xl bg-brand-500 text-white">
@@ -112,7 +110,6 @@ export default function FeaturesPage() {
                 ))}
               </ul>
             </section>
-            </Reveal>
           ))}
         </div>
         <div className="mt-12 flex flex-wrap gap-3">

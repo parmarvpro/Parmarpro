@@ -1,7 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import Link from "next/link";
 
-import { CountUp } from "@/components/motion/count-up";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function Stat({ label, value, hint, icon: Icon, href }: { label: string; value: number; hint: string; icon: LucideIcon; href?: string }) {
@@ -11,7 +10,7 @@ export function Stat({ label, value, hint, icon: Icon, href }: { label: string; 
       <CardContent className="flex items-start justify-between p-5">
         <div>
           <p className="eyebrow">{label}</p>
-          <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-ink-900"><CountUp to={value} durationMs={900} /></p>
+          <p className="mt-2 text-4xl font-bold tabular-nums tracking-tight text-ink-900">{value.toLocaleString("en-IN")}</p>
           <p className="mt-1 text-xs text-ink-500">{hint}</p>
         </div>
         <span className="flex size-10 items-center justify-center rounded-xl bg-brand-500 text-white">

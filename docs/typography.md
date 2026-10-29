@@ -163,7 +163,7 @@ Remove `Geist`, `Geist_Mono`, `Instrument_Serif` and `--font-instrument-serif`.
 }
 ```
 
-Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Rule: outlined words (the ribbon) use `font-kerning: none` and tracking `+0.03em`; with kerning and the display `-0.03em`, and even at `-0.01em` or `0`, the outlines of pairs such as T and Y touch or overlap (seen in zoomed renders of "ACTIVITY"). The footer wordmark may use `-0.04em` only because none of the pairs in "PARMARPRO" collide (checked zoomed).
+Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Rule: any outlined word set at display size uses `font-kerning: none` and tracking `+0.03em` (the scrolling ribbon that first needed this was removed with the motion system); with kerning and the display `-0.03em`, and even at `-0.01em` or `0`, the outlines of pairs such as T and Y touch or overlap (seen in zoomed renders of "ACTIVITY"). The footer wordmark may use `-0.04em` only because none of the pairs in "PARMARPRO" collide (checked zoomed).
 
 ## 5. Scale and rules
 
@@ -175,7 +175,6 @@ Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Ru
 | H2 (section) | `clamp(1.6rem, 3.4vw, 3rem)` | 800 | 112% | upper | -0.028em | 1.0 |
 | Card word (Capture, Follow up, Book) | `clamp(1.6rem, 2.6vw, 2.25rem)` | 800 | 112% | upper | -0.03em | 0.95 |
 | Price | `clamp(2rem, 5vw, 3.5rem)` | 800 | 112% | upper | -0.03em | 1.0 |
-| Ribbon words | `clamp(2.5rem, 9vw, 7.5rem)` | 800 | 112% | upper | -0.03em | 0.95 |
 | Footer wordmark | `clamp(2.5rem, 12.8vw, 14rem)` (measured: "PARMARPRO" is about 7.2 times the font size wide, so 12.8vw fills about 92% of the screen) | 800 | 112% | upper | -0.04em | 0.9 |
 | Lead paragraph | `clamp(1.0625rem, 0.6vw + 0.95rem, 1.25rem)` | 400 | 100% | sentence | 0 | 1.55 |
 | Body | 1rem | 400 | 100% | sentence | 0 | 1.6 |
@@ -201,7 +200,7 @@ Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Ru
 3. **Accent:** at most one word per headline, weight 300, never italic, never a serif.
 4. **No italics anywhere.** `font-synthesis: none` backs this up.
 5. **Minimum size 12px.** Exception: the aria-hidden sample cards inside the hero illustration may use 11px on phones.
-6. **Numerals:** lining by default. `tabular-nums` only in table cells, stat numbers, date/time columns and the 01/02/03 step numbers. **Never on a static display price or any figure with a comma or decimal point** (the animated count-up keeps tabular figures so its width does not jitter; checked in Archivo) (in testing, Schibsted Grotesk set a price as "75 , 000" with tabular figures; Archivo did not, but the rule keeps this safe if the font ever changes). Phone and date cells get `whitespace-nowrap`.
+6. **Numerals:** lining by default. `tabular-nums` only in table cells, stat numbers, date/time columns and the 01/02/03 step numbers. **Never on a static display price or any figure with a comma or decimal point** (in testing, Schibsted Grotesk set a price as "75 , 000" with tabular figures; Archivo did not, but the rule keeps this safe if the font ever changes). Phone and date cells get `whitespace-nowrap`.
 7. **Uppercase is visual only.** DOM text stays sentence case (tests rely on it).
 8. **`₹` always comes from Archivo**, never a fallback. Price text keeps `₹` and digits in one element.
 9. **Replace arbitrary sizes** with the scale: `text-[9px]`, `[10px]`, `[11px]` become `text-xs` (12px) except in the hero illustration; `text-[12px]` becomes `text-xs`; `text-[15px]` becomes `text-sm` or `text-base`, whichever the surrounding text uses.
@@ -229,7 +228,7 @@ Edit: `src/app/layout.tsx`, `src/app/globals.css`, `src/app/(marketing)/page.tsx
 | Accessibility (Lighthouse) | 100 | 100 |
 | Horizontal overflow, clipped headings | none | none (home, features, pricing, contact, sign-in at 390, 768, 1024, 1440) |
 
-The LCP and TBT targets from the motion work (2.5 s and 200 ms) are **still not met** in this sandbox; the font change helps but is not the main cause (see the performance notes in `design-system.md`). Numbers come from a CPU-only container with placeholder Clerk keys and are not real-device results.
+The LCP and TBT targets (2.5 s and 200 ms) were **still not met** in this sandbox at the time; the font change helped but was not the main cause. These numbers were measured while the motion system was still in place (it has since been removed), so they need re-measuring. Numbers come from a CPU-only container with placeholder Clerk keys and are not real-device results.
 
 Checked in zoomed renders: the outlined ribbon needed `font-kerning: none` and `+0.03em` tracking (section 4) because the T and Y outlines touched; the footer wordmark outline is clean.
 

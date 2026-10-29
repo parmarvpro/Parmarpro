@@ -38,7 +38,10 @@ test("marketing pages carry no invented metrics or testimonials", async ({ page 
   for (const phrase of ["testimonial", "% more patients", "trusted by", "clinics use parmarpro", "revenue recovered"]) {
     expect(text).not.toContain(phrase);
   }
-  await expect(page.getByText("Illustration · sample data")).toBeVisible();
+  // The home page shows no sample records (the illustrated product stage, which carried the
+  // "Illustration · sample data" label, is gone), so none may appear without that label.
+  await expect(page.getByText("Sample inquiry")).toHaveCount(0);
+  await expect(page.getByText("Illustration · sample data")).toHaveCount(0);
 });
 
 test("contact form validates input in the browser", async ({ page }) => {
