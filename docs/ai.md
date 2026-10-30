@@ -22,6 +22,16 @@ Google's terms treat the two kinds of key differently. The terms below were read
 
 **Retention.** Every request sends `store: false`, which stops Google keeping the interaction as a stored resource. Without it, Google keeps Interactions for 55 days on the paid tier and 1 day on the free tier, according to the [Interactions API documentation](https://ai.google.dev/gemini-api/docs/interactions-overview) of 15 October 2026. The paid terms' separate abuse-detection logging still applies to paid use. The transport sets the flag in `src/server/ai/transport.ts`.
 
+## What staff see
+
+Staff see AI help in three places, all built from `src/lib/ai-help.ts`, so the words match:
+
+- **Settings → AI help** (`/dashboard/settings/ai`): the state (off, on but not connected, or on), the two prompts staff can run, what each one receives and returns, and what is never sent. Every member with settings access can read it.
+- **A lead** (`src/components/leads/ai-triage-card.tsx`): the *AI help* card with *Sort with AI* and *Draft a reply*. The card says why nothing can run when the service is not connected, and *Sort with AI* is disabled when the lead has no enquiry text. Results are labelled *Suggested by Gemini*.
+- **Automations**: the *AI help with enquiries* switch, with a link to the settings page above.
+
+The clinic can run only the two prompts listed on that page. There is no free-text prompt box. The operations note is not in the clinic UI; it runs only in the founder's digest.
+
 ## Models and roles
 
 | Model | Role | Used for |

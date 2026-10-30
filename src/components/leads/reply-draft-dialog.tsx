@@ -1,6 +1,6 @@
 "use client";
 
-import { CopyIcon, Loader2Icon, MessageCircleIcon, PencilLineIcon } from "lucide-react";
+import { CopyIcon, Loader2Icon, MessageCircleIcon, PencilLineIcon, RefreshCwIcon } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -11,38 +11,51 @@ import { Textarea } from "@/components/ui/textarea";
 import { whatsappLink } from "@/lib/whatsapp";
 import { draftLeadReplyAction } from "@/server/actions/leads";
 
-const NOTE = {
-  ai: "Suggested by AI, check before sending.",
-  no_enquiry: "This lead has no enquiry text to answer, so this is the standard message.",
-  ai_unavailable: "AI is not available right now, so this is the standard message.",
-} as const;
+/** Where the text in the box came from. "template" is the standard follow-up message, with the reason. */
+type DraftSource = { source: "ai" } | { source: "template"; reason: "no_enquiry" | "ai_unavailable" };
+
+function describe(draft: DraftSource | null, pending: boolean): string {
+  if (pending || draft === null) return "Gemini is drafting a reply from the enquiry text.";
+  if (draft.source === "ai") return "Suggested by Gemini. Check it, edit it if you need to, then send it yourself. Nothing has been sent.";
+  return draft.reason === "no_enquiry"
+    ? "This lead has no enquiry text, so this is the standard follow-up message."
+    : "Gemini did not give a usable reply, so this is the standard follow-up message.";
+}
 
 /**
- * Asks for a suggested reply to a lead's enquiry and shows it in a dialog, to edit. Nothing is stored
- * or sent: staff copy the text or open it in WhatsApp, check it and send it themselves. A refusal
- * shows as a toast with the server's message. Nothing is stored, so the page is not refreshed.
+ * Asks Gemini for a suggested reply to a lead's enquiry and shows it in a dialog, to edit. The dialog
+ * opens at once and says that a draft is on its way. Nothing is stored or sent: staff copy the text or
+ * open it in WhatsApp, check it and send it themselves. If a draft fails when the box already holds
+ * text, the text is kept; if there is none yet, the dialog closes and a toast says why.
  */
 export function DraftReplyButton({ leadId, phone }: { leadId: string; phone: string | null }) {
   const [pending, startTransition] = useTransition();
   const [open, setOpen] = useState(false);
-  const [note, setNote] = useState<keyof typeof NOTE>("ai_unavailable");
+  const [draft, setDraft] = useState<DraftSource | null>(null);
   const [text, setText] = useState("");
 
-  function draft() {
+  function draftReply() {
+    const hadText = text !== "";
     startTransition(async () => {
       try {
         const result = await draftLeadReplyAction(leadId);
         if (!result.ok) {
+          if (!hadText) setOpen(false);
           toast.error(result.message);
           return;
         }
-        setNote(result.data.source === "ai" ? "ai" : result.data.reason);
+        setDraft(result.data.source === "ai" ? { source: "ai" } : { source: "template", reason: result.data.reason });
         setText(result.data.text);
-        setOpen(true);
       } catch {
+        if (!hadText) setOpen(false);
         toast.error("Something went wrong. Please try again.");
       }
     });
+  }
+
+  function openAndDraft() {
+    setOpen(true);
+    draftReply();
   }
 
   const reply = text.trim();
@@ -60,25 +73,37 @@ export function DraftReplyButton({ leadId, phone }: { leadId: string; phone: str
 
   return (
     <>
-      <Button type="button" variant="outline" size="sm" disabled={pending} onClick={draft}>
-        {pending ? <Loader2Icon className="animate-spin" /> : <PencilLineIcon />}
+      <Button type="button" variant="outline" size="sm" disabled={pending} onClick={openAndDraft}>
+        <PencilLineIcon />
         Draft a reply
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Draft a reply</DialogTitle>
-            <DialogDescription>{NOTE[note]}</DialogDescription>
+            <DialogDescription>{describe(draft, pending)}</DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
             <Label htmlFor="reply-draft-text">Reply</Label>
-            <Textarea id="reply-draft-text" rows={8} value={text} onChange={(event) => setText(event.target.value)} />
+            <Textarea
+              id="reply-draft-text"
+              rows={8}
+              value={text}
+              disabled={pending}
+              placeholder={pending ? "Drafting…" : undefined}
+              onChange={(event) => setText(event.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">Drafting again replaces the text in the box.</p>
           </div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Close
             </Button>
-            <Button type="button" variant="outline" disabled={reply === ""} onClick={copy}>
+            <Button type="button" variant="outline" disabled={pending} onClick={draftReply}>
+              {pending ? <Loader2Icon className="animate-spin" /> : <RefreshCwIcon />}
+              Draft again
+            </Button>
+            <Button type="button" variant="outline" disabled={reply === "" || pending} onClick={copy}>
               <CopyIcon />
               Copy
             </Button>

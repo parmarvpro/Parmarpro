@@ -6,13 +6,16 @@ import { useActionSubmit } from "@/components/forms/use-action-submit";
 import { Button } from "@/components/ui/button";
 import { sortLeadWithAiAction } from "@/server/actions/leads";
 
-/** Asks for an AI sort of one lead. A refusal or a busy model shows as a toast with the server's message. */
-export function SortWithAiButton({ leadId, label }: { leadId: string; label: string }) {
+/**
+ * Asks Gemini to sort one lead. It is disabled while the lead has no enquiry text to sort, and while a
+ * sort is running. A refusal or a busy model shows as a toast with the server's message.
+ */
+export function SortWithAiButton({ leadId, label, disabled = false }: { leadId: string; label: string; disabled?: boolean }) {
   const { pending, run } = useActionSubmit({ success: "Lead sorted. Check the suggestion before acting." });
   return (
-    <Button type="button" variant="outline" size="sm" disabled={pending} onClick={() => run(() => sortLeadWithAiAction(leadId))}>
+    <Button type="button" variant="outline" size="sm" disabled={pending || disabled} onClick={() => run(() => sortLeadWithAiAction(leadId))}>
       {pending ? <Loader2Icon className="animate-spin" /> : null}
-      {label}
+      {pending ? "Sorting…" : label}
     </Button>
   );
 }

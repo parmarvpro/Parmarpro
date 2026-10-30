@@ -13,6 +13,7 @@ import { TaskFormDialog } from "@/components/tasks/task-form-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { describeActivity } from "@/lib/activity";
+import { enquiryTextFromNotes } from "@/lib/enquiry";
 import { formatDateTime, formatPhone, humanize } from "@/lib/format";
 import { firstNameOf, inquiryFollowUpText, whatsappLink } from "@/lib/whatsapp";
 import { paidLaneConfigured } from "@/server/ai/configured";
@@ -149,7 +150,14 @@ export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[
 
         <div className="space-y-6">
           {aiEnabled ? (
-            <AiTriageCard leadId={lead.id} phone={lead.phone_e164} triage={triage} canSort={canUpdate && paidLaneConfigured()} />
+            <AiTriageCard
+              leadId={lead.id}
+              phone={lead.phone_e164}
+              triage={triage}
+              canUpdate={canUpdate}
+              aiAvailable={paidLaneConfigured()}
+              hasEnquiry={enquiryTextFromNotes(lead.notes) !== ""}
+            />
           ) : null}
           <Card>
             <CardHeader>

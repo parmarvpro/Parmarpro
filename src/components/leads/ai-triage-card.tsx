@@ -1,7 +1,7 @@
 import { DraftReplyButton } from "@/components/leads/reply-draft-dialog";
 import { SortWithAiButton } from "@/components/leads/sort-with-ai-button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LANGUAGE_LABELS, TREATMENT_LABELS, URGENCY_LABELS, type Urgency } from "@/lib/ai-triage";
 import { formatDateTime } from "@/lib/format";
 
@@ -12,7 +12,6 @@ export type LeadTriageView = {
   language: string;
   best_time: string | null;
   summary: string;
-  model: string;
   updated_at: string;
 };
 
@@ -28,34 +27,58 @@ function labelFor(labels: Record<string, string>, value: string): string {
 }
 
 /**
- * The AI sorting card on a lead. Shown only while the clinic has AI help on (the caller decides).
- * Every suggestion is labelled as such. The sort and reply-draft buttons appear only for members who
- * may update the lead while the paid key is configured. `phone` is the lead's number, for WhatsApp.
+ * The AI help card on a lead. Shown only while the clinic has AI help on (the caller decides).
+ * Every result is a suggestion and is labelled as one. Staff who can edit the lead get the two
+ * prompts while the Gemini service is connected; everyone else sees the last suggestion. When the
+ * service is not connected, the card says so rather than showing buttons that cannot work.
+ * `phone` is the lead's number, for WhatsApp. `hasEnquiry` is false when there is no enquiry text to sort.
  */
 export function AiTriageCard({
   leadId,
   phone,
   triage,
-  canSort,
+  canUpdate,
+  aiAvailable,
+  hasEnquiry,
 }: {
   leadId: string;
   phone: string | null;
   triage: LeadTriageView | null;
-  canSort: boolean;
+  canUpdate: boolean;
+  aiAvailable: boolean;
+  hasEnquiry: boolean;
 }) {
+  const canRun = canUpdate && aiAvailable;
+
   return (
     <Card>
-      <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
-        <CardTitle>AI sorting</CardTitle>
-        {canSort ? (
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            <DraftReplyButton leadId={leadId} phone={phone} />
-            <SortWithAiButton leadId={leadId} label={triage ? "Sort again" : "Sort with AI"} />
-          </div>
-        ) : null}
+      <CardHeader className="space-y-1">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CardTitle>AI help</CardTitle>
+          {canRun ? (
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <DraftReplyButton leadId={leadId} phone={phone} />
+              <SortWithAiButton leadId={leadId} label={triage ? "Sort again" : "Sort with AI"} disabled={!hasEnquiry} />
+            </div>
+          ) : null}
+        </div>
+        <CardDescription>Gemini suggests. Check before acting.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        {triage ? <TriageDetails triage={triage} /> : <p className="text-sm text-muted-foreground">Not sorted yet.</p>}
+        {aiAvailable ? null : (
+          <p className="text-sm text-muted-foreground">Gemini is not connected for ParmarPro yet, so nothing is sent. Reply to this enquiry by hand for now.</p>
+        )}
+        {canRun && !hasEnquiry ? <p className="text-sm text-muted-foreground">This lead has no enquiry text to sort.</p> : null}
+        {triage ? (
+          <TriageDetails triage={triage} />
+        ) : aiAvailable ? (
+          <p className="text-sm text-muted-foreground">Not sorted yet.</p>
+        ) : null}
+        {canRun ? (
+          <p className="text-xs text-muted-foreground">
+            Sorting and drafting send the enquiry text to Gemini, without the name, phone number or email. See AI help in Settings for the full list.
+          </p>
+        ) : null}
       </CardContent>
     </Card>
   );
@@ -81,9 +104,7 @@ function TriageDetails({ triage }: { triage: LeadTriageView }) {
         ) : null}
       </dl>
       <p className="text-sm">{triage.summary}</p>
-      <p className="text-xs text-muted-foreground">
-        Suggested by AI, check before acting · {triage.model} · {formatDateTime(triage.updated_at)}
-      </p>
+      <p className="text-xs text-muted-foreground">Suggested by Gemini · {formatDateTime(triage.updated_at)}</p>
     </>
   );
 }

@@ -7,6 +7,7 @@ import {
   LayoutDashboardIcon,
   ListChecksIcon,
   SettingsIcon,
+  SparklesIcon,
   UsersIcon,
   UsersRoundIcon,
   ZapIcon,
@@ -27,6 +28,7 @@ const ICONS: Record<string, LucideIcon> = {
   users: UsersIcon,
   settings: SettingsIcon,
   zap: ZapIcon,
+  sparkles: SparklesIcon,
   "credit-card": CreditCardIcon,
 };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { CopyIcon, KeyRoundIcon, Loader2Icon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -302,8 +303,13 @@ export function AutomationSettingsForm({
               onCheckedChange={(checked) => set("ai_enquiry_help", checked)}
             />
             {aiAvailable ? null : (
-              <p className="text-sm text-muted-foreground">Not available yet: the AI service has not been switched on for ParmarPro.</p>
+              <p className="text-sm text-muted-foreground">Not connected yet: the Gemini service has not been set up for ParmarPro, so nothing runs.</p>
             )}
+            <p className="text-sm">
+              <Link className="text-primary hover:underline" href="/dashboard/settings/ai">
+                See what AI help sends, and when it runs
+              </Link>
+            </p>
           </CardContent>
         </Card>
       </div>
