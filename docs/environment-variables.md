@@ -34,6 +34,8 @@ Placeholders live in `.env.example`. Real values are kept only in:
 | `FOUNDER_ALERT_EMAIL` | server only (a personal address, not a credential) | enquiry alerts and the founder digest | optional | the owner's address | the owner's address | Without it, no founder email is sent |
 | `CRON_SECRET` | **secret** | bearer check on `POST /api/jobs/[job]` | optional (for local `curl` tests) | staging value, equal to Vault `parmarpro_cron_secret` | production value, equal to Vault `parmarpro_cron_secret` | `openssl rand -hex 32`. Without it the job endpoints answer `503` |
 | `LINK_SIGNING_SECRET` | **secret** | HMAC for signed email links | optional | staging value | production value | `openssl rand -hex 32`. Without it, links fall back to the dashboard and patient reminders are not sent |
+| `GEMINI_FREE_API_KEY` | **secret** | free AI lane: the operations note in the founder digest (`src/server/ai/free-lane.ts`) | optional | a key from a Google AI Studio project **without billing** | the same project's key, Sensitive | Non-personal data only: Google's unpaid terms forbid personal data. Without it, the digest has no AI note. See [docs/ai.md](ai.md) |
+| `GEMINI_PAID_API_KEY` | **secret** | paid AI lane: enquiry sorting and reply drafts (`src/server/ai/paid-lane.ts`) | optional | a key from a **separate** project **with billing** and a budget alert | that project's key, Sensitive | Without it, AI sorting and reply drafts are unavailable. See [docs/ai.md](ai.md) |
 
 **CI-only secrets** (GitHub Actions; optional): `E2E_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_SECRET_KEY`, `E2E_OWNER_EMAIL`, `E2E_VIEWER_EMAIL`. They enable the authenticated Playwright journey against the Clerk **development** instance. Never use production keys in CI.
 

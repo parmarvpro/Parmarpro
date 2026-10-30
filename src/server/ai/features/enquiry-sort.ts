@@ -7,6 +7,7 @@ import { redactContact, type Contact } from "@/lib/redact";
 import { AI_MODEL_CHAINS } from "@/server/ai/models";
 import { paidLane } from "@/server/ai/paid-lane";
 import type { AiRunner, AiTask } from "@/server/ai/run";
+import { firstCharacters } from "@/server/ai/text";
 
 /**
  * Sorts one enquiry for staff: the treatment it is about, how soon to call, the language and
@@ -139,9 +140,4 @@ function finish(value: Triage, input: EnquirySortInput): Triage | null {
     best_time: value.best_time === null ? null : firstCharacters(redactContact(value.best_time, input.contact), BEST_TIME_MAX),
   });
   return checked.success ? checked.data : null;
-}
-
-/** The text trimmed, then its first `max` characters, counted as code points so that none is split, trimmed again. */
-function firstCharacters(text: string, max: number): string {
-  return Array.from(text.trim()).slice(0, max).join("").trim();
 }

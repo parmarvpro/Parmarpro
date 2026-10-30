@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { runAction } from "@/server/actions/result";
-import { sortLeadWithAi } from "@/server/dal/ai-triage";
+import { draftLeadReply, sortLeadWithAi } from "@/server/dal/ai-triage";
 import { convertLeadToPatient, createLead, deleteLead, updateLead } from "@/server/dal/leads";
 
 export async function createLeadAction(input: unknown) {
@@ -41,4 +41,9 @@ export async function sortLeadWithAiAction(id: unknown) {
     await sortLeadWithAi(id);
     revalidatePath("/dashboard", "layout");
   });
+}
+
+/** A suggested reply to an enquiry. Nothing is stored, so nothing is revalidated. */
+export async function draftLeadReplyAction(id: unknown) {
+  return runAction("leads.draftReply", () => draftLeadReply(id));
 }

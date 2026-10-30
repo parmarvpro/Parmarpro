@@ -149,7 +149,7 @@ export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[
 
         <div className="space-y-6">
           {aiEnabled ? (
-            <AiTriageCard leadId={lead.id} triage={triage} canSort={canUpdate && paidLaneConfigured()} />
+            <AiTriageCard leadId={lead.id} phone={lead.phone_e164} triage={triage} canSort={canUpdate && paidLaneConfigured()} />
           ) : null}
           <Card>
             <CardHeader>

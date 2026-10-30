@@ -1,3 +1,4 @@
+import { DraftReplyButton } from "@/components/leads/reply-draft-dialog";
 import { SortWithAiButton } from "@/components/leads/sort-with-ai-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,15 +29,17 @@ function labelFor(labels: Record<string, string>, value: string): string {
 
 /**
  * The AI sorting card on a lead. Shown only while the clinic has AI help on (the caller decides).
- * Every suggestion is labelled as such, and the sort button appears only for members who may update
- * the lead while the paid key is configured.
+ * Every suggestion is labelled as such. The sort and reply-draft buttons appear only for members who
+ * may update the lead while the paid key is configured. `phone` is the lead's number, for WhatsApp.
  */
 export function AiTriageCard({
   leadId,
+  phone,
   triage,
   canSort,
 }: {
   leadId: string;
+  phone: string | null;
   triage: LeadTriageView | null;
   canSort: boolean;
 }) {
@@ -44,7 +47,12 @@ export function AiTriageCard({
     <Card>
       <CardHeader className="flex-row items-center justify-between gap-4 space-y-0">
         <CardTitle>AI sorting</CardTitle>
-        {canSort ? <SortWithAiButton leadId={leadId} label={triage ? "Sort again" : "Sort with AI"} /> : null}
+        {canSort ? (
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <DraftReplyButton leadId={leadId} phone={phone} />
+            <SortWithAiButton leadId={leadId} label={triage ? "Sort again" : "Sort with AI"} />
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent className="space-y-4">
         {triage ? <TriageDetails triage={triage} /> : <p className="text-sm text-muted-foreground">Not sorted yet.</p>}

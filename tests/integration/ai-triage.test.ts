@@ -10,7 +10,9 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vites
 
 import type { Triage } from "@/lib/ai-triage";
 import { CONSENT_NOTE } from "@/lib/enquiry";
+import { inquiryFollowUpText } from "@/lib/whatsapp";
 import type { EnquirySortInput, EnquirySortResult } from "@/server/ai/features/enquiry-sort";
+import type { ReplyDraftInput, ReplyDraftResult } from "@/server/ai/features/reply-draft";
 
 import { admin, claimsFor, closePool, createClinicFixture, deleteClinicFixture, type ClinicFixture, type Persona } from "../helpers/db";
 import { mintToken } from "../helpers/jwt";
@@ -357,6 +359,115 @@ describe("the leads list and the AI switch", () => {
     expect(await dal.isAiEnquiryHelpOn()).toBe(true);
     await actAs(B.viewer);
     expect(await dal.isAiEnquiryHelpOn()).toBe(false);
+    await setAiHelp(A.id, false);
+  });
+});
+
+describe("suggesting a reply to an enquiry", () => {
+  /** A drafter that answers with `result` and records what it was given. */
+  function fakeDrafter(result: ReplyDraftResult | null = { reply: "Hello, thank you for your enquiry. Synthetic Clinic AiA", model: MODEL }) {
+    return vi.fn<(input: ReplyDraftInput) => Promise<ReplyDraftResult | null>>(async () => result);
+  }
+
+  it("is refused, and no draft is made, when the clinic has AI help off", async () => {
+    await setAiHelp(A.id, false);
+    const lead = await insertLead(A.id, `Synthetic question about pain.\n\n${CONSENT_NOTE}`);
+    const draft = fakeDrafter();
+    await actAs(A.owner);
+    await expect(dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true })).rejects.toMatchObject({ code: "ai_disabled" });
+    expect(draft).not.toHaveBeenCalled();
+  });
+
+  it("is refused when the paid key is not configured, even with AI help on", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, "Synthetic question about pain.");
+    const draft = fakeDrafter();
+    await actAs(A.owner);
+    await expect(dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => false })).rejects.toMatchObject({ code: "ai_not_configured" });
+    expect(draft).not.toHaveBeenCalled();
+    await setAiHelp(A.id, false);
+  });
+
+  it("is refused for a viewer, and for another clinic's user the lead is not found", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, "Synthetic question.");
+    const draft = fakeDrafter();
+
+    await actAs(A.viewer);
+    await expect(dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true })).rejects.toMatchObject({ code: "forbidden" });
+
+    await actAs(B.owner);
+    await expect(dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true })).rejects.toMatchObject({ code: "not_found" });
+    expect(draft).not.toHaveBeenCalled();
+    await setAiHelp(A.id, false);
+  });
+
+  it("returns the standard message, with no AI call, when the notes hold only the consent line", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, CONSENT_NOTE, "whatsapp", "Synthetic Draft Blank");
+    const draft = fakeDrafter();
+    await actAs(A.owner);
+    const result = await dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true });
+
+    expect(result).toEqual({
+      text: inquiryFollowUpText({ firstName: "Synthetic", clinicName: "Synthetic Clinic AiA" }),
+      source: "template",
+      reason: "no_enquiry",
+    });
+    expect(draft).not.toHaveBeenCalled();
+    await setAiHelp(A.id, false);
+  });
+
+  it("returns the AI reply, passing the stored treatment label, and stores nothing", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, `Synthetic question about pain.\n\n${CONSENT_NOTE}`, "referral", "Synthetic Caller Draft");
+    await actAs(A.staff);
+    await dal.saveLeadTriage(lead, TRIAGE, MODEL);
+    const before = await triageRows(lead);
+    const reply = "Hello, thank you for your enquiry. Synthetic Clinic AiA";
+    const draft = fakeDrafter({ reply, model: MODEL });
+
+    const result = await dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true });
+
+    expect(result).toEqual({ text: reply, source: "ai", model: MODEL });
+    expect(draft).toHaveBeenCalledWith({
+      text: "Synthetic question about pain.",
+      clinicName: "Synthetic Clinic AiA",
+      contact: { fullName: "Synthetic Caller Draft", phone: null, email: null },
+      clinicId: A.id,
+      treatmentLabel: "Pain / emergency",
+    });
+    expect(await triageRows(lead)).toEqual(before);
+    await setAiHelp(A.id, false);
+  });
+
+  it("returns the standard message when no model answers, and passes no treatment for a lead that was never sorted", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, "Synthetic question about a check-up.", "whatsapp", "Synthetic Draft Unsorted");
+    const draft = fakeDrafter(null);
+    await actAs(A.owner);
+    const result = await dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true });
+
+    expect(result).toEqual({
+      text: inquiryFollowUpText({ firstName: "Synthetic", clinicName: "Synthetic Clinic AiA" }),
+      source: "template",
+      reason: "ai_unavailable",
+    });
+    expect(draft).toHaveBeenCalledWith(expect.objectContaining({ treatmentLabel: null }));
+    expect(await triageRows(lead)).toEqual([]);
+    await setAiHelp(A.id, false);
+  });
+
+  it("passes no treatment label when the stored treatment is unclear", async () => {
+    await setAiHelp(A.id, true);
+    const lead = await insertLead(A.id, "Synthetic question.", "whatsapp", "Synthetic Draft Unclear");
+    await actAs(A.staff);
+    await dal.saveLeadTriage(lead, { ...TRIAGE, treatment: "unclear", urgency: "routine" }, MODEL);
+    const draft = fakeDrafter(null);
+
+    await dal.draftLeadReply(lead, { draft, paidLaneConfigured: () => true });
+
+    expect(draft).toHaveBeenCalledWith(expect.objectContaining({ treatmentLabel: null }));
     await setAiHelp(A.id, false);
   });
 });

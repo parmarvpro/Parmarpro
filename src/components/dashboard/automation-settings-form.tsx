@@ -296,7 +296,7 @@ export function AutomationSettingsForm({
             <ToggleRow
               id="ai_enquiry_help"
               label="AI help with enquiries"
-              help="Sends the text of each enquiry (never the name, phone number or email) to Google's Gemini service to suggest the treatment and how urgent it is. Google does not use it to improve its products. Staff check every suggestion; nothing is sent to patients automatically."
+              help="Sends the text of each enquiry (never the name, phone number or email) to Google's Gemini service to suggest the treatment, how urgent it is and a reply. Google does not use it to improve its products. Staff check every suggestion; nothing is sent to patients automatically."
               checked={draft.ai_enquiry_help}
               disabled={locked}
               onCheckedChange={(checked) => set("ai_enquiry_help", checked)}

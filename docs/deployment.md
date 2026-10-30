@@ -39,6 +39,8 @@ Never paste a key into chat, an issue, a commit or a screenshot. Each one goes i
 | Founder alert address | The founder's own mailbox | Vercel `FOUNDER_ALERT_EMAIL` |
 | Cron secret **secret** | Generate with `openssl rand -hex 32` | Vercel `CRON_SECRET`, and the same value in Supabase Vault as `parmarpro_cron_secret` (see `docs/automations.md`) |
 | Link signing secret **secret** | Generate with `openssl rand -hex 32` | Vercel `LINK_SIGNING_SECRET` only |
+| Gemini API key, free lane **secret** | Google AI Studio, an API key in a Google Cloud project **without billing**. Non-personal data only | Vercel `GEMINI_FREE_API_KEY` (Sensitive). See [`docs/ai.md`](ai.md) |
+| Gemini API key, paid lane **secret** | Google AI Studio, an API key in a **separate** project **with billing** and a budget alert | Vercel `GEMINI_PAID_API_KEY` (Sensitive). See [`docs/ai.md`](ai.md) |
 | Vercel access for deploys from your computer | Vercel → **Account settings → Tokens**, or `vercel login` | Your own machine only (never the repo) |
 | Local development values | Copy `.env.example` to `.env.local` and fill in dev values | `.env.local` (gitignored) |
 

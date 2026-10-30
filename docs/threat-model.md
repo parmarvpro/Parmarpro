@@ -59,9 +59,19 @@ Written at gate G0 and reviewed again at G5. The method is STRIDE per actor and 
 | T23 | **Invitation hijack** (E): accepting an invitation meant for someone else | 1 | Clerk binds invitations to the invitee's verified email. Reconciliation reads membership and invitation metadata from the Clerk Backend API, never from the client | Unit test of the reconciliation logic |
 | T24 | **Test or debug bypass left in production** (E) | — | No auth-bypass flags exist in application code. Test doubles live only under `tests/`. A CI grep check looks for bypass patterns | CI check; code review |
 
+## 3a. AI features
+
+The AI features (sorting enquiries, drafting replies and the operations note) are described in [`docs/ai.md`](ai.md). They add three threats:
+
+- **Prompt injection through enquiry text** (T25). An enquirer can write instructions to the model. The model has no tools and no access to data: it returns one JSON object, which must match a strict schema, and a reply must also pass the reply check. Staff review every suggestion, and nothing is sent automatically.
+- **Personal data leaving the application** (T26). The paid lane receives only the enquiry text with the enquirer's name, phone and email removed, the clinic name and the treatment label. The free lane receives counts only. Model inputs are built from fixed keys, and an ESLint rule restricts which files may import each lane. Every request sends `store: false`. Paid-tier terms say prompts are not used to improve Google's products.
+- **Cost abuse or quota exhaustion** (T27). Every call is reserved in the database against the model's per-minute and per-day limits, and against a daily cap of 100 calls per clinic, before anything is sent. A budget alert on the paid project and the kill switch in `docs/ai.md` stop spending.
+
 ## 4. Residual risks and assumptions
 
 - **Clerk and Supabase are trusted** for JWT signing and verification. A compromise of either is out of scope for the app but covered by the incident runbook.
+- **Redaction is pattern-based.** A person named in an enquiry who is not the enquirer may still reach the paid lane. Google's paid-tier terms apply to that text. The privacy notice says the enquirer's details are removed, which is accurate for those details only.
+- **Clinical-use terms.** Google's Gemini API terms forbid use in clinical practice or for medical advice. Counsel should confirm the sorting and drafting use before AI help is offered to clinics (see `docs/ai.md`).
 - **A compromised owner account** has full control of its own clinic. Mitigation: encourage MFA (Clerk). Enforcing MFA for owners is a G7 decision.
 - **In-memory rate limiting** is per serverless instance. It is a deterrent, not a guarantee. A production rate limiter (for example Upstash or Vercel Firewall rules) is a follow-up.
 - **Legal compliance** (DPDP Act 2023, any health-information obligations, GST invoicing) is **not** claimed. The privacy notice and terms need legal review before launch.

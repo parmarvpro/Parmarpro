@@ -70,12 +70,23 @@ export default function PrivacyPage() {
         <li>Supabase: database hosting (Mumbai region, ap-south-1).</li>
         <li>Clerk: sign-in, sessions and team invitations.</li>
         <li>Resend: sending service emails such as reminders, summaries and receipts.</li>
+        <li>Google (Gemini API, paid service): sorting enquiries and drafting suggested replies, only for clinics that turn on AI help.</li>
         <li>Razorpay: payment processing.</li>
         <li>Vercel: application hosting.</li>
         <li>Sentry: error monitoring (scrubbed reports).</li>
         <li>PostHog: product analytics (no patient data; you can opt out).</li>
       </ul>
       <p>Some of these providers may process data outside India under their own security and contractual safeguards.</p>
+
+      <h2>AI help with enquiries</h2>
+      <p>
+        A clinic can choose to turn on AI help. When it does, the text of each enquiry the clinic receives is sent to
+        Google&apos;s Gemini service to suggest the treatment it is about, how urgent it is and a reply. The enquirer&apos;s
+        name, phone number and email address are removed from the text first. Google does not use this data to improve its
+        products; it keeps it for a limited time only to detect misuse and meet legal requirements, and it may process it
+        outside India. Clinic staff check every suggestion, and nothing is sent to anyone automatically. ParmarPro&apos;s own
+        daily operations summary also uses Gemini, with counts only and no personal data.
+      </p>
 
       <h2>Retention</h2>
       <p>

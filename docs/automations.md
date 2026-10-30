@@ -1,6 +1,6 @@
 # Automations and scheduled jobs
 
-ParmarPro sends a few emails and creates some follow-up tasks without anyone pressing a button. This page lists each automation: what it does, when it runs, where it runs, who receives it, and how to switch it off. It also covers how the scheduler is set up, how to test a job without sending anything, and the owner setup checklist.
+ParmarPro sends a few emails and creates some follow-up tasks without anyone pressing a button. This page lists each automation: what it does, when it runs, where it runs, who receives it, and how to switch it off. It also covers how the scheduler is set up, how to test a job without sending anything, and the owner setup checklist. The AI operations note in the founder digest and *AI help with enquiries* (sorting and reply drafts) are described in [AI features](ai.md).
 
 All times are India Standard Time (IST, UTC+05:30). Cron expressions in the repository are written in UTC.
 

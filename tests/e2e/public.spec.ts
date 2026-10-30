@@ -54,4 +54,5 @@ test("contact form validates input in the browser", async ({ page }) => {
 test("legal pages are honest about review status", async ({ page }) => {
   await page.goto("/privacy");
   await expect(page.getByText(/Draft pending legal review/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "AI help with enquiries" })).toBeVisible();
 });
