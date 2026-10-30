@@ -48,6 +48,90 @@ export type Database = {
           },
         ];
       };
+      ai_calls: {
+        Row: {
+          id: number;
+          lane: string;
+          model: string;
+          feature: string;
+          clinic_id: string | null;
+          status: string;
+          est_input_tokens: number;
+          input_tokens: number | null;
+          output_tokens: number | null;
+          thought_tokens: number | null;
+          created_at: string;
+          settled_at: string | null;
+        };
+        Insert: {
+          id?: never;
+          lane: string;
+          model: string;
+          feature: string;
+          clinic_id?: string | null;
+          status?: string;
+          est_input_tokens: number;
+          input_tokens?: number | null;
+          output_tokens?: number | null;
+          thought_tokens?: number | null;
+          created_at?: string;
+          settled_at?: string | null;
+        };
+        Update: {
+          id?: never;
+          lane?: string;
+          model?: string;
+          feature?: string;
+          clinic_id?: string | null;
+          status?: string;
+          est_input_tokens?: number;
+          input_tokens?: number | null;
+          output_tokens?: number | null;
+          thought_tokens?: number | null;
+          created_at?: string;
+          settled_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ai_calls_clinic_id_fkey";
+            columns: ["clinic_id"];
+            isOneToOne: false;
+            referencedRelation: "clinics";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      ai_model_limits: {
+        Row: {
+          lane: string;
+          model: string;
+          rpm: number;
+          tpm: number;
+          rpd: number;
+          enabled: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          lane: string;
+          model: string;
+          rpm: number;
+          tpm: number;
+          rpd: number;
+          enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          lane?: string;
+          model?: string;
+          rpm?: number;
+          tpm?: number;
+          rpd?: number;
+          enabled?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [
+        ];
+      };
       appointments: {
         Row: {
           id: string;
@@ -206,6 +290,7 @@ export type Database = {
           enquiry_form_enabled: boolean;
           enquiry_form_key: string | null;
           updated_at: string;
+          ai_enquiry_help: boolean;
         };
         Insert: {
           clinic_id: string;
@@ -222,6 +307,7 @@ export type Database = {
           enquiry_form_enabled?: boolean;
           enquiry_form_key?: string | null;
           updated_at?: string;
+          ai_enquiry_help?: boolean;
         };
         Update: {
           clinic_id?: string;
@@ -238,6 +324,7 @@ export type Database = {
           enquiry_form_enabled?: boolean;
           enquiry_form_key?: string | null;
           updated_at?: string;
+          ai_enquiry_help?: boolean;
         };
         Relationships: [
           {
@@ -451,6 +538,91 @@ export type Database = {
           follow_up_at?: string | null;
         };
         Relationships: [
+        ];
+      };
+      job_runs: {
+        Row: {
+          id: number;
+          job: string;
+          ok: boolean;
+          dry_run: boolean;
+          result: Json;
+          duration_ms: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: never;
+          job: string;
+          ok: boolean;
+          dry_run: boolean;
+          result: Json;
+          duration_ms: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: never;
+          job?: string;
+          ok?: boolean;
+          dry_run?: boolean;
+          result?: Json;
+          duration_ms?: number;
+          created_at?: string;
+        };
+        Relationships: [
+        ];
+      };
+      lead_ai_triage: {
+        Row: {
+          lead_id: string;
+          clinic_id: string;
+          treatment: string;
+          urgency: string;
+          language: string;
+          best_time: string | null;
+          summary: string;
+          model: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          lead_id: string;
+          clinic_id?: string;
+          treatment: string;
+          urgency: string;
+          language: string;
+          best_time?: string | null;
+          summary: string;
+          model: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          lead_id?: string;
+          clinic_id?: string;
+          treatment?: string;
+          urgency?: string;
+          language?: string;
+          best_time?: string | null;
+          summary?: string;
+          model?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lead_ai_triage_clinic_id_fkey";
+            columns: ["clinic_id"];
+            isOneToOne: false;
+            referencedRelation: "clinics";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "lead_ai_triage_clinic_id_lead_id_fkey";
+            columns: ["clinic_id", "lead_id"];
+            isOneToOne: false;
+            referencedRelation: "leads";
+            referencedColumns: ["clinic_id", "id"];
+          },
         ];
       };
       leads: {
@@ -829,6 +1001,27 @@ export type Database = {
           p_display_name?: string;
         };
         Returns: string;
+      };
+      ai_reserve: {
+        Args: {
+          p_lane: string;
+          p_model: string;
+          p_feature: string;
+          p_clinic_id: string;
+          p_est_tokens: number;
+          p_clinic_daily_cap: number;
+        };
+        Returns: number;
+      };
+      ai_settle: {
+        Args: {
+          p_id: number;
+          p_status: string;
+          p_input_tokens: number;
+          p_output_tokens: number;
+          p_thought_tokens: number;
+        };
+        Returns: undefined;
       };
       apply_verified_payment: {
         Args: {
