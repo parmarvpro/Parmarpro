@@ -20,7 +20,7 @@
   - Plan: ________
   - Daily backup retention: ________
   - PITR window: ________
-- Optional extra: a scheduled logical export (`pg_dump` of the `public` schema with the privileged connection string), stored encrypted in a separate account. Only add it if retention requirements demand it; dumps contain patient contact data and must be protected accordingly.
+- Extra, off until you turn it on: `.github/workflows/backup.yml` takes a nightly logical export (`pg_dump` of the `public` and `private` schemas) at 03:00 IST. It restores the dump into an empty PostgreSQL 17 container and prints row counts, to show the file can be read. Then it encrypts the dump with age and keeps the encrypted file as a GitHub workflow artifact for 7 days. It runs only once the repository secrets `SUPABASE_DB_URL` and `BACKUP_AGE_RECIPIENT` are set, and only from the default branch. The dumps contain patient contact data. They are encrypted before they leave the runner, and the age private key must stay offline, with the owner. The nightly restore check does **not** replace the restore test in §4: it proves that the dump can be read, not that the application works on the restored data.
 
 ## 3. Restore procedures
 

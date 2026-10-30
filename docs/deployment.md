@@ -34,10 +34,17 @@ Never paste a key into chat, an issue, a commit or a screenshot. Each one goes i
 | Sentry DSN | Sentry → project `parmarpro-web` → **Settings → Client Keys (DSN)** | Vercel `NEXT_PUBLIC_SENTRY_DSN` (public by design) |
 | Sentry auth token **secret** | Sentry → **Settings → Developer settings**, scope `project:releases` only | Vercel `SENTRY_AUTH_TOKEN` (build) |
 | PostHog project key and host | PostHog → **Project settings → Project API key** | Vercel `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST` (public by design) |
+| Resend API key (`re_…`) **secret** | Resend → **API Keys**, after verifying your sending domain | Vercel `RESEND_API_KEY` |
+| Sender address | Your domain, verified in Resend, in the form `ParmarPro <hello@your-domain>` | Vercel `EMAIL_FROM` |
+| Founder alert address | The founder's own mailbox | Vercel `FOUNDER_ALERT_EMAIL` |
+| Cron secret **secret** | Generate with `openssl rand -hex 32` | Vercel `CRON_SECRET`, and the same value in Supabase Vault as `parmarpro_cron_secret` (see `docs/automations.md`) |
+| Link signing secret **secret** | Generate with `openssl rand -hex 32` | Vercel `LINK_SIGNING_SECRET` only |
 | Vercel access for deploys from your computer | Vercel → **Account settings → Tokens**, or `vercel login` | Your own machine only (never the repo) |
 | Local development values | Copy `.env.example` to `.env.local` and fill in dev values | `.env.local` (gitignored) |
 
 Production keys are different keys from different places (a Clerk production instance, a separate Supabase production project, Razorpay Live Mode). They are created at gate G7 and live only in Vercel's **Production** scope.
+
+The scheduler (pg_cron schedules, Vault secrets, and the GitHub secrets for the backup and nightly E2E workflows) is set up per environment as described in [`docs/automations.md`](automations.md), using `supabase/ops/schedules.sql`.
 
 ## 2. One-time provider setup
 

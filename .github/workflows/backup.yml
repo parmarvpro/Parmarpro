@@ -1,0 +1,131 @@
+name: Backup
+
+# Nightly logical backup (03:00 IST) of the database's public and private schemas.
+#
+# 1. Dump with the PostgreSQL 17 client (the postgres:17 image) from SUPABASE_DB_URL.
+# 2. Restore the dump into an empty PostgreSQL 17 service container, to prove the
+#    dump is readable, and print row counts for three tables.
+# 3. Encrypt the dump with age to BACKUP_AGE_RECIPIENT and upload the encrypted
+#    file as a workflow artifact, kept for 7 days.
+#
+# This supplements Supabase's own backups and point-in-time recovery. It does not
+# replace them. See docs/backup-and-recovery.md.
+#
+# Needs two repository secrets. Without either one the run succeeds, prints a
+# notice and takes no backup:
+#   SUPABASE_DB_URL       the session pooler connection string of the project
+#   BACKUP_AGE_RECIPIENT  an age public key. Its private key stays offline, with the owner.
+
+on:
+  schedule:
+    - cron: "30 21 * * *" # 21:30 UTC = 03:00 IST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Dump, check the restore, encrypt
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      # Ephemeral restore target. The container is discarded after the job, holds no
+      # secrets and no real data. The password is a fixed, throwaway value.
+      restore-check:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: restore-check-throwaway
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - name: Check that the backup secrets are set
+        id: gate
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_AGE_RECIPIENT" ]; then
+            echo "::notice title=Backup skipped::SUPABASE_DB_URL or BACKUP_AGE_RECIPIENT is not set. No backup was taken."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Dump the public and private schemas
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e SUPABASE_DB_URL \
+            -v "$GITHUB_WORKSPACE:/work" -w /work \
+            postgres:17 \
+            sh -c 'pg_dump "$SUPABASE_DB_URL" --format=custom --no-owner --no-privileges --schema=public --schema=private --file=backup.dump'
+          test -s backup.dump
+
+      - name: Restore the dump into the empty check database
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          PGPASSWORD: restore-check-throwaway
+        run: |
+          # The policies and grants in the dump name these roles. They must exist before the restore.
+          docker run --rm --network host -e PGPASSWORD postgres:17 \
+            psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -c "
+              do \$\$ begin
+                if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;
+                if not exists (select 1 from pg_roles where rolname = 'authenticated') then create role authenticated nologin; end if;
+                if not exists (select 1 from pg_roles where rolname = 'service_role') then create role service_role nologin; end if;
+              end \$\$;"
+          # --clean --if-exists drops the empty public schema that a new database starts with.
+          # Without it, the dump's own CREATE SCHEMA public fails under --exit-on-error.
+          docker run --rm --network host -e PGPASSWORD -v "$GITHUB_WORKSPACE:/work" -w /work postgres:17 \
+            pg_restore --host=localhost --username=postgres --dbname=postgres \
+              --clean --if-exists --no-owner --no-privileges --exit-on-error backup.dump
+
+      - name: Print row counts from the restored copy
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          PGPASSWORD: restore-check-throwaway
+        run: |
+          docker run --rm --network host -e PGPASSWORD postgres:17 \
+            psql -h localhost -U postgres -d postgres -tA -v ON_ERROR_STOP=1 -c "
+              select 'clinics ' || count(*) from public.clinics
+              union all select 'leads ' || count(*) from public.leads
+              union all select 'patients ' || count(*) from public.patients;"
+
+      - name: Encrypt the dump with age
+        id: encrypt
+        if: steps.gate.outputs.enabled == 'true'
+        env:
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age
+          file="parmarpro-$(date -u +%Y%m%dT%H%MZ).dump.age"
+          age -r "$BACKUP_AGE_RECIPIENT" -o "$file" backup.dump
+          shred -u backup.dump
+          echo "file=$file" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the encrypted backup
+        if: steps.gate.outputs.enabled == 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: parmarpro-backup
+          path: ${{ steps.encrypt.outputs.file }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove any plaintext dump left behind
+        if: always()
+        run: |
+          if [ -f backup.dump ]; then shred -u backup.dump; fi

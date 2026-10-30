@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Privacy notice" };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Privacy notice" updated="28 October 2026">
+    <LegalPage title="Privacy notice" updated="30 October 2026">
       <p>
         This notice explains what personal data ParmarPro handles, why, and the choices you have. ParmarPro is software
         used by dental clinics to manage inquiries, appointments and follow-up work.
@@ -58,10 +58,18 @@ export default function PrivacyPage() {
       </ul>
       <p>We do not sell personal data and we do not use clinic records for advertising.</p>
 
+      <h2>Emails we send</h2>
+      <p>
+        Staff morning summaries contain counts only, with no patient or colleague names. Appointment reminder emails go only
+        to patients who agreed to email contact. They carry the patient&apos;s first name, the clinic and the appointment
+        time, contain no clinical information, and always include a link that stops them.
+      </p>
+
       <h2>Service providers</h2>
       <ul>
         <li>Supabase: database hosting (Mumbai region, ap-south-1).</li>
         <li>Clerk: sign-in, sessions and team invitations.</li>
+        <li>Resend: sending service emails such as reminders, summaries and receipts.</li>
         <li>Razorpay: payment processing.</li>
         <li>Vercel: application hosting.</li>
         <li>Sentry: error monitoring (scrubbed reports).</li>
@@ -74,6 +82,13 @@ export default function PrivacyPage() {
         Clinic records are kept while the clinic uses ParmarPro and deleted on the clinic&apos;s request when it closes its
         account, except where we must keep billing records for legal or tax reasons.
       </p>
+      <p>Some records are kept for shorter periods:</p>
+      <ul>
+        <li>Contact form enquiries are deleted after 12 months.</li>
+        <li>Payment and account webhook records (event identifiers and status) are deleted after 90 days.</li>
+        <li>The log of emails sent is deleted after 180 days.</li>
+        <li>The activity history of each clinic is deleted after 24 months.</li>
+      </ul>
 
       <h2>Your choices and rights</h2>
       <ul>

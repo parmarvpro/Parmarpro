@@ -63,6 +63,7 @@ CI (`.github/workflows/ci.yml`) runs all of the above, plus gitleaks over the fu
 - [Security plan](docs/security-plan.md) (permission matrix, test matrices)
 - [Security test results](docs/security-test-results.md)
 - [Environment variables](docs/environment-variables.md)
+- [Automations and scheduled jobs](docs/automations.md)
 - [Deployment, staging and launch checklist](docs/deployment.md)
 - [Operations and maintenance](docs/operations.md)
 - [Incident response](docs/incident-response.md)

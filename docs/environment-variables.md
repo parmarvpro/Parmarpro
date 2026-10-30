@@ -29,7 +29,23 @@ Placeholders live in `.env.example`. Real values are kept only in:
 | `SENTRY_AUTH_TOKEN` | **secret (build)** | source-map upload | — | optional | yes | Scope it to `project:releases` only |
 | `NEXT_PUBLIC_POSTHOG_KEY` | yes | PostHog (in-app only) | optional | staging project | prod project | Empty disables analytics |
 | `NEXT_PUBLIC_POSTHOG_HOST` | yes | `/ingest` rewrite target | `https://us.i.posthog.com` | same | same, or the EU host | |
+| `RESEND_API_KEY` | **secret** | email sender (`src/server/email/send.ts`) | optional | staging Resend key | production Resend key | Starts with `re_`. Without it no email is sent, and each job reports `not_configured` |
+| `EMAIL_FROM` | server only | email sender | optional | sender on the staging domain | sender on the production domain | `Name <address@domain>`, on a domain verified in Resend |
+| `FOUNDER_ALERT_EMAIL` | server only (a personal address, not a credential) | enquiry alerts and the founder digest | optional | the owner's address | the owner's address | Without it, no founder email is sent |
+| `CRON_SECRET` | **secret** | bearer check on `POST /api/jobs/[job]` | optional (for local `curl` tests) | staging value, equal to Vault `parmarpro_cron_secret` | production value, equal to Vault `parmarpro_cron_secret` | `openssl rand -hex 32`. Without it the job endpoints answer `503` |
+| `LINK_SIGNING_SECRET` | **secret** | HMAC for signed email links | optional | staging value | production value | `openssl rand -hex 32`. Without it, links fall back to the dashboard and patient reminders are not sent |
 
 **CI-only secrets** (GitHub Actions; optional): `E2E_CLERK_PUBLISHABLE_KEY`, `E2E_CLERK_SECRET_KEY`, `E2E_OWNER_EMAIL`, `E2E_VIEWER_EMAIL`. They enable the authenticated Playwright journey against the Clerk **development** instance. Never use production keys in CI.
+
+**Scheduler secrets, outside environment variables.** pg_cron reaches the app through `private.call_job`, which reads three values from Supabase Vault: `parmarpro_app_url`, `parmarpro_cron_secret` and, optionally for protected previews, `parmarpro_vercel_bypass`. Create them once per Supabase project, as described in `supabase/ops/schedules.sql`. Rotate `CRON_SECRET` in Vercel and in Vault together, or every job call is refused.
+
+**GitHub Actions secrets for the scheduled checks.** Each workflow skips with a notice, and runs nothing, when its required secret is missing.
+
+- `SUPABASE_DB_URL` **secret**: session pooler connection string, read by the nightly backup (`backup.yml`).
+- `BACKUP_AGE_RECIPIENT`: age public key that encrypts the backup (`backup.yml`). Its private key stays offline, with the owner.
+- `STAGING_URL`: the staging origin, read by the nightly E2E (`nightly-e2e.yml`).
+- `VERCEL_AUTOMATION_BYPASS_SECRET` **secret**: Vercel's *Protection Bypass for Automation*. Optional. Read by the nightly E2E and by Lighthouse (`lighthouse.yml`) to get past Deployment Protection.
+
+See `docs/automations.md` for what each job does and the owner setup checklist.
 
 **Local test stack:** `scripts/local-db/start.sh` generates a random database password and JWT secret for each run and writes them to `.env.test.local`, which is gitignored and disposable.

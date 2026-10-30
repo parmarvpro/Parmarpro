@@ -1,0 +1,99 @@
+name: Lighthouse
+
+# Report-only performance check for preview deployments.
+#
+# Runs when a deployment reports success, and never for the Production environment.
+# It measures "/" and "/pricing" with Lighthouse's default mobile emulation, 3 runs
+# each, and uploads the reports as a workflow artifact. It has no assertions, and
+# a failure here cannot fail the build.
+#
+# A protected preview needs VERCEL_AUTOMATION_BYPASS_SECRET, or the reports measure
+# Vercel's sign-in page instead of the app. Lighthouse copies its settings, including
+# that header, into every report, so the secret is removed from the reports before
+# they are uploaded, and nothing is uploaded if any copy remains. The header is only
+# ever sent to a *.vercel.app deployment URL.
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lighthouse-${{ github.event.deployment.environment }}
+  cancel-in-progress: true
+
+jobs:
+  lighthouse:
+    name: Lighthouse report (preview)
+    # Vercel names environments "Production" or "Production – <project>".
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      !github.event.deployment.production_environment &&
+      !startsWith(github.event.deployment.environment, 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DEPLOY_URL: ${{ github.event.deployment_status.environment_url || github.event.deployment_status.target_url }}
+      BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+    steps:
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+
+      - name: Collect Lighthouse reports (report only)
+        # Report only: a failure is shown in the log and does not fail the run.
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOY_URL" ]; then
+            echo "::notice title=Lighthouse skipped::The deployment status has no URL."
+            exit 0
+          fi
+          base="${DEPLOY_URL%/}"
+          # The bypass header must never go anywhere but a Vercel deployment.
+          if ! printf '%s' "$base" | grep -Eq '^https://[a-z0-9-]+\.vercel\.app$'; then
+            echo "::notice title=Lighthouse skipped::The deployment URL is not a *.vercel.app URL."
+            exit 0
+          fi
+          if [ -z "$BYPASS_SECRET" ]; then
+            echo "::notice title=Lighthouse::VERCEL_AUTOMATION_BYPASS_SECRET is not set. A protected preview is measured at its sign-in page."
+          fi
+          # The config and the raw reports carry the bypass header. They are written with
+          # owner-only permissions and removed on exit, whether or not Lighthouse succeeds.
+          config="$RUNNER_TEMP/lighthouserc.json"
+          raw="$RUNNER_TEMP/lhci-raw"
+          trap 'rm -rf "$config" "$raw" .lighthouseci' EXIT
+          umask 077
+          jq -n --arg base "$base" '
+            {ci: {collect: {
+              url: [$base + "/", $base + "/pricing"],
+              numberOfRuns: 3,
+              settings: ({formFactor: "mobile"} + (
+                if ($ENV.BYPASS_SECRET // "") == ""
+                then {}
+                else {extraHeaders: {"x-vercel-protection-bypass": $ENV.BYPASS_SECRET}}
+                end
+              ))
+            }}}' > "$config"
+          # Results go to .lighthouseci, the default folder that upload reads from.
+          npx --yes @lhci/cli@0.15.1 collect --config="$config"
+          npx --yes @lhci/cli@0.15.1 upload --target=filesystem --outputDir="$raw"
+          if [ -n "$BYPASS_SECRET" ]; then
+            perl -pi -e 's/\Q$ENV{BYPASS_SECRET}\E/[redacted]/g' "$raw"/*
+            if grep -rqF -- "$BYPASS_SECRET" "$raw"; then
+              echo "::error title=Lighthouse::A report still contains the bypass secret. Nothing is uploaded."
+              exit 1
+            fi
+          fi
+          # Only a checked folder reaches the path the upload step reads.
+          mv "$raw" lhci-report
+
+      - name: Upload the Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: lhci-report
+          path: lhci-report
+          if-no-files-found: warn
+          retention-days: 7

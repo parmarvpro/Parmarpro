@@ -10,6 +10,9 @@ import { defineConfig, devices } from "@playwright/test";
  */
 const PORT = 3100;
 const baseURL = process.env.BASE_URL ?? `http://127.0.0.1:${PORT}`;
+// Protected preview deployments (Vercel Deployment Protection) let automation through with this header.
+// Only the nightly staging run sets it. An empty value counts as not set.
+const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -19,7 +22,17 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL,
-    trace: "retain-on-failure",
+    // Traces record every request header, so with the bypass header set they would carry the secret
+    // into the uploaded report. Screenshots carry no headers.
+    ...(bypassSecret ? { trace: "off", screenshot: "only-on-failure" } : { trace: "retain-on-failure" }),
+    ...(bypassSecret
+      ? {
+          extraHTTPHeaders: {
+            "x-vercel-protection-bypass": bypassSecret,
+            "x-vercel-set-bypass-cookie": "true",
+          },
+        }
+      : {}),
     // Sandboxed dev containers route traffic through an egress proxy; talk to the local server directly.
     launchOptions: process.env.BASE_URL ? {} : { args: ["--no-proxy-server"] },
   },
