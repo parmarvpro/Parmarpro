@@ -20,6 +20,7 @@ export const automationSettingsSchema = z
     recall_months: z.number(MONTHS_MESSAGE).int(MONTHS_MESSAGE).min(1, MONTHS_MESSAGE).max(24, MONTHS_MESSAGE).optional(),
     patient_email_reminders: z.boolean().optional(),
     enquiry_form_enabled: z.boolean().optional(),
+    ai_enquiry_help: z.boolean().optional(),
   })
   .strict()
   .refine((value) => Object.keys(value).length > 0, "Nothing to change.");

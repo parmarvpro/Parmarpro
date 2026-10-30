@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { runAction } from "@/server/actions/result";
+import { sortLeadWithAi } from "@/server/dal/ai-triage";
 import { convertLeadToPatient, createLead, deleteLead, updateLead } from "@/server/dal/leads";
 
 export async function createLeadAction(input: unknown) {
@@ -32,5 +33,12 @@ export async function convertLeadAction(id: unknown) {
     const result = await convertLeadToPatient(id);
     revalidatePath("/dashboard", "layout");
     return result;
+  });
+}
+
+export async function sortLeadWithAiAction(id: unknown) {
+  return runAction("leads.sortWithAi", async () => {
+    await sortLeadWithAi(id);
+    revalidatePath("/dashboard", "layout");
   });
 }

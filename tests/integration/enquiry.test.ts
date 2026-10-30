@@ -53,7 +53,22 @@ describe("finding the clinic behind an enquiry key", () => {
   it("returns the clinic when the form is on, the key matches and the clinic is in its trial", async () => {
     const key = newKey();
     await setForm(A.id, key, true);
-    await expect(enquiry.findEnquiryClinic(key)).resolves.toEqual({ clinicId: A.id, clinicName: "Synthetic Clinic Enquiry" });
+    await expect(enquiry.findEnquiryClinic(key)).resolves.toEqual({
+      clinicId: A.id,
+      clinicName: "Synthetic Clinic Enquiry",
+      aiEnquiryHelp: false,
+    });
+  });
+
+  it("reports whether the clinic has AI help with enquiries switched on", async () => {
+    const key = newKey();
+    await setForm(A.id, key, true);
+    await admin("update public.clinic_automation_settings set ai_enquiry_help = true where clinic_id = $1", [A.id]);
+    try {
+      await expect(enquiry.findEnquiryClinic(key)).resolves.toMatchObject({ aiEnquiryHelp: true });
+    } finally {
+      await admin("update public.clinic_automation_settings set ai_enquiry_help = false where clinic_id = $1", [A.id]);
+    }
   });
 
   it("returns null when the form is switched off, even with the right key", async () => {

@@ -6,7 +6,7 @@ import { z } from "zod";
 import { reportError } from "@/lib/observability/report";
 import { enquirySchema, type EnquiryFormState } from "@/lib/validation/enquiry";
 import { createRateLimiter, ipFromHeaders } from "@/server/rate-limit";
-import { createWebsiteLead, findEnquiryClinic, websiteEnquiriesToday } from "@/server/privileged/enquiry";
+import { storeWebsiteEnquiry } from "@/server/enquiry/website-intake";
 
 /**
  * The public website enquiry form. There is no login: the clinic key in the
@@ -15,8 +15,6 @@ import { createWebsiteLead, findEnquiryClinic, websiteEnquiriesToday } from "@/s
  */
 
 const AREA = "enquiry.form";
-/** Website enquiries per clinic per IST day. Stops a flood from filling the leads list. Not exported: "use server" modules export only actions. */
-const WEBSITE_DAILY_CAP = 50;
 
 const limiter = createRateLimiter({ limit: 5, windowMs: 10 * 60 * 1000 });
 
@@ -45,18 +43,13 @@ export async function submitEnquiryAction(key: string, _previous: EnquiryFormSta
     // Honeypot filled: report success, store nothing.
     if (input.website) return { status: "sent" };
 
-    const clinic = await findEnquiryClinic(key);
-    if (!clinic) return { status: "unavailable" };
-    if ((await websiteEnquiriesToday(clinic.clinicId)) >= WEBSITE_DAILY_CAP) return { status: "busy" };
-
-    await createWebsiteLead({
-      clinicId: clinic.clinicId,
+    const outcome = await storeWebsiteEnquiry(key, {
       fullName: input.fullName,
       phone: input.phone,
       email: input.email,
       message: input.message,
     });
-    return { status: "sent" };
+    return { status: outcome };
   } catch (error) {
     reportError(error, { area: AREA });
     return { status: "error" };

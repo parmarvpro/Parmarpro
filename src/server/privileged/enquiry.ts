@@ -1,5 +1,6 @@
 import "server-only";
 
+import { CONSENT_NOTE } from "@/lib/enquiry";
 import { istDayStart } from "@/lib/ist";
 import { privilegedDb } from "@/server/privileged/client";
 
@@ -11,9 +12,8 @@ import { privilegedDb } from "@/server/privileged/client";
  */
 
 const KEY_PATTERN = /^[0-9a-f]{64}$/;
-const CONSENT_NOTE = "Website enquiry form: the enquirer agreed to be contacted about this enquiry.";
 
-export type EnquiryClinic = { clinicId: string; clinicName: string };
+export type EnquiryClinic = { clinicId: string; clinicName: string; aiEnquiryHelp: boolean };
 
 export type WebsiteLeadInput = {
   clinicId: string;
@@ -33,7 +33,7 @@ export async function findEnquiryClinic(key: string): Promise<EnquiryClinic | nu
   const db = privilegedDb();
   const { data: settings, error } = await db
     .from("clinic_automation_settings")
-    .select("clinic_id, clinics!inner(name, archived_at)")
+    .select("clinic_id, ai_enquiry_help, clinics!inner(name, archived_at)")
     .eq("enquiry_form_key", key)
     .eq("enquiry_form_enabled", true)
     .maybeSingle();
@@ -48,7 +48,7 @@ export async function findEnquiryClinic(key: string): Promise<EnquiryClinic | nu
   if (entitlementError) throw entitlementError;
   if (!entitlement || !isEntitled(entitlement, Date.now())) return null;
 
-  return { clinicId: settings.clinic_id, clinicName: settings.clinics.name };
+  return { clinicId: settings.clinic_id, clinicName: settings.clinics.name, aiEnquiryHelp: settings.ai_enquiry_help };
 }
 
 function isEntitled(entitlement: { trial_ends_at: string | null; paid_through: string | null }, now: number): boolean {

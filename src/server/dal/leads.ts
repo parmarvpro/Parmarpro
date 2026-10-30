@@ -9,7 +9,7 @@ import { pageRange, searchFilter } from "@/server/dal/shared";
 import { parseInput } from "@/server/validation";
 
 const LIST_COLUMNS =
-  "id, full_name, phone_e164, source, status, next_follow_up_at, created_at, assigned_to, patient_id, assignee:clinic_members(id, display_name, role)";
+  "id, full_name, phone_e164, source, status, next_follow_up_at, created_at, assigned_to, patient_id, assignee:clinic_members(id, display_name, role), lead_ai_triage(urgency)";
 
 export async function listLeads(rawFilters: unknown) {
   const ctx = await requirePermission("lead:read");

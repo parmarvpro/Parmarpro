@@ -9,11 +9,14 @@ import { PageHeader } from "@/components/dashboard/page-header";
 import { Pagination } from "@/components/dashboard/pagination";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { URGENCY_LABELS } from "@/lib/ai-triage";
 import { formatDateTime, formatPhone } from "@/lib/format";
 import { flattenSearchParams } from "@/lib/search-params";
 import { getAuthContext } from "@/server/auth/context";
 import { hasPermission } from "@/server/auth/permissions";
+import { isAiEnquiryHelpOn } from "@/server/dal/ai-triage";
 import { listLeads } from "@/server/dal/leads";
 import { memberLabel } from "@/server/dal/shared";
 import { listAssignableMembers } from "@/server/dal/team";
@@ -22,7 +25,12 @@ export const metadata: Metadata = { title: "Leads" };
 
 export default async function LeadsPage({ searchParams }: PageProps<"/dashboard/leads">) {
   const params = flattenSearchParams(await searchParams);
-  const [{ rows, total, filters }, members, ctx] = await Promise.all([listLeads(params), listAssignableMembers(), getAuthContext()]);
+  const [{ rows, total, filters }, members, ctx, aiEnabled] = await Promise.all([
+    listLeads(params),
+    listAssignableMembers(),
+    getAuthContext(),
+    isAiEnquiryHelpOn(),
+  ]);
   const canCreate = hasPermission(ctx.role, "lead:create");
 
   return (
@@ -86,7 +94,12 @@ export default async function LeadsPage({ searchParams }: PageProps<"/dashboard/
                     <TableCell className="whitespace-nowrap text-muted-foreground">{formatPhone(lead.phone_e164)}</TableCell>
                     <TableCell>{sourceLabel(lead.source)}</TableCell>
                     <TableCell>
-                      <StatusBadge status={lead.status} />
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <StatusBadge status={lead.status} />
+                        {aiEnabled && lead.lead_ai_triage.some((triage) => triage.urgency === "call_today") ? (
+                          <Badge variant="destructive">{URGENCY_LABELS.call_today}</Badge>
+                        ) : null}
+                      </div>
                     </TableCell>
                     <TableCell className={overdue ? "font-medium whitespace-nowrap text-destructive" : "whitespace-nowrap text-muted-foreground"}>
                       {formatDateTime(lead.next_follow_up_at)}

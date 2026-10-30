@@ -27,6 +27,7 @@ export type AutomationSettingsValues = {
   recall_months: number;
   patient_email_reminders: boolean;
   enquiry_form_enabled: boolean;
+  ai_enquiry_help: boolean;
 };
 
 /** Editable copy of the settings. Numbers stay text while typing, so a cleared field is reported, not silently zero. */
@@ -47,6 +48,7 @@ function draftFrom(settings: AutomationSettingsValues): Draft {
     recall_months: String(settings.recall_months),
     patient_email_reminders: settings.patient_email_reminders,
     enquiry_form_enabled: settings.enquiry_form_enabled,
+    ai_enquiry_help: settings.ai_enquiry_help,
   };
 }
 
@@ -93,10 +95,13 @@ export function AutomationSettingsForm({
   settings,
   enquiryLink,
   canUpdate,
+  aiAvailable,
 }: {
   settings: AutomationSettingsValues;
   enquiryLink: string | null;
   canUpdate: boolean;
+  /** False while the paid AI key is not configured: the switch can be set, but nothing runs. */
+  aiAvailable: boolean;
 }) {
   const [draft, setDraft] = useState<Draft>(() => draftFrom(settings));
   const { pending, run, fieldErrors, setFieldErrors } = useActionSubmit({ success: "Automation settings saved" });
@@ -280,6 +285,25 @@ export function AutomationSettingsForm({
               onCheckedChange={(checked) => set("enquiry_form_enabled", checked)}
             />
             <EnquiryLink link={enquiryLink} enabled={draft.enquiry_form_enabled} canUpdate={canUpdate} />
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>AI help</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <ToggleRow
+              id="ai_enquiry_help"
+              label="AI help with enquiries"
+              help="Sends the text of each enquiry (never the name, phone number or email) to Google's Gemini service to suggest the treatment and how urgent it is. Google does not use it to improve its products. Staff check every suggestion; nothing is sent to patients automatically."
+              checked={draft.ai_enquiry_help}
+              disabled={locked}
+              onCheckedChange={(checked) => set("ai_enquiry_help", checked)}
+            />
+            {aiAvailable ? null : (
+              <p className="text-sm text-muted-foreground">Not available yet: the AI service has not been switched on for ParmarPro.</p>
+            )}
           </CardContent>
         </Card>
       </div>

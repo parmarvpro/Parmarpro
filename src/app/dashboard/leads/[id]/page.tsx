@@ -7,6 +7,7 @@ import { AppointmentFormDialog } from "@/components/appointments/appointment-for
 import { sourceLabel } from "@/components/dashboard/options";
 import { StatusBadge } from "@/components/dashboard/status-badge";
 import { ConfirmActionButton } from "@/components/forms/confirm-action-button";
+import { AiTriageCard } from "@/components/leads/ai-triage-card";
 import { LeadFormDialog } from "@/components/leads/lead-form-dialog";
 import { TaskFormDialog } from "@/components/tasks/task-form-dialog";
 import { Button } from "@/components/ui/button";
@@ -14,9 +15,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { describeActivity } from "@/lib/activity";
 import { formatDateTime, formatPhone, humanize } from "@/lib/format";
 import { firstNameOf, inquiryFollowUpText, whatsappLink } from "@/lib/whatsapp";
+import { paidLaneConfigured } from "@/server/ai/configured";
 import { isAppError } from "@/server/auth/errors";
 import { hasPermission } from "@/server/auth/permissions";
 import { convertLeadAction, deleteLeadAction } from "@/server/actions/leads";
+import { getLeadTriage, isAiEnquiryHelpOn } from "@/server/dal/ai-triage";
 import { getClinic } from "@/server/dal/clinic";
 import { getLead } from "@/server/dal/leads";
 import { memberLabel } from "@/server/dal/shared";
@@ -35,11 +38,14 @@ async function load(id: string) {
 
 export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[id]">) {
   const { id } = await params;
-  const [{ lead, history, tasks, appointments, role }, members, { clinic }] = await Promise.all([
+  const [{ lead, history, tasks, appointments, role }, members, { clinic }, aiEnabled] = await Promise.all([
     load(id),
     listAssignableMembers(),
     getClinic(),
+    isAiEnquiryHelpOn(),
   ]);
+  // The triage is read only while AI help is on: with it off, no AI output is shown.
+  const triage = aiEnabled ? await getLeadTriage(lead.id) : null;
   const followUpHref = lead.phone_e164
     ? whatsappLink(lead.phone_e164, inquiryFollowUpText({ firstName: firstNameOf(lead.full_name), clinicName: clinic.name }))
     : null;
@@ -142,6 +148,9 @@ export default async function LeadPage({ params }: PageProps<"/dashboard/leads/[
         </Card>
 
         <div className="space-y-6">
+          {aiEnabled ? (
+            <AiTriageCard leadId={lead.id} triage={triage} canSort={canUpdate && paidLaneConfigured()} />
+          ) : null}
           <Card>
             <CardHeader>
               <CardTitle>Appointments</CardTitle>

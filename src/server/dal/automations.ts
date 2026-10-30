@@ -14,7 +14,7 @@ import { parseInput } from "@/server/validation";
  */
 
 const SETTINGS_COLUMNS =
-  "morning_digest, weekly_summary, untouched_lead_tasks, untouched_lead_hours, no_show_tasks, round_robin, recall_tasks, recall_months, patient_email_reminders, enquiry_form_enabled, enquiry_form_key";
+  "morning_digest, weekly_summary, untouched_lead_tasks, untouched_lead_hours, no_show_tasks, round_robin, recall_tasks, recall_months, patient_email_reminders, enquiry_form_enabled, enquiry_form_key, ai_enquiry_help";
 
 export async function getAutomationSettings() {
   const ctx = await requirePermission("clinic:read");
