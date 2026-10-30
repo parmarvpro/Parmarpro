@@ -52,8 +52,6 @@ export function describeActivity(event: ActivityEvent): string {
       return `Team member joined as ${humanize(String(meta.role ?? "member"))}`;
     case "revoked":
       return "Invitation revoked";
-    case "payment_applied":
-      return "Payment confirmed; plan extended";
     default:
       return `${entity} ${humanize(event.action).toLowerCase()}`;
   }

@@ -16,7 +16,7 @@ export default function PrivacyPage() {
       <p>
         For information that a clinic enters about its patients and inquirers, the clinic decides why and how that data
         is used. ParmarPro processes it on the clinic&apos;s behalf and only to provide the service. For account,
-        billing, website and product-usage data about clinic staff and visitors to our website, ParmarPro is responsible.
+        website and product-usage data about clinic staff and visitors to our website, ParmarPro is responsible.
       </p>
 
       <h2>What we collect</h2>
@@ -32,14 +32,10 @@ export default function PrivacyPage() {
           clinics are asked not to enter them.
         </li>
         <li>
-          <strong>Billing data:</strong> order and payment identifiers, amounts, payment status and method type from
-          Razorpay. Card numbers, CVV, UPI PINs and bank credentials are collected by Razorpay and never reach ParmarPro.
-        </li>
-        <li>
           <strong>Contact form:</strong> the name, clinic, phone, email, city and message you send us.
         </li>
         <li>
-          <strong>Product usage:</strong> events such as &ldquo;lead created&rdquo; or &ldquo;billing page viewed&rdquo;,
+          <strong>Product usage:</strong> events such as &ldquo;lead created&rdquo; or &ldquo;team member invited&rdquo;,
           with an anonymous clinic identifier. These events never include patient names, phone numbers, email addresses
           or notes.
         </li>
@@ -52,7 +48,6 @@ export default function PrivacyPage() {
       <h2>How we use it</h2>
       <ul>
         <li>To provide the service, keep each clinic&apos;s data separate and enforce team permissions.</li>
-        <li>To process payments and keep billing records.</li>
         <li>To respond to your enquiries.</li>
         <li>To fix errors and understand which product features are used, so we can improve them.</li>
       </ul>
@@ -69,9 +64,8 @@ export default function PrivacyPage() {
       <ul>
         <li>Supabase: database hosting (Mumbai region, ap-south-1).</li>
         <li>Clerk: sign-in, sessions and team invitations.</li>
-        <li>Resend: sending service emails such as reminders, summaries and receipts.</li>
+        <li>Resend: sending service emails such as reminders and summaries.</li>
         <li>Google (Gemini API, paid service): sorting enquiries and drafting suggested replies, only for clinics that turn on AI help.</li>
-        <li>Razorpay: payment processing.</li>
         <li>Vercel: application hosting.</li>
         <li>Sentry: error monitoring (scrubbed reports).</li>
         <li>PostHog: product analytics (no patient data; you can opt out).</li>
@@ -91,12 +85,12 @@ export default function PrivacyPage() {
       <h2>Retention</h2>
       <p>
         Clinic records are kept while the clinic uses ParmarPro and deleted on the clinic&apos;s request when it closes its
-        account, except where we must keep billing records for legal or tax reasons.
+        account, except where we must keep records for legal reasons.
       </p>
       <p>Some records are kept for shorter periods:</p>
       <ul>
         <li>Contact form enquiries are deleted after 12 months.</li>
-        <li>Payment and account webhook records (event identifiers and status) are deleted after 90 days.</li>
+        <li>Account webhook records (event identifiers and status) are deleted after 90 days.</li>
         <li>The log of emails sent is deleted after 180 days.</li>
         <li>The activity history of each clinic is deleted after 24 months.</li>
       </ul>

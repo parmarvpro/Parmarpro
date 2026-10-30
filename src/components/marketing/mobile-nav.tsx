@@ -10,10 +10,9 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/s
 
 const LINKS = [
   { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
   { href: "/sign-in", label: "Sign in" },
-  { href: "/sign-up", label: "Start free trial" },
+  { href: "/sign-up", label: "Get started" },
 ];
 
 export function MobileMarketingNav() {

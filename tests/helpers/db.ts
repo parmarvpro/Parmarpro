@@ -103,7 +103,7 @@ export function claimsFor(userId: string, orgId?: string, rol: "admin" | "member
   return orgId ? { sub: userId, role: "authenticated", o: { id: orgId, rol } } : { sub: userId, role: "authenticated" };
 }
 
-export async function createClinicFixture(label: string, options: { entitled?: boolean } = {}): Promise<ClinicFixture> {
+export async function createClinicFixture(label: string): Promise<ClinicFixture> {
   const suffix = alnum();
   const orgId = `org_${label}${suffix}`;
   const { rows } = await admin<{ id: string }>(
@@ -111,11 +111,6 @@ export async function createClinicFixture(label: string, options: { entitled?: b
     [orgId, `Synthetic Clinic ${label}`],
   );
   const clinicId = rows[0]!.id;
-  const entitled = options.entitled ?? true;
-  await admin(
-    "insert into public.clinic_entitlements (clinic_id, trial_ends_at) values ($1, now() + ($2 || ' days')::interval)",
-    [clinicId, entitled ? "14" : "-1"],
-  );
 
   const personas = {} as Record<Persona["role"], Persona>;
   for (const role of ["owner", "admin", "staff", "viewer"] as const) {
@@ -165,7 +160,5 @@ export async function createClinicFixture(label: string, options: { entitled?: b
 
 export async function deleteClinicFixture(clinic: ClinicFixture | undefined) {
   if (!clinic) return;
-  await admin("delete from public.payments where clinic_id = $1", [clinic.id]);
-  await admin("delete from public.billing_orders where clinic_id = $1", [clinic.id]);
   await admin("delete from public.clinics where id = $1", [clinic.id]);
 }

@@ -36,9 +36,6 @@ Each schema is a strict Zod object, so unknown properties cause the event to be 
 | `appointment_created` | `appointment_type` (enum), `from_lead` (bool) | The server action succeeded |
 | `task_completed` | — | A task was marked done |
 | `team_member_invited` | `role` (admin, staff or viewer) | Invitation sent |
-| `billing_page_viewed` | — | Billing page opened |
-| `checkout_initiated` | `plan` | Razorpay Checkout opened. **This is not a payment** |
-| `payment_verified` | `plan` | Sent only after `/api/billing/verify` returns `paid`, meaning the server verified the payment with Razorpay |
 | `page_viewed` | `route` (route template such as `/dashboard/leads/[id]`) | On navigation |
 
 Naming convention: `object_action`, in snake_case and past tense.

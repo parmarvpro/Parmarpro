@@ -6,7 +6,6 @@ import {
   clerkRoleFor,
   hasPermission,
   PERMISSIONS,
-  requiresEntitlement,
   ROLES,
   type Permission,
   type Role,
@@ -23,11 +22,11 @@ const OPERATE: Permission[] = [
 ];
 const MANAGE: Permission[] = [
   "lead:delete", "patient:archive", "appointment:delete", "task:delete", "clinic:update",
-  "team:invite", "team:change_role", "team:remove", "billing:read",
+  "team:invite", "team:change_role", "team:remove",
 ];
 
 const EXPECTED: Record<Role, Set<Permission>> = {
-  owner: new Set([...READ_ONLY, ...OPERATE, ...MANAGE, "billing:pay"]),
+  owner: new Set([...READ_ONLY, ...OPERATE, ...MANAGE]),
   admin: new Set([...READ_ONLY, ...OPERATE, ...MANAGE]),
   staff: new Set([...READ_ONLY, ...OPERATE]),
   viewer: new Set(READ_ONLY),
@@ -43,21 +42,9 @@ describe("permission matrix", () => {
     }
   }
 
-  it("only the owner can pay", () => {
-    expect(ROLES.filter((role) => hasPermission(role, "billing:pay"))).toEqual(["owner"]);
-  });
-
   it("viewers have no write permission at all", () => {
     const writes = PERMISSIONS.filter((p) => !p.endsWith(":read"));
     expect(writes.filter((p) => hasPermission("viewer", p))).toEqual([]);
-  });
-
-  it("entitlement gates operational writes only", () => {
-    expect(OPERATE.every(requiresEntitlement)).toBe(true);
-    expect(requiresEntitlement("billing:pay")).toBe(false);
-    expect(requiresEntitlement("team:invite")).toBe(false);
-    expect(requiresEntitlement("lead:delete")).toBe(false);
-    expect(READ_ONLY.some(requiresEntitlement)).toBe(false);
   });
 });
 

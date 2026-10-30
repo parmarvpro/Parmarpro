@@ -13,7 +13,6 @@ const leadSource = z.enum([
 ]);
 const appointmentType = z.enum(["consultation", "follow_up", "procedure", "other"]);
 const role = z.enum(["admin", "staff", "viewer"]);
-const plan = z.literal("parmarpro_clinic_monthly");
 
 export const ANALYTICS_EVENTS = {
   registration_completed: z.object({}).strict(),
@@ -24,10 +23,6 @@ export const ANALYTICS_EVENTS = {
   appointment_created: z.object({ appointment_type: appointmentType, from_lead: z.boolean() }).strict(),
   task_completed: z.object({}).strict(),
   team_member_invited: z.object({ role }).strict(),
-  billing_page_viewed: z.object({}).strict(),
-  checkout_initiated: z.object({ plan }).strict(),
-  /** Sent only after the server verified the payment with Razorpay. */
-  payment_verified: z.object({ plan }).strict(),
   page_viewed: z.object({ route: z.string().regex(/^\/[a-z0-9\-/[\]]*$/).max(80) }).strict(),
 } as const;
 
@@ -35,7 +30,10 @@ export type AnalyticsEvent = keyof typeof ANALYTICS_EVENTS;
 export type AnalyticsProps<E extends AnalyticsEvent> = z.input<(typeof ANALYTICS_EVENTS)[E]>;
 
 export function validateEvent<E extends AnalyticsEvent>(event: E, props: unknown): AnalyticsProps<E> | null {
-  const result = ANALYTICS_EVENTS[event].safeParse(props);
+  // An event name that is not in the allowlist (for example one that was removed) is rejected, never thrown.
+  const schema = (ANALYTICS_EVENTS as Record<string, z.ZodType | undefined>)[event];
+  if (!schema) return null;
+  const result = schema.safeParse(props);
   return result.success ? (result.data as AnalyticsProps<E>) : null;
 }
 

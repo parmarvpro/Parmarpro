@@ -6,8 +6,8 @@ import { privilegedDb } from "@/server/privileged/client";
 
 /**
  * PRIVILEGED operations behind the email links and the automation emails. They
- * run with the service role. Callers verify the signed link (or the webhook or
- * payment) before calling, and every function here takes only the ids it needs.
+ * run with the service role. Callers verify the signed link (or the webhook)
+ * before calling, and every function here takes only the ids it needs.
  * Patient names and emails never leave this module.
  */
 
@@ -134,14 +134,6 @@ export async function clinicOwnersAndName(clinicId: string): Promise<{ clinicNam
     .order("id", { ascending: true });
   if (error) throw error;
   return { clinicName, ownerUserIds: data.map((row) => row.clerk_user_id) };
-}
-
-/** When the clinic's free trial ends, or null when the clinic has no trial date. */
-export async function clinicTrialEndsAt(clinicId: string): Promise<Date | null> {
-  if (!isUuid(clinicId)) return null;
-  const { data, error } = await privilegedDb().from("clinic_entitlements").select("trial_ends_at").eq("clinic_id", clinicId).maybeSingle();
-  if (error) throw error;
-  return data?.trial_ends_at ? new Date(data.trial_ends_at) : null;
 }
 
 /** Number of enquiry auto-replies recorded in the notification log since `since`. */

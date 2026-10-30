@@ -27,7 +27,6 @@ const suffix = () => randomBytes(8).toString("hex");
 
 let A: ClinicFixture;
 let B: ClinicFixture;
-let C: ClinicFixture | undefined;
 
 beforeAll(async () => {
   A = await createClinicFixture("autoa");
@@ -35,7 +34,6 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await deleteClinicFixture(C);
   await deleteClinicFixture(B);
   await deleteClinicFixture(A);
   await closePool();
@@ -247,10 +245,7 @@ describe("AU-02d automation marks on tasks cannot be set by users", () => {
 });
 
 describe("AU-03 untouched new leads get one follow-up task", () => {
-  it("creates one task per stale lead, once, and skips leads that are scheduled, already worked or unentitled", async () => {
-    const clinicC = await createClinicFixture("autoc", { entitled: false });
-    C = clinicC;
-
+  it("creates one task per stale lead, once, and skips leads that are scheduled or already worked", async () => {
     const stale = await insertBackdated(
       `insert into public.leads (clinic_id, full_name, source, status, assigned_to, created_at)
        values ($1, 'Stale Inquiry', 'website', 'new', $2, now() - interval '3 days') returning id`,
@@ -270,13 +265,7 @@ describe("AU-03 untouched new leads get one follow-up task", () => {
       A.id,
       worked[0]!.id,
     ]);
-    const unentitled = await insertBackdated(
-      `insert into public.leads (clinic_id, full_name, source, status, created_at)
-       values ($1, 'Lapsed Clinic Inquiry', 'website', 'new', now() - interval '3 days') returning id`,
-      [clinicC.id],
-    );
-
-    const leadIds = [stale[0]!.id, scheduled[0]!.id, worked[0]!.id, unentitled[0]!.id];
+    const leadIds = [stale[0]!.id, scheduled[0]!.id, worked[0]!.id];
     const run = await asRole("service_role", null, async (q) => {
       const first = await q<{ n: number }>("select private.job_untouched_lead_tasks() as n");
       const afterFirst = await q<AutoTaskRow>(
@@ -470,23 +459,6 @@ describe("AU-07 patient email reminders", () => {
   });
 });
 
-describe("AU-08 trial and renewal notices", () => {
-  it("a trial ending in 5 days gets a trial_reminder with 5 days left", async () => {
-    await admin("update public.clinic_entitlements set trial_ends_at = now() + interval '5 days' where clinic_id = $1", [A.id]);
-    const result = await asRole("service_role", null, (q) =>
-      q<{ clinic_id: string; notice: string; days_left: number; period_key: string; owner_user_ids: string[] }>(
-        "select * from public.job_entitlement_notices(now())",
-      ),
-    );
-    expect(result.error).toBeNull();
-    const mine = result.rows.filter((r) => r.clinic_id === A.id);
-    expect(mine).toHaveLength(1);
-    expect(mine[0]).toMatchObject({ notice: "trial_reminder", days_left: 5, owner_user_ids: [A.owner.userId] });
-    expect(mine[0]!.period_key).toMatch(/^trial_reminder:\d{4}-\d{2}-\d{2}$/);
-    expect(result.rows.filter((r) => r.clinic_id === B.id)).toHaveLength(0);
-  });
-});
-
 describe("AU-09 scheduled and job functions are for the service role only", () => {
   it("authenticated users and anon cannot execute the digest or the cleanup", async () => {
     const digest = await asUser(A.owner.claims, (q) => q("select * from public.job_staff_digest(now())"));
@@ -615,7 +587,7 @@ describe("AU-13 the notification log is for the service role only", () => {
     const read = await asUser(A.owner.claims, (q) => q("select * from public.notification_log"));
     expect(read.error?.code).toBe("42501");
     const write = await asRole("service_role", null, (q) =>
-      q("insert into public.notification_log (kind, subject_key, period_key) values ('trial_reminder', 'clinic-x', '2026-11-03')"),
+      q("insert into public.notification_log (kind, subject_key, period_key) values ('welcome', 'clinic-x', '2026-11-03')"),
     );
     expect(write.error).toBeNull();
   });
@@ -657,7 +629,7 @@ describe("AU-14 weekly summary and founder metrics", () => {
     );
     expect(result.error).toBeNull();
     expect(Object.keys(result.rows[0]!.m).sort()).toEqual(
-      ["clinics_created", "enquiries", "paid_active", "payments_captured", "revenue_paise", "trials_active"].sort(),
+      ["clinics_created", "enquiries"].sort(),
     );
   });
 });

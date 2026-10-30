@@ -212,68 +212,6 @@ export type Database = {
           },
         ];
       };
-      billing_orders: {
-        Row: {
-          id: string;
-          clinic_id: string;
-          provider: string;
-          provider_order_id: string;
-          plan_code: string;
-          period_months: number;
-          base_paise: number;
-          gst_paise: number;
-          amount_paise: number;
-          currency: string;
-          status: Database["public"]["Enums"]["billing_order_status"];
-          created_by: string;
-          paid_at: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id: string;
-          clinic_id: string;
-          provider?: string;
-          provider_order_id: string;
-          plan_code: string;
-          period_months: number;
-          base_paise: number;
-          gst_paise: number;
-          amount_paise: number;
-          currency?: string;
-          status?: Database["public"]["Enums"]["billing_order_status"];
-          created_by: string;
-          paid_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          clinic_id?: string;
-          provider?: string;
-          provider_order_id?: string;
-          plan_code?: string;
-          period_months?: number;
-          base_paise?: number;
-          gst_paise?: number;
-          amount_paise?: number;
-          currency?: string;
-          status?: Database["public"]["Enums"]["billing_order_status"];
-          created_by?: string;
-          paid_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "billing_orders_clinic_id_fkey";
-            columns: ["clinic_id"];
-            isOneToOne: false;
-            referencedRelation: "clinics";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       clinic_automation_settings: {
         Row: {
           clinic_id: string;
@@ -340,38 +278,6 @@ export type Database = {
             isOneToOne: false;
             referencedRelation: "clinic_members";
             referencedColumns: ["clinic_id", "id"];
-          },
-        ];
-      };
-      clinic_entitlements: {
-        Row: {
-          clinic_id: string;
-          plan_code: string;
-          trial_ends_at: string | null;
-          paid_through: string | null;
-          updated_at: string;
-        };
-        Insert: {
-          clinic_id: string;
-          plan_code?: string;
-          trial_ends_at?: string | null;
-          paid_through?: string | null;
-          updated_at?: string;
-        };
-        Update: {
-          clinic_id?: string;
-          plan_code?: string;
-          trial_ends_at?: string | null;
-          paid_through?: string | null;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "clinic_entitlements_clinic_id_fkey";
-            columns: ["clinic_id"];
-            isOneToOne: true;
-            referencedRelation: "clinics";
-            referencedColumns: ["id"];
           },
         ];
       };
@@ -795,69 +701,6 @@ export type Database = {
           },
         ];
       };
-      payments: {
-        Row: {
-          id: string;
-          clinic_id: string;
-          billing_order_id: string;
-          provider: string;
-          provider_payment_id: string;
-          status: Database["public"]["Enums"]["payment_status"];
-          amount_paise: number;
-          currency: string;
-          method: string | null;
-          error_code: string | null;
-          captured_at: string | null;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: string;
-          clinic_id: string;
-          billing_order_id: string;
-          provider?: string;
-          provider_payment_id: string;
-          status: Database["public"]["Enums"]["payment_status"];
-          amount_paise: number;
-          currency?: string;
-          method?: string | null;
-          error_code?: string | null;
-          captured_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: string;
-          clinic_id?: string;
-          billing_order_id?: string;
-          provider?: string;
-          provider_payment_id?: string;
-          status?: Database["public"]["Enums"]["payment_status"];
-          amount_paise?: number;
-          currency?: string;
-          method?: string | null;
-          error_code?: string | null;
-          captured_at?: string | null;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "payments_clinic_id_billing_order_id_fkey";
-            columns: ["clinic_id", "billing_order_id"];
-            isOneToOne: false;
-            referencedRelation: "billing_orders";
-            referencedColumns: ["clinic_id", "id"];
-          },
-          {
-            foreignKeyName: "payments_clinic_id_fkey";
-            columns: ["clinic_id"];
-            isOneToOne: false;
-            referencedRelation: "clinics";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       tasks: {
         Row: {
           id: string;
@@ -1023,17 +866,6 @@ export type Database = {
         };
         Returns: undefined;
       };
-      apply_verified_payment: {
-        Args: {
-          p_billing_order_id: string;
-          p_provider_order_id: string;
-          p_provider_payment_id: string;
-          p_amount_paise: number;
-          p_currency: string;
-          p_method?: string;
-        };
-        Returns: Json;
-      };
       archive_clinic_from_clerk: {
         Args: {
           p_clerk_org_id: string;
@@ -1082,19 +914,6 @@ export type Database = {
           p_clerk_user_id: string;
         };
         Returns: undefined;
-      };
-      job_entitlement_notices: {
-        Args: {
-          p_now: string;
-        };
-        Returns: {
-          clinic_id: string;
-          clinic_name: string;
-          notice: string;
-          days_left: number;
-          period_key: string;
-          owner_user_ids: string[];
-        }[];
       };
       job_founder_metrics: {
         Args: {
@@ -1156,9 +975,6 @@ export type Database = {
           member_id: string;
           role: Database["public"]["Enums"]["member_role"];
           display_name: string;
-          entitled: boolean;
-          trial_ends_at: string;
-          paid_through: string;
         }[];
       };
       ops_counts: {
@@ -1166,19 +982,6 @@ export type Database = {
           p_since: string;
         };
         Returns: Json;
-      };
-      record_payment_attempt: {
-        Args: {
-          p_billing_order_id: string;
-          p_provider_order_id: string;
-          p_provider_payment_id: string;
-          p_status: Database["public"]["Enums"]["payment_status"];
-          p_amount_paise: number;
-          p_currency: string;
-          p_method?: string;
-          p_error_code?: string;
-        };
-        Returns: undefined;
       };
       regenerate_enquiry_form_key: {
         Args: never;
@@ -1217,13 +1020,11 @@ export type Database = {
     Enums: {
       appointment_status: "scheduled" | "confirmed" | "completed" | "cancelled" | "no_show";
       appointment_type: "consultation" | "follow_up" | "procedure" | "other";
-      billing_order_status: "created" | "paid" | "failed" | "expired";
       invitation_status: "pending" | "accepted" | "revoked" | "expired";
       lead_source: "walk_in" | "phone_call" | "whatsapp" | "website" | "google" | "instagram" | "facebook" | "referral" | "practo" | "justdial" | "other";
       lead_status: "new" | "contacted" | "qualified" | "appointment_booked" | "converted" | "lost";
       member_role: "owner" | "admin" | "staff" | "viewer";
       member_status: "active" | "removed";
-      payment_status: "authorized" | "captured" | "failed" | "refunded";
       task_status: "open" | "done" | "cancelled";
       webhook_status: "received" | "processed" | "ignored" | "failed";
     };

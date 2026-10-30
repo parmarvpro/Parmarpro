@@ -240,25 +240,6 @@ describe("staff digest, end to end", () => {
   });
 });
 
-describe("trial notices, end to end", () => {
-  beforeAll(async () => {
-    await admin("update public.clinic_entitlements set trial_ends_at = now() + interval '5 days' where clinic_id = $1", [B.id]);
-  });
-
-  it("sends one trial reminder to the owner of a clinic whose trial ends in 5 days, and nothing on a second run", async () => {
-    await runJob("trial-renewal");
-    const owner = sentTo(addressOf(B.owner.userId));
-    expect(owner).toHaveLength(1);
-    expect(sentTo(addressOf(B.staff.userId))).toHaveLength(0);
-    // Clinic A's trial ends in 14 days: no notice yet.
-    expect(sentTo(addressOf(A.owner.userId))).toHaveLength(0);
-
-    sent = [];
-    await runJob("trial-renewal");
-    expect(sentTo(addressOf(B.owner.userId))).toHaveLength(0);
-  });
-});
-
 describe("job runs and the founder digest's operations section, end to end", () => {
   let handler: typeof import("@/server/jobs/handler");
   let ops: typeof import("@/server/privileged/ops");

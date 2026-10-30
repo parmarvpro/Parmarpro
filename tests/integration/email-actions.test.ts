@@ -143,13 +143,6 @@ describe("clinic facts for the automation emails", () => {
     await expect(email.clinicOwnersAndName(randomUUID())).resolves.toBeNull();
   });
 
-  it("clinicTrialEndsAt returns the trial end date", async () => {
-    const trialEnd = await email.clinicTrialEndsAt(A.id);
-    expect(trialEnd).toBeInstanceOf(Date);
-    expect(Math.abs((trialEnd?.getTime() ?? 0) - (Date.now() + 14 * DAY_MS))).toBeLessThan(MINUTE_MS);
-    await expect(email.clinicTrialEndsAt(randomUUID())).resolves.toBeNull();
-  });
-
   it("autoRepliesSentSince counts the auto-replies logged since the given time", async () => {
     const since = new Date(Date.now() - MINUTE_MS);
     const before = await email.autoRepliesSentSince(since);

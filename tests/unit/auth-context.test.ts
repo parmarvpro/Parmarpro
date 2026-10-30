@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// The database counts as connected for these tests. Placeholder values only; nothing is sent.
+process.env.SUPABASE_URL = "https://example.supabase.co";
+process.env.SUPABASE_PUBLISHABLE_KEY = "sb_publishable_synthetic_unit_test_value";
+
 const authMock = vi.fn();
 const rpcMock = vi.fn();
 
@@ -19,7 +23,7 @@ function signedIn(orgId: string | null = "org_A1", orgRole: string | null = "org
   authMock.mockResolvedValue({ userId: "user_1", orgId, orgRole, getToken: async () => "token" });
 }
 
-function membership(role: string, entitled = true) {
+function membership(role: string) {
   rpcMock.mockResolvedValue({
     data: [
       {
@@ -29,9 +33,6 @@ function membership(role: string, entitled = true) {
         member_id: "22222222-2222-4222-8222-222222222222",
         role,
         display_name: null,
-        entitled,
-        trial_ends_at: null,
-        paid_through: null,
       },
     ],
     error: null,
@@ -81,18 +82,19 @@ describe("requirePermission", () => {
     await expect(requirePermission("team:invite")).rejects.toMatchObject({ code: "forbidden" });
   });
 
-  it("rejects an admin attempting to pay", async () => {
-    signedIn();
-    membership("admin");
-    await expect(requirePermission("billing:pay")).rejects.toMatchObject({ code: "forbidden" });
-  });
-
-  it("rejects operational writes when the clinic is not entitled (402)", async () => {
-    signedIn();
-    membership("owner", false);
-    await expect(requirePermission("lead:create")).rejects.toMatchObject({ code: "entitlement_required", status: 402 });
-    await expect(requirePermission("lead:read")).resolves.toMatchObject({ role: "owner" });
-    await expect(requirePermission("billing:pay")).resolves.toMatchObject({ role: "owner" });
+  it("reports not_connected without querying the database when the database is not configured", async () => {
+    const saved = { url: process.env.SUPABASE_URL, key: process.env.SUPABASE_PUBLISHABLE_KEY };
+    delete process.env.SUPABASE_URL;
+    delete process.env.SUPABASE_PUBLISHABLE_KEY;
+    try {
+      signedIn();
+      await expect(getSessionState()).resolves.toEqual({ kind: "not_connected", userId: "user_1" });
+      expect(rpcMock).not.toHaveBeenCalled();
+      await expect(requirePermission("lead:read")).rejects.toMatchObject({ code: "not_configured", status: 503 });
+    } finally {
+      process.env.SUPABASE_URL = saved.url;
+      process.env.SUPABASE_PUBLISHABLE_KEY = saved.key;
+    }
   });
 
   it("returns the context for an authorized caller", async () => {

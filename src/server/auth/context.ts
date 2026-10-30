@@ -4,7 +4,8 @@ import { auth } from "@clerk/nextjs/server";
 import { cache } from "react";
 
 import { AppError } from "@/server/auth/errors";
-import { hasPermission, isRole, requiresEntitlement, type Permission, type Role } from "@/server/auth/permissions";
+import { hasPermission, isRole, type Permission, type Role } from "@/server/auth/permissions";
+import { isConfigured, supabaseEnv } from "@/lib/env";
 import { createUserDb, type UserDb } from "@/server/db/user-client";
 import { mapDbError } from "@/server/db/errors";
 
@@ -17,19 +18,14 @@ export type AuthContext = {
   memberId: string;
   role: Role;
   displayName: string | null;
-  entitled: boolean;
-  trialEndsAt: string | null;
-  paidThrough: string | null;
-  /** Later of trial end and paid-through, and whether it is within 7 days. */
-  accessEndsAt: string | null;
-  accessEndsSoon: boolean;
-  onTrial: boolean;
   /** Supabase client acting as this user under RLS. */
   db: UserDb;
 };
 
 export type SessionState =
   | { kind: "signed_out" }
+  /** Clerk sign-in works, but the clinic database is not connected, so membership cannot be loaded. */
+  | { kind: "not_connected"; userId: string }
   | { kind: "no_org"; userId: string }
   | { kind: "no_membership"; userId: string; orgId: string; orgRole: string | null; db: UserDb }
   | { kind: "member"; ctx: AuthContext };
@@ -44,6 +40,7 @@ export type SessionState =
 export const getSessionState = cache(async (): Promise<SessionState> => {
   const session = await auth();
   if (!session.userId) return { kind: "signed_out" };
+  if (!isConfigured(supabaseEnv)) return { kind: "not_connected", userId: session.userId };
   if (!session.orgId) return { kind: "no_org", userId: session.userId };
 
   const db = createUserDb(() => session.getToken());
@@ -55,7 +52,6 @@ export const getSessionState = cache(async (): Promise<SessionState> => {
     return { kind: "no_membership", userId: session.userId, orgId: session.orgId, orgRole: session.orgRole ?? null, db };
   }
 
-  const access = accessWindow(row.trial_ends_at ?? null, row.paid_through ?? null);
   return {
     kind: "member",
     ctx: {
@@ -67,28 +63,11 @@ export const getSessionState = cache(async (): Promise<SessionState> => {
       memberId: row.member_id,
       role: row.role,
       displayName: row.display_name ?? null,
-      entitled: row.entitled,
-      trialEndsAt: row.trial_ends_at ?? null,
-      paidThrough: row.paid_through ?? null,
-      ...access,
       db,
     },
   };
 });
 
-const RENEWAL_NOTICE_MS = 7 * 24 * 60 * 60 * 1000;
-
-function accessWindow(trialEndsAt: string | null, paidThrough: string | null) {
-  const trialEnd = trialEndsAt ? Date.parse(trialEndsAt) : 0;
-  const paidEnd = paidThrough ? Date.parse(paidThrough) : 0;
-  const end = Math.max(trialEnd, paidEnd);
-  if (!end) return { accessEndsAt: null, accessEndsSoon: false, onTrial: false };
-  return {
-    accessEndsAt: new Date(end).toISOString(),
-    accessEndsSoon: end - Date.now() <= RENEWAL_NOTICE_MS,
-    onTrial: trialEnd >= paidEnd,
-  };
-}
 
 /** Returns the member context or throws 401/403. */
 export async function getAuthContext(): Promise<AuthContext> {
@@ -96,6 +75,8 @@ export async function getAuthContext(): Promise<AuthContext> {
   switch (state.kind) {
     case "signed_out":
       throw new AppError("unauthenticated");
+    case "not_connected":
+      throw new AppError("not_configured");
     case "no_org":
       throw new AppError("no_active_clinic");
     case "no_membership":
@@ -107,12 +88,11 @@ export async function getAuthContext(): Promise<AuthContext> {
 
 /**
  * The single entry point for authorization in Server Actions, Route Handlers
- * and data loaders. Throws AppError (401/402/403) when the caller may not
+ * and data loaders. Throws AppError (401/403) when the caller may not
  * perform `permission`. PostgreSQL RLS enforces the same rules again.
  */
 export async function requirePermission(permission: Permission): Promise<AuthContext> {
   const ctx = await getAuthContext();
   if (!hasPermission(ctx.role, permission)) throw new AppError("forbidden");
-  if (requiresEntitlement(permission) && !ctx.entitled) throw new AppError("entitlement_required");
   return ctx;
 }

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 
 export const MARKETING_LINKS = [
   { href: "/features", label: "Features" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
@@ -35,7 +34,7 @@ export function SiteHeader() {
               <Link href="/sign-in">Sign in</Link>
             </Button>
             <Button asChild size="sm" className="hidden sm:inline-flex">
-              <Link href="/sign-up">Start free trial</Link>
+              <Link href="/sign-up">Get started</Link>
             </Button>
           </Show>
           <Show when="signed-in">

@@ -192,7 +192,6 @@ Outlined text (`.outline-text`, `.outline-text-soft`) keeps its 1.5px stroke. Ru
 | Stat number | 1.75rem | 700 | `tabular-nums` |
 | Badge | 0.75rem | 600 | |
 | Helper text | 0.75rem | 400 | |
-| Payment IDs | 0.75rem | system mono | |
 
 ### Fixed rules
 1. **Weights allowed:** 300 (accent only), 400, 500, 600, 700, 800 (display only). Nothing else.
@@ -212,9 +211,9 @@ Edit: `src/app/layout.tsx`, `src/app/globals.css`, `src/app/(marketing)/page.tsx
 
 ## 7. How it will be verified
 
-- **E2E (`typography.spec.ts`):** body `font-family` starts with Archivo; hero `h1` computes weight 800 and `font-stretch` 112%; `.accent` computes weight 300 and `font-style` normal; exactly **one** woff2 is requested on `/`; `/pricing` price text uses Archivo; no horizontal scroll at 390, 768, 1024 and 1440 (existing tests).
+- **E2E (`typography.spec.ts`):** body `font-family` starts with Archivo; hero `h1` computes weight 800 and `font-stretch` 112%; `.accent` computes weight 300 and `font-style` normal; exactly **one** woff2 is requested on `/`; no horizontal scroll at 390, 768, 1024 and 1440 (existing tests).
 - **Unit/guard:** no import of `next/font/google` anywhere in `src`, and the build script's own assertions (`₹` present, size under 60 KB).
-- **Screenshots** at 390, 768, 1024 and 1440 for `/`, `/features`, `/pricing`, `/contact`, `/sign-in`, checking the outlined ribbon and footer wordmark for inner-contour artifacts.
+- **Screenshots** at 390, 768, 1024 and 1440 for `/`, `/features`, `/contact`, `/sign-in`, checking the outlined ribbon and footer wordmark for inner-contour artifacts.
 - **Measured before and after:** font bytes and request count, CLS (fallback metrics are adjusted to Arial), Lighthouse mobile.
 - Existing checks unchanged: lint, typecheck, unit, build, public-env, no-bypass, E2E, gitleaks, CI.
 
@@ -226,7 +225,7 @@ Edit: `src/app/layout.tsx`, `src/app/globals.css`, `src/app/(marketing)/page.tsx
 | Font files in the production build | 13 files (all subsets) | **1 file, 49.5 KB**, preloaded |
 | Lighthouse mobile, home (3 runs, same flags) | perf 56-59, LCP 4.9-5.0 s, TBT 0.92-1.19 s, CLS 0-0.004 | perf 60-66, LCP 4.6-4.7 s, TBT 0.62-0.88 s, CLS 0 |
 | Accessibility (Lighthouse) | 100 | 100 |
-| Horizontal overflow, clipped headings | none | none (home, features, pricing, contact, sign-in at 390, 768, 1024, 1440) |
+| Horizontal overflow, clipped headings | none | none (home, features, contact, sign-in at 390, 768, 1024, 1440) |
 
 The LCP and TBT targets (2.5 s and 200 ms) were **still not met** in this sandbox at the time; the font change helped but was not the main cause. These numbers were measured while the motion system was still in place (it has since been removed), so they need re-measuring. Numbers come from a CPU-only container with placeholder Clerk keys and are not real-device results.
 

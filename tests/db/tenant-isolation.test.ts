@@ -27,7 +27,6 @@ const TENANT_TABLES = [
   "appointments",
   "tasks",
   "activity_events",
-  "clinic_entitlements",
 ] as const;
 
 beforeAll(async () => {
@@ -359,7 +358,7 @@ describe("TI-12..TI-15 missing, wrong or stale membership is denied", () => {
 });
 
 describe("TI-16 anonymous callers see nothing", () => {
-  for (const table of [...TENANT_TABLES, "billing_orders", "payments", "webhook_events", "contact_requests", "clinic_invitations"]) {
+  for (const table of [...TENANT_TABLES, "webhook_events", "contact_requests", "clinic_invitations"]) {
     it(`anon select ${table} is denied`, async () => {
       const result = await asRole("anon", null, (q) => q(`select * from public.${table} limit 1`));
       expect(result.error?.code).toBe("42501");
@@ -372,68 +371,17 @@ describe("TI-16 anonymous callers see nothing", () => {
   });
 });
 
-describe("TI-17..TI-19 billing data is read-only and scoped", () => {
-  it.each([
-    ["webhook_events select", "select * from public.webhook_events"],
-    [
-      "webhook_events insert",
-      "insert into public.webhook_events (provider, event_id, event_type, payload_sha256) values ('razorpay','evt_x','payment.captured', repeat('a',64))",
-    ],
-    ["entitlement update", "update public.clinic_entitlements set paid_through = now() + interval '10 years'"],
-    ["entitlement insert", "insert into public.clinic_entitlements (clinic_id, paid_through) values (gen_random_uuid(), now())"],
-    [
-      "billing_orders insert",
-      "insert into public.billing_orders (id, clinic_id, provider_order_id, plan_code, period_months, base_paise, gst_paise, amount_paise, created_by) values (gen_random_uuid(), gen_random_uuid(), 'order_x', 'p', 1, 1, 0, 1, 'x')",
-    ],
-    ["payments update", "update public.payments set status = 'captured'"],
-  ])("%s is denied to the clinic owner", async (_name, sql) => {
-    const result = await asUser(A.owner.claims, (q) => q(sql));
-    expect(result.error?.code).toBe("42501");
-  });
-
-  it("TI-18 apply_verified_payment is not executable by users", async () => {
-    const result = await asUser(A.owner.claims, (q) =>
-      q("select public.apply_verified_payment(gen_random_uuid(), 'order_x', 'pay_x', 1, 'INR')"),
+describe("TI-17 payment objects are removed", () => {
+  it("the payment tables and functions no longer exist", async () => {
+    const { rows } = await admin<{ tables: number; functions: number }>(
+      `select (select count(*) from pg_tables
+                where schemaname = 'public' and tablename in ('billing_orders', 'payments', 'clinic_entitlements'))::int as tables,
+              (select count(*) from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+                where (n.nspname = 'public'
+                       and p.proname in ('apply_verified_payment', 'record_payment_attempt', 'job_entitlement_notices'))
+                   or (n.nspname = 'private' and p.proname in ('clinic_has_entitlement', 'trial_days')))::int as functions`,
     );
-    expect(result.error?.code).toBe("42501");
-  });
-
-  it("TI-19 entitlement of Clinic B is invisible to Clinic A", async () => {
-    const result = await asUser(A.owner.claims, (q) =>
-      q("select * from public.clinic_entitlements where clinic_id = $1", [B.id]),
-    );
-    expect(result.rowCount).toBe(0);
-  });
-
-  it("staff cannot read billing orders or payments", async () => {
-    await admin(
-      "insert into public.billing_orders (id, clinic_id, provider_order_id, plan_code, period_months, base_paise, gst_paise, amount_paise, created_by) values (gen_random_uuid(), $1, $2, 'parmarpro_clinic_monthly', 1, 7500000, 1350000, 8850000, 'system')",
-      [A.id, `order_staffcheck${Date.now()}`],
-    );
-    const staff = await asUser(A.staff.claims, (q) => q("select * from public.billing_orders"));
-    expect(staff.rowCount).toBe(0);
-    const owner = await asUser(A.owner.claims, (q) => q("select * from public.billing_orders"));
-    expect(owner.rowCount).toBeGreaterThan(0);
-  });
-});
-
-describe("TI-20 writes require an active entitlement; reads do not", () => {
-  it("expired clinic can read but not write", async () => {
-    const expired = await createClinicFixture("Expired", { entitled: false });
-    try {
-      const read = await asUser(expired.staff.claims, (q) => q("select id from public.leads"));
-      expect(read.rowCount).toBeGreaterThan(0);
-      const insert = await asUser(expired.staff.claims, (q) =>
-        q("insert into public.leads (full_name) values ('Blocked')"),
-      );
-      expect(insert.error?.code).toBe("42501");
-      const update = await asUser(expired.staff.claims, (q) =>
-        q("update public.leads set notes = 'blocked' where id = $1", [expired.leadId]),
-      );
-      expect(update.error?.code).toBe("42501");
-    } finally {
-      await deleteClinicFixture(expired);
-    }
+    expect(rows[0]).toEqual({ tables: 0, functions: 0 });
   });
 });
 
@@ -494,16 +442,16 @@ describe("TI-23 clinic creation is restricted to the org admin, once", () => {
     expect(result.error?.code).toBe("23505");
   });
 
-  it("org admin creates the clinic, becomes owner and gets a trial", async () => {
+  it("org admin creates the clinic and becomes its owner", async () => {
     const orgId = `org_fresh${Date.now()}`;
     const userId = `user_founder${Date.now()}`;
     const result = await asUser(claimsFor(userId, orgId, "admin"), async (q) => {
       const created = await q<{ id: string }>("select public.create_clinic_for_active_org('Synthetic Fresh Dental') as id");
-      const me = await q<{ role: string; entitled: boolean }>("select role, entitled from public.my_membership()");
+      const me = await q<{ role: string }>("select role from public.my_membership()");
       return { created, me };
     });
     expect(result.created.error).toBeNull();
-    expect(result.me.rows[0]).toEqual({ role: "owner", entitled: true });
+    expect(result.me.rows[0]).toEqual({ role: "owner" });
   });
 
   it("no org claim cannot create a clinic", async () => {

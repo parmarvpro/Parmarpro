@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash, timingSafeEqual } from "node:crypto";
 
+import { MissingConfigurationError } from "@/lib/env";
 import { reportError } from "@/lib/observability/report";
 import { jsonResponse } from "@/server/http";
 import type { JobFn, JobResult, JobRunRecord } from "@/server/jobs/registry";
@@ -50,6 +51,8 @@ export async function handleJobRequest(request: Request, jobName: string, deps: 
   try {
     result = await job({ now: deps.now(), dryRun });
   } catch (error) {
+    // Without the database the run can neither be done nor recorded. Answer 503 and do not report it as a failure.
+    if (error instanceof MissingConfigurationError) return jsonResponse({ error: "not_configured" }, 503);
     reportError(error, { area: `jobs.${jobName}` });
     await recordRun(deps, { job: jobName, ok: false, dryRun, result: {}, durationMs: performance.now() - startedAt });
     return jsonResponse({ error: "internal" }, 500);

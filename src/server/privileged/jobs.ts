@@ -11,7 +11,6 @@ import { privilegedDb } from "@/server/privileged/client";
  * or a concurrent change cannot apply the same transition twice.
  */
 
-const MINUTE_MS = 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const ENQUIRY_COLUMNS = "id, full_name, clinic_name, city, created_at";
@@ -21,20 +20,12 @@ type JobFunctions = Database["public"]["Functions"];
 
 export type StaffDigestRow = JobFunctions["job_staff_digest"]["Returns"][number];
 export type PatientReminderRow = JobFunctions["job_patient_reminders"]["Returns"][number];
-export type EntitlementNoticeRow = JobFunctions["job_entitlement_notices"]["Returns"][number];
 
 export type WeeklySummaryRow = {
   clinic_id: string;
   clinic_name: string;
   owner_user_ids: string[];
   summary: WeeklySummary;
-};
-
-export type StaleBillingOrder = {
-  id: string;
-  clinic_id: string;
-  provider_order_id: string;
-  created_at: string;
 };
 
 export type ExpirableInvitation = {
@@ -62,31 +53,6 @@ export type FounderEnquiries = {
 /** ISO timestamp `ms` before `now`. */
 function ago(now: Date, ms: number): string {
   return new Date(now.getTime() - ms).toISOString();
-}
-
-/** Orders still unpaid 15 minutes after they were created, oldest first. */
-export async function staleBillingOrders(now: Date, limit = 50): Promise<StaleBillingOrder[]> {
-  const { data, error } = await privilegedDb()
-    .from("billing_orders")
-    .select("id, clinic_id, provider_order_id, created_at")
-    .eq("status", "created")
-    .lte("created_at", ago(now, 15 * MINUTE_MS))
-    .order("created_at", { ascending: true })
-    .limit(limit);
-  if (error) throw error;
-  return data;
-}
-
-/** Marks an unpaid order expired. False when the order was no longer 'created' (for example, it was paid meanwhile). */
-export async function expireBillingOrder(id: string): Promise<boolean> {
-  const { data, error } = await privilegedDb()
-    .from("billing_orders")
-    .update({ status: "expired" })
-    .eq("id", id)
-    .eq("status", "created")
-    .select("id");
-  if (error) throw error;
-  return data.length > 0;
 }
 
 /** Pending invitations older than 7 days, oldest first, with the Clerk organization they belong to. */
@@ -128,12 +94,6 @@ export async function staffDigestRows(now: Date): Promise<StaffDigestRow[]> {
 
 export async function patientReminderRows(now: Date): Promise<PatientReminderRow[]> {
   const { data, error } = await privilegedDb().rpc("job_patient_reminders", { p_now: now.toISOString() });
-  if (error) throw error;
-  return data;
-}
-
-export async function entitlementNoticeRows(now: Date): Promise<EntitlementNoticeRow[]> {
-  const { data, error } = await privilegedDb().rpc("job_entitlement_notices", { p_now: now.toISOString() });
   if (error) throw error;
   return data;
 }
@@ -233,10 +193,6 @@ function parseFounderMetrics(value: Json): FounderMetrics {
   const o = asObject(value);
   return {
     clinics_created: numberField(o, "clinics_created"),
-    trials_active: numberField(o, "trials_active"),
-    paid_active: numberField(o, "paid_active"),
-    payments_captured: numberField(o, "payments_captured"),
-    revenue_paise: numberField(o, "revenue_paise"),
     enquiries: numberField(o, "enquiries"),
   };
 }

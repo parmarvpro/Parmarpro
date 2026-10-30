@@ -10,14 +10,13 @@ const QUIET: OpsCounts = {
   email_budget_hits: 0,
   emails_sent_today: 4,
   webhooks_failed: 0,
-  orders_unpaid_over_1h: 0,
   ai_calls: 3,
   ai_calls_failed: 0,
   ai_calls_rate_limited: 0,
 };
 
 describe("OPS_COUNT_KEYS", () => {
-  it("names exactly the eleven counts, in the order the digest shows them", () => {
+  it("names exactly the ten counts, in the order the digest shows them", () => {
     expect([...OPS_COUNT_KEYS]).toEqual([
       "job_runs",
       "job_runs_failed",
@@ -26,7 +25,6 @@ describe("OPS_COUNT_KEYS", () => {
       "email_budget_hits",
       "emails_sent_today",
       "webhooks_failed",
-      "orders_unpaid_over_1h",
       "ai_calls",
       "ai_calls_failed",
       "ai_calls_rate_limited",
@@ -45,7 +43,6 @@ describe("opsNeedsAttention", () => {
     "emails_failed",
     "email_budget_hits",
     "webhooks_failed",
-    "orders_unpaid_over_1h",
     "ai_calls_failed",
   ] as const)("is true when %s is above zero", (key) => {
     expect(opsNeedsAttention({ ...QUIET, [key]: 1 })).toBe(true);

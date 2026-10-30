@@ -2,11 +2,11 @@ import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
 import { AnalyticsToggle } from "@/components/dashboard/analytics-toggle";
-import { EntitlementBanner } from "@/components/dashboard/entitlement-banner";
 import { MobileSidebar } from "@/components/dashboard/mobile-sidebar";
 import { NAV_ITEMS } from "@/components/dashboard/nav-items";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
 import { Logo } from "@/components/logo";
+import { NotConnected } from "@/components/not-connected";
 import { AnalyticsProvider } from "@/components/providers/analytics-provider";
 import { Badge } from "@/components/ui/badge";
 import { publicEnv } from "@/lib/env";
@@ -18,6 +18,7 @@ import { hasPermission } from "@/server/auth/permissions";
 export default async function DashboardLayout({ children }: LayoutProps<"/dashboard">) {
   const state = await getSessionState();
   if (state.kind === "signed_out") redirect("/sign-in");
+  if (state.kind === "not_connected") return <NotConnected />;
   if (state.kind !== "member") redirect("/onboarding");
   const { ctx } = state;
 
@@ -59,13 +60,6 @@ export default async function DashboardLayout({ children }: LayoutProps<"/dashbo
             </Badge>
             <UserButton />
           </header>
-          <EntitlementBanner
-            entitled={ctx.entitled}
-            accessEndsAt={ctx.accessEndsAt}
-            accessEndsSoon={ctx.accessEndsSoon}
-            onTrial={ctx.onTrial}
-            canManageBilling={hasPermission(ctx.role, "billing:pay")}
-          />
           <main id="main" className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
             {children}
           </main>

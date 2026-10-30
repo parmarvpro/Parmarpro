@@ -3,9 +3,7 @@ import "server-only";
 import { expireInvitationsJob } from "@/server/jobs/expire-invitations";
 import { founderDigestJob } from "@/server/jobs/founder-digest";
 import { patientRemindersJob } from "@/server/jobs/patient-reminders";
-import { reconcilePaymentsJob } from "@/server/jobs/reconcile-payments";
 import { staffDigestJob } from "@/server/jobs/staff-digest";
-import { trialRenewalJob } from "@/server/jobs/trial-renewal";
 import { weeklySummaryJob } from "@/server/jobs/weekly-summary";
 
 export type JobContext = { now: Date; dryRun: boolean };
@@ -23,9 +21,7 @@ export type JobRunRecord = { job: string; ok: boolean; dryRun: boolean; result: 
  * do not form a runtime cycle.
  */
 export const JOBS: Record<string, JobFn> = {
-  "reconcile-payments": reconcilePaymentsJob,
   "expire-invitations": expireInvitationsJob,
-  "trial-renewal": trialRenewalJob,
   "staff-digest": staffDigestJob,
   "weekly-summary": weeklySummaryJob,
   "patient-reminders": patientRemindersJob,

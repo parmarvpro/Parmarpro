@@ -13,7 +13,6 @@ export const OPS_COUNT_KEYS = [
   "email_budget_hits",
   "emails_sent_today",
   "webhooks_failed",
-  "orders_unpaid_over_1h",
   "ai_calls",
   "ai_calls_failed",
   "ai_calls_rate_limited",
@@ -30,7 +29,6 @@ const ATTENTION_KEYS: readonly OpsCountKey[] = [
   "emails_failed",
   "email_budget_hits",
   "webhooks_failed",
-  "orders_unpaid_over_1h",
   "ai_calls_failed",
 ];
 

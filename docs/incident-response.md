@@ -7,8 +7,6 @@ Applies to any suspected security, privacy or availability incident affecting Pa
 Signals to watch:
 - **Sentry:**
   - spikes in errors;
-  - `webhook.razorpay` events tagged `razorpay_webhook_invalid_signature` or `razorpay_webhook_mismatch_*`;
-  - `billing.verify` events with code `order` / `amount` / `currency`.
 - **Supabase:**
   - API and Postgres logs (unexpected `42501` bursts, unusual RPC calls);
   - security advisor findings.
@@ -18,7 +16,7 @@ Signals to watch:
 - **Reports:** from clinics, for example "I can see another clinic's data". Treat this as **critical** until disproven.
 
 Severity:
-- **Critical:** cross-tenant data exposure, leaked privileged secret, payment manipulation.
+- **Critical:** cross-tenant data exposure, leaked privileged secret.
 - **High:** account takeover, PII in third-party telemetry.
 - **Medium:** service outage, failed webhooks.
 - **Low:** anything else.
@@ -29,7 +27,6 @@ Severity:
 |---|---|
 | Leaked Supabase secret key | Supabase → Settings → API keys → **revoke/rotate the secret key** immediately. Update `SUPABASE_SECRET_KEY` in Vercel (Production and Preview separately) and redeploy |
 | Leaked Clerk secret key | Clerk → API keys → roll the secret key. Update Vercel and redeploy. Review Clerk users, organizations and memberships for changes |
-| Leaked Razorpay key secret or webhook secret | Razorpay → regenerate the API key and/or webhook secret. Update Vercel and redeploy. Review recent orders and payments against `billing_orders` and `payments` |
 | Leaked Sentry or PostHog token | Revoke the token in the provider and create a new one |
 | Compromised user account | Clerk → user → revoke all sessions, reset the password, enforce MFA. If they are a member of a clinic, remove them through the Team page (this ends access immediately) |
 | Compromised owner account | As above, then verify `clinic_members` roles with SQL (read-only) and correct them through a reviewed migration or the support process |
@@ -54,7 +51,6 @@ Severity:
 
 - Inform affected clinics without undue delay, with facts, scope and the actions taken.
 - Personal-data breaches can create legal notification duties for ParmarPro and/or the clinic, for example under India's DPDP Act 2023 and rules, and CERT-In directions (6-hour reporting for certain incidents). **Get legal advice immediately** for any incident involving personal data or credentials.
-- Payment-related incidents: contact Razorpay support.
 
 ## 6. Recover
 
@@ -80,4 +76,3 @@ Then update the threat model and this runbook.
 | Legal counsel | | |
 | Supabase support | Dashboard → Support | |
 | Clerk support | Dashboard → Support | |
-| Razorpay support | Dashboard → Support | |

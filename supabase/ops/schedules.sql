@@ -78,9 +78,7 @@ declare
   v_headers jsonb;
 begin
   if p_job is null or p_job not in (
-    'reconcile-payments',
     'expire-invitations',
-    'trial-renewal',
     'staff-digest',
     'weekly-summary',
     'patient-reminders',
@@ -137,11 +135,9 @@ select cron.schedule('parmarpro_recall_tasks', '5 2 * * *', $$select private.job
 
 -- App jobs (the app's /api/jobs/<name> endpoints, through private.call_job).
 select cron.schedule('parmarpro_staff_digest', '30 2 * * *', $$select private.call_job('staff-digest')$$);  -- 08:00 IST daily
-select cron.schedule('parmarpro_trial_renewal', '30 3 * * *', $$select private.call_job('trial-renewal')$$);  -- 09:00 IST daily
 select cron.schedule('parmarpro_weekly_summary', '45 3 * * 1', $$select private.call_job('weekly-summary')$$);  -- 09:15 IST Mondays
 select cron.schedule('parmarpro_founder_digest', '0 4 * * *', $$select private.call_job('founder-digest')$$);  -- 09:30 IST daily
 select cron.schedule('parmarpro_patient_reminders', '30 4 * * *', $$select private.call_job('patient-reminders')$$);  -- 10:00 IST daily
-select cron.schedule('parmarpro_reconcile_payments', '*/15 * * * *', $$select private.call_job('reconcile-payments')$$);  -- every 15 minutes
 select cron.schedule('parmarpro_expire_invitations', '0 20 * * *', $$select private.call_job('expire-invitations')$$);  -- 01:30 IST daily
 
 -- Retention deletes (the database function does the work).

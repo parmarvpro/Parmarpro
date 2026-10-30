@@ -7,6 +7,7 @@ import { EyebrowTag } from "@/components/brand/eyebrow-tag";
 import { Halftone } from "@/components/brand/halftone";
 import { Sparkle } from "@/components/brand/sparkle";
 import { Logo } from "@/components/logo";
+import { NotConnected } from "@/components/not-connected";
 import { ClaimInvitation } from "@/components/onboarding/claim-invitation";
 import { ClinicSetupForm } from "@/components/onboarding/clinic-setup-form";
 import { RegistrationTracker } from "@/components/onboarding/registration-tracker";
@@ -21,6 +22,7 @@ export const metadata: Metadata = { title: "Set up your clinic" };
 export default async function OnboardingPage() {
   const state = await getSessionState();
   if (state.kind === "signed_out") redirect("/sign-in");
+  if (state.kind === "not_connected") return <NotConnected />;
   if (state.kind === "member") redirect("/dashboard");
 
   const session = await auth();
@@ -68,7 +70,7 @@ export default async function OnboardingPage() {
             <CardHeader>
               <CardTitle>{isOrgAdmin ? "Finish setting up your clinic" : "Create your clinic workspace"}</CardTitle>
               <CardDescription>
-                You will be the owner. Your 14-day trial starts now, and you can invite your team afterwards.
+                You will be the owner. You can invite your team afterwards.
               </CardDescription>
             </CardHeader>
             <CardContent>

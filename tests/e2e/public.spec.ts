@@ -3,7 +3,6 @@ import { expect, test } from "./fixtures";
 const PAGES = [
   { path: "/", heading: /Stop losing patients/i },
   { path: "/features", heading: /^Features$/ },
-  { path: "/pricing", heading: /Simple pricing/i },
   { path: "/contact", heading: /Talk to us/i },
   { path: "/privacy", heading: /Privacy notice/i },
   { path: "/terms", heading: /Terms of service/i },
@@ -24,13 +23,6 @@ for (const page of PAGES) {
     await expect(browser.getByRole("heading", { level: 1 })).toHaveText(page.heading);
   });
 }
-
-test("pricing shows the real plan price and GST", async ({ page }) => {
-  await page.goto("/pricing");
-  await expect(page.getByText("₹75,000")).toBeVisible();
-  await expect(page.getByText(/18% GST/)).toBeVisible();
-  await expect(page.getByText(/₹88,500/)).toBeVisible();
-});
 
 test("marketing pages carry no invented metrics or testimonials", async ({ page }) => {
   await page.goto("/");

@@ -9,7 +9,7 @@ import { z } from "zod";
  *   secret-looking name uses that prefix or a secret value appears in the
  *   client bundle.
  * - Server values are validated lazily on first use, so a missing optional
- *   integration (for example Razorpay before credentials exist) fails only the
+ *   integration (for example Resend before credentials exist) fails only the
  *   feature that needs it, with a clear error, instead of the whole app.
  */
 
@@ -45,15 +45,6 @@ const supabaseSchema = z.object({
 const supabaseSecretSchema = z.object({
   SUPABASE_URL: z.url(),
   SUPABASE_SECRET_KEY: z.string().min(20),
-});
-
-const razorpaySchema = z.object({
-  RAZORPAY_KEY_ID: z.string().regex(/^rzp_(test|live)_[A-Za-z0-9]+$/, "RAZORPAY_KEY_ID must look like rzp_test_… or rzp_live_…"),
-  RAZORPAY_KEY_SECRET: z.string().min(10),
-});
-
-const razorpayWebhookSchema = z.object({
-  RAZORPAY_WEBHOOK_SECRET: z.string().min(10),
 });
 
 const emailSchema = z.object({
@@ -111,23 +102,6 @@ export function supabaseSecretEnv() {
   return load("Supabase (secret)", supabaseSecretSchema);
 }
 
-export function razorpayEnv() {
-  const env = load("Razorpay", razorpaySchema);
-  const appEnv = publicEnv.NEXT_PUBLIC_APP_ENV;
-  // Guard against live keys outside production and test keys in production.
-  if (appEnv !== "production" && env.RAZORPAY_KEY_ID.startsWith("rzp_live_")) {
-    throw new MissingConfigurationError("Razorpay", "live key used outside production");
-  }
-  if (appEnv === "production" && env.RAZORPAY_KEY_ID.startsWith("rzp_test_")) {
-    throw new MissingConfigurationError("Razorpay", "test key used in production");
-  }
-  return env;
-}
-
-export function razorpayWebhookEnv() {
-  return load("Razorpay webhook", razorpayWebhookSchema);
-}
-
 /** Server-only: transactional email (Resend). */
 export function emailEnv() {
   return load("Email", emailSchema);
@@ -161,7 +135,7 @@ export function geminiPaidEnv() {
   return load("Gemini (paid)", geminiPaidSchema);
 }
 
-type ConfiguredArea = "supabase" | "razorpay" | "razorpayWebhook" | "clerk";
+type ConfiguredArea = "supabase" | "clerk";
 
 /**
  * True when the configuration is present and valid. Accepts a named area
@@ -189,12 +163,6 @@ function isAreaConfigured(area: ConfiguredArea): boolean {
     switch (area) {
       case "supabase":
         supabaseEnv();
-        return true;
-      case "razorpay":
-        razorpayEnv();
-        return true;
-      case "razorpayWebhook":
-        razorpayWebhookEnv();
         return true;
       case "clerk":
         return Boolean(process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);

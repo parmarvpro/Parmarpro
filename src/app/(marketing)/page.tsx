@@ -6,7 +6,6 @@ import { Sparkle } from "@/components/brand/sparkle";
 import { AccentWords } from "@/components/brand/accent-words";
 import { StepCard } from "@/components/brand/step-card";
 import { Button } from "@/components/ui/button";
-import { PLANS, TRIAL_DAYS } from "@/lib/plans";
 
 const TILES = [
   {
@@ -42,7 +41,6 @@ const TILES = [
 ];
 
 export default function HomePage() {
-  const plan = PLANS.parmarpro_clinic_monthly;
   return (
     <>
       <section className="relative overflow-hidden">
@@ -66,14 +64,13 @@ export default function HomePage() {
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Button asChild size="lg">
               <Link href="/sign-up">
-                Start your {TRIAL_DAYS}-day trial <ArrowRightIcon />
+                Get started <ArrowRightIcon />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link href="/contact">Talk to us</Link>
             </Button>
           </div>
-          <p className="mt-4 text-sm text-ink-500">No card required to start the trial.</p>
         </div>
       </section>
 
@@ -165,18 +162,11 @@ export default function HomePage() {
         <div className="relative overflow-hidden rounded-3xl bg-brand-500">
           <Sparkle tone="white" className="absolute -right-16 -bottom-20 hidden size-96 opacity-95 md:block" />
           <div className="relative flex flex-col items-start gap-6 p-8 md:p-14">
-            <EyebrowTag tone="inverse">{TRIAL_DAYS}-day free trial</EyebrowTag>
+            <EyebrowTag tone="inverse">Get started</EyebrowTag>
             <h2 className="headline max-w-2xl text-[clamp(1.6rem,3.4vw,3rem)] text-white">
-              <AccentWords text={`Try it with your team for ${TRIAL_DAYS} days.`} accent={["days"]} />
+              <AccentWords text="Set up your clinic workspace today." accent={["today"]} />
             </h2>
             <p className="max-w-lg text-white">Set up takes a few minutes. Invite your front desk when you are ready.</p>
-            <p className="text-white">
-              After the trial:{" "}
-              <span className="text-2xl font-bold">
-                ₹{(plan.basePaise / 100).toLocaleString("en-IN")}
-              </span>{" "}
-              per clinic per month, plus 18% GST.
-            </p>
             <Button asChild size="lg" variant="inverse">
               <Link href="/sign-up">
                 Create your clinic workspace <ArrowRightIcon />

@@ -225,27 +225,8 @@ describe("direct Data API calls with a user's own token (bypassing the app)", ()
     expect(await response.json()).toEqual([]);
   });
 
-  it("owner cannot grant itself a paid period", async () => {
-    const response = await rest(`/clinic_entitlements?clinic_id=eq.${A.id}`, A.owner, {
-      method: "PATCH",
-      body: JSON.stringify({ paid_through: "2099-01-01T00:00:00Z" }),
-    });
-    expect([401, 403]).toContain(response.status);
-    const row = await admin<{ paid_through: Date | null }>("select paid_through from public.clinic_entitlements where clinic_id = $1", [A.id]);
-    expect(row.rows[0]!.paid_through).toBeNull();
-  });
-
-  it("owner cannot call service-only RPCs", async () => {
-    const response = await rest("/rpc/apply_verified_payment", A.owner, {
-      method: "POST",
-      body: JSON.stringify({
-        p_billing_order_id: "00000000-0000-4000-8000-000000000000",
-        p_provider_order_id: "order_x",
-        p_provider_payment_id: "pay_x",
-        p_amount_paise: 1,
-        p_currency: "INR",
-      }),
-    });
+  it("the payment tables are not exposed through the Data API", async () => {
+    const response = await rest(`/clinic_entitlements?clinic_id=eq.${A.id}`, A.owner);
     expect([401, 403, 404]).toContain(response.status);
   });
 

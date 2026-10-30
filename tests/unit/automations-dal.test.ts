@@ -9,6 +9,10 @@ const mocks = vi.hoisted(() => ({
   from: vi.fn(),
 }));
 
+// The database counts as connected for these tests. Placeholder values only; nothing is sent.
+process.env.SUPABASE_URL = "https://example.supabase.co";
+process.env.SUPABASE_PUBLISHABLE_KEY = "sb_publishable_synthetic_unit_test_value";
+
 vi.mock("@clerk/nextjs/server", () => ({ auth: () => mocks.auth() }));
 vi.mock("@/server/db/user-client", () => ({
   createUserDb: () => ({ rpc: (...args: unknown[]) => mocks.rpc(...args), from: (...args: unknown[]) => mocks.from(...args) }),
@@ -45,9 +49,6 @@ function signedInAs(role: Role) {
               member_id: MEMBER_ID,
               role,
               display_name: null,
-              entitled: true,
-              trial_ends_at: null,
-              paid_through: null,
             },
           ],
           error: null,

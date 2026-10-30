@@ -64,7 +64,7 @@ const SECTIONS = [
     points: [
       "Invite your team by email",
       "Owner, administrator, staff and read-only roles",
-      "Administrators manage staff; only the owner manages billing",
+      "Owners and administrators manage the team and clinic settings",
     ],
   },
   {
@@ -78,7 +78,7 @@ const SECTIONS = [
     points: [
       "Clinic data isolated by database-level access rules",
       "Sign-in powered by Clerk, with multi-factor authentication available",
-      "Payments handled by Razorpay; ParmarPro never sees card details",
+      "Each clinic's records are separated from every other clinic's",
     ],
   },
 ];
@@ -114,10 +114,10 @@ export default function FeaturesPage() {
         </div>
         <div className="mt-12 flex flex-wrap gap-3">
           <Button asChild size="lg">
-            <Link href="/sign-up">Start free trial</Link>
+            <Link href="/sign-up">Get started</Link>
           </Button>
           <Button asChild size="lg" variant="outline">
-            <Link href="/pricing">See pricing</Link>
+            <Link href="/contact">Talk to us</Link>
           </Button>
         </div>
       </div>

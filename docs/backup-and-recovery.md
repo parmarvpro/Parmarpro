@@ -6,9 +6,8 @@
 
 | Data | Where | Backup mechanism |
 |---|---|---|
-| Clinic records, memberships, billing records, audit trail | Supabase PostgreSQL | Supabase automated backups (and PITR on paid plans) |
+| Clinic records, memberships, audit trail | Supabase PostgreSQL | Supabase automated backups (and PITR on paid plans) |
 | Identity (users, organizations, MFA) | Clerk | Managed by Clerk. ParmarPro stores only Clerk IDs |
-| Payments (source of truth) | Razorpay | Managed by Razorpay. `billing_orders` and `payments` can be reconciled from the Razorpay dashboard and API |
 | Schema | `supabase/migrations/*.sql` in Git | Git history on GitHub |
 | Application | Git, plus Vercel deployments | Instant rollback in Vercel |
 | Secrets | Vercel and GitHub encrypted variables | Not backed up. Regenerate from each provider if lost |
@@ -28,7 +27,6 @@
 1. Supabase dashboard → Database → Backups → choose a backup or PITR timestamp → Restore. This replaces the project's data.
 2. Verify the migrations list matches `supabase/migrations`.
 3. Run the post-restore checks (§4, steps 3–6).
-4. Reconcile billing: compare Razorpay payments since the restore point with `payments`. Re-apply verified payments by replaying webhooks from the Razorpay dashboard. Processing is idempotent.
 
 **B. Single-record recovery (operator error)**
 1. Restore a backup into a **new, separate** project. Never restore over production for a partial recovery.
@@ -51,6 +49,6 @@
 
 ## 5. Known limitations
 
-- Clerk and Razorpay data are outside ParmarPro's backups. Recovery depends on those providers.
-- Restoring the database to an earlier point can make it disagree with Clerk (memberships created later) and with Razorpay (payments made later). Steps A4 and lazy membership reconciliation address this, but they need operator attention.
+- Clerk data is outside ParmarPro's backups. Recovery depends on those providers.
+- Restoring the database to an earlier point can make it disagree with Clerk (memberships created later). Steps A4 and lazy membership reconciliation address this, but they need operator attention.
 - Backups contain personal data. Access to the Supabase dashboard must be limited to authorized operators with MFA.

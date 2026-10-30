@@ -15,7 +15,6 @@ import { startRestProxy } from "../helpers/rest-proxy";
 const CONSENT_NOTE = "Website enquiry form: the enquirer agreed to be contacted about this enquiry.";
 
 let A: ClinicFixture;
-let UNPAID: ClinicFixture;
 let proxy: Awaited<ReturnType<typeof startRestProxy>>;
 let enquiry: typeof import("@/server/privileged/enquiry");
 
@@ -30,11 +29,9 @@ beforeAll(async () => {
   process.env.SUPABASE_SECRET_KEY = await mintToken({ role: "service_role" }, { expiresIn: "1h" });
   enquiry = await import("@/server/privileged/enquiry");
   A = await createClinicFixture("Enquiry");
-  UNPAID = await createClinicFixture("EnquiryUnpaid", { entitled: false });
 });
 
 afterAll(async () => {
-  await deleteClinicFixture(UNPAID);
   await deleteClinicFixture(A);
   await closePool();
   await proxy.close();
@@ -50,7 +47,7 @@ async function setForm(clinicId: string, key: string, enabled: boolean) {
 }
 
 describe("finding the clinic behind an enquiry key", () => {
-  it("returns the clinic when the form is on, the key matches and the clinic is in its trial", async () => {
+  it("returns the clinic when the form is on, the key matches and the clinic is not archived", async () => {
     const key = newKey();
     await setForm(A.id, key, true);
     await expect(enquiry.findEnquiryClinic(key)).resolves.toEqual({
@@ -82,12 +79,6 @@ describe("finding the clinic behind an enquiry key", () => {
     await expect(enquiry.findEnquiryClinic(newKey())).resolves.toBeNull();
     await expect(enquiry.findEnquiryClinic("not-a-key")).resolves.toBeNull();
     await expect(enquiry.findEnquiryClinic(newKey().toUpperCase())).resolves.toBeNull();
-  });
-
-  it("returns null when the clinic has no running trial or paid period", async () => {
-    const key = newKey();
-    await setForm(UNPAID.id, key, true);
-    await expect(enquiry.findEnquiryClinic(key)).resolves.toBeNull();
   });
 
   it("returns null when the clinic is archived", async () => {

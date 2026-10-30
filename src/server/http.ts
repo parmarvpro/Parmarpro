@@ -1,5 +1,6 @@
 import "server-only";
 
+import { MissingConfigurationError } from "@/lib/env";
 import { reportError } from "@/lib/observability/report";
 import { AppError, isAppError } from "@/server/auth/errors";
 
@@ -10,7 +11,12 @@ export function jsonResponse(body: unknown, status = 200): Response {
 }
 
 export function errorResponse(error: unknown, area: string): Response {
-  const appError = isAppError(error) ? error : new AppError("internal", { cause: error });
+  // A missing setting is expected while a service is not connected: answer 503, do not report it.
+  const appError = isAppError(error)
+    ? error
+    : error instanceof MissingConfigurationError
+      ? new AppError("not_configured")
+      : new AppError("internal", { cause: error });
   if (appError.code === "internal") reportError(appError.cause ?? error, { area, code: appError.code });
   return jsonResponse(
     {

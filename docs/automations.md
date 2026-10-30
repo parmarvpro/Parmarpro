@@ -25,10 +25,8 @@ These rules apply to every automation.
 | Round-robin assignment | Instant (on new inquiry) | Database trigger | Assigns new unassigned inquiries in turn | Settings: *Share new inquiries in turn* (off by default) |
 | Appointment reminder email | 10:00 daily (for the next day) | App job `patient-reminders` (pg_cron) | Patients who agreed to email contact | Settings: *Appointment reminder email* (off by default) |
 | Website enquiry form | Instant (on submit) | App action | Creates a lead; sends no email | Settings: *Accept enquiries through the form* (off by default) |
-| Trial and renewal notices | 09:00 daily | App job `trial-renewal` (pg_cron) | Active clinic owners | Not switchable: account notices |
-| Welcome email and payment receipts | Instant | App, after onboarding or payment | The clinic's owner or owners | Not switchable: account and billing notices |
+| Welcome email | Instant | App, after onboarding | The clinic's owner or owners | Not switchable: account notices |
 | Founder alerts and digest | Instant, and 09:30 daily | App, and job `founder-digest` | ParmarPro's founder, not clinics | Unset `FOUNDER_ALERT_EMAIL` |
-| Payment reconciliation | Every 15 minutes | App job `reconcile-payments` (pg_cron) | No email: checks unpaid orders with Razorpay | Not switchable |
 | Invitation expiry | 01:30 daily | App job `expire-invitations` (pg_cron) | No email: revokes stale invitations | Not switchable |
 | Retention cleanup | Monday 02:30 | SQL function (pg_cron) | No email: deletes old records | Not switchable |
 
@@ -95,24 +93,10 @@ Everyone in the clinic can see these settings at **Dashboard → Settings → Au
 - **Limit:** 50 submissions per clinic per IST day. Further submissions see a "busy" message.
 - **Stop:** turn off *Accept enquiries through the form*. Creating a new link also stops the old one at once.
 
-### Trial and renewal notices
+### Welcome email
 
-- **What, to clinic owners, once per period:**
-  - trial reminder, 3 to 7 days before the trial ends;
-  - trial ending, 0 to 2 days before;
-  - trial ended, within 3 days after;
-  - renewal reminder, 2 to 5 days before the paid period ends;
-  - renewal due, 0 to 1 day before;
-  - access lapsed, within 3 days after.
-- **When:** 09:00 IST, every day.
-- **Where:** pg_cron calls `POST /api/jobs/trial-renewal`.
-- **Stop:** not switchable. These are account notices.
-
-### Welcome email and payment receipts
-
-- **Welcome:** sent once, after a clinic is set up, to the person who set it up. It is sent only when a trial end date exists.
-- **Receipt:** sent after a payment is confirmed, to each active owner with an email address.
-- **Stop:** not switchable. These are account and billing notices.
+- **Welcome:** sent once, after a clinic is set up, to the person who set it up.
+- **Stop:** not switchable. This is an account notice.
 
 ## Founder alerts and digest
 
@@ -127,7 +111,6 @@ These go to ParmarPro's operator, not to clinics.
 
 These run without any clinic setting.
 
-- **Payment reconciliation** (every 15 minutes, `POST /api/jobs/reconcile-payments`). Checks unpaid orders against Razorpay, so a payment whose callback or webhook never arrived still grants access. An order that stays unpaid for 48 hours expires. An authorised payment that is never captured is expired after 7 days.
 - **Invitation expiry** (01:30 IST, `POST /api/jobs/expire-invitations`). An invitation not accepted within 7 days is revoked in Clerk and marked expired.
 - **Retention cleanup** (Monday 02:30 IST, the SQL function `private.job_cleanup()`). Deletes webhook records after 90 days, contact-form enquiries after 12 months, the email send log after 180 days, and the activity history after 24 months.
 
@@ -135,7 +118,7 @@ These run without any clinic setting.
 
 - **Backup** (03:00 IST, `.github/workflows/backup.yml`). Dumps the `public` and `private` schemas, restores the dump into an empty PostgreSQL 17 container to prove it can be read, encrypts it with age, and uploads the encrypted file as a workflow artifact kept for 7 days. It runs only when `SUPABASE_DB_URL` and `BACKUP_AGE_RECIPIENT` are set. Otherwise it prints a notice and takes no backup. This supplements Supabase's own backups and point-in-time recovery; it does not replace them. See [backup and recovery](backup-and-recovery.md).
 - **Nightly E2E** (03:30 IST, `.github/workflows/nightly-e2e.yml`). Runs the Playwright suite against the staging deployment. It runs only when `STAGING_URL` is set. The authenticated journey stays skipped there, because the Clerk test secrets are not passed to that workflow.
-- **Lighthouse** (after each successful preview deployment, `.github/workflows/lighthouse.yml`). Measures `/` and `/pricing` on mobile emulation, three runs each, and uploads the reports. It is report-only: it never fails and never runs for the Production environment. Lighthouse copies the bypass header into every report, so the workflow removes the secret from the reports before uploading them and uploads nothing if a copy remains.
+- **Lighthouse** (after each successful preview deployment, `.github/workflows/lighthouse.yml`). Measures `/` and `/features` on mobile emulation, three runs each, and uploads the reports. It is report-only: it never fails and never runs for the Production environment. Lighthouse copies the bypass header into every report, so the workflow removes the secret from the reports before uploading them and uploads nothing if a copy remains.
 - **Bypass secret and test reports.** Playwright traces record request headers, so when `VERCEL_AUTOMATION_BYPASS_SECRET` is set (the nightly run), traces are off and a failed test keeps a screenshot instead. The uploaded report never contains the secret.
 
 ## Limits

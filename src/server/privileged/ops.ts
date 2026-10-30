@@ -25,7 +25,6 @@ const OpsCountsSchema = z.strictObject({
   email_budget_hits: COUNT,
   emails_sent_today: COUNT,
   webhooks_failed: COUNT,
-  orders_unpaid_over_1h: COUNT,
   ai_calls: COUNT,
   ai_calls_failed: COUNT,
   ai_calls_rate_limited: COUNT,

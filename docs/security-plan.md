@@ -6,7 +6,7 @@ Written at gate G0. It defines the roles, the permissions, the release criteria,
 
 | Role | Clerk role | Intent |
 |---|---|---|
-| `owner` | `org:admin` | Full control of the clinic, including billing payments and team management |
+| `owner` | `org:admin` | Full control of the clinic, including team management |
 | `admin` | `org:member` | Runs clinic operations and manages staff and viewers. Cannot touch owners or other admins, and cannot pay |
 | `staff` | `org:member` | Day-to-day operations: create and update leads, patients, appointments, tasks |
 | `viewer` | `org:member` | Read-only access to operational records |
@@ -25,8 +25,6 @@ The canonical implementation is `src/server/auth/permissions.ts`. Unit tests cov
 | `lead:delete`, `patient:archive`, `appointment:delete`, `task:delete` | ✅ | ✅ | ❌ | ❌ |
 | `clinic:update` (name, settings) | ✅ | ✅ | ❌ | ❌ |
 | `team:invite`, `team:change_role`, `team:remove` | ✅ | ✅ (staff and viewer targets only) | ❌ | ❌ |
-| `billing:read` | ✅ | ✅ | ❌ | ❌ |
-| `billing:pay` | ✅ | ❌ | ❌ | ❌ |
 
 **Role-assignment rules**, enforced in both the RPCs and the server:
 
@@ -35,7 +33,6 @@ The canonical implementation is `src/server/auth/permissions.ts`. Unit tests cov
 - An admin may assign only `staff` or `viewer`, and may only act on members who are currently staff or viewers.
 - The last active owner can never be demoted or removed.
 
-**Entitlement:** writes to operational tables (leads, patients, appointments, tasks) need an active trial or a paid period. Reads are always allowed, so a clinic's data is never held hostage.
 
 ## 3. Release criteria (per gate)
 
@@ -48,11 +45,10 @@ The canonical implementation is `src/server/auth/permissions.ts`. Unit tests cov
   - the Supabase security advisors show no errors (staging).
 - **G3:** core journeys work against the database; authorization is enforced on every operation; no fabricated metrics.
 - **G4:**
-  - billing tests pass (section 5);
   - telemetry scrubber tests pass;
   - integrations either verified in staging or explicitly marked "awaiting credentials".
 - **G5:**
-  - lint, typecheck, unit, DB, integration, billing, E2E, build, audit, and secret-scan results are recorded;
+  - lint, typecheck, unit, DB, integration, E2E, build, audit, and secret-scan results are recorded;
   - no unresolved critical or high findings;
   - medium findings fixed, or mitigated with documentation.
 - **G6:** the 16-step staging flow is executed and recorded.
@@ -80,34 +76,13 @@ Fixtures: **Clinic A** and **Clinic B**, each with an owner, an admin, a staff m
 | TI-14 | JWT with `o.id = B` for a user who is a member of A only (forged or mismatched claim) | Sees nothing |
 | TI-15 | Membership row deactivated while the JWT still carries `o.id = A` | Sees nothing |
 | TI-16 | Anonymous role selects from every table | Nothing / permission denied |
-| TI-17 | Authenticated user reads or writes `webhook_events`; writes `payments`, `billing_orders`, `clinic_entitlements` | Rejected |
-| TI-18 | Authenticated user calls `apply_verified_payment` | Permission denied (service role only) |
-| TI-19 | A-staff reads Clinic B's `clinic_entitlements`, `payments`, or `billing_orders` | 0 rows |
-| TI-20 | Writes when the entitlement has expired | Rejected; reads still allowed |
+| TI-17 | Payment tables and functions | Not present in the database (removed 30 October 2026) |
 | TI-21 | `activity_events`: an authenticated user inserts, updates, or deletes | Rejected |
 | TI-22 | Anonymous inserts into `contact_requests` and selects it back | Insert OK; select denied |
 | TI-23 | Staff of A calls `create_clinic_for_active_org` for an org where they are `org:member`, or for an org that already has a clinic | Rejected |
 | TI-24 | After switching the active org from A to B (user is a member of both), the user sees only B | Only B rows |
 
-## 5. Billing test matrix
-
-| ID | Case | Expected |
-|---|---|---|
-| BL-01 | Webhook with an invalid or missing `X-Razorpay-Signature` | 400; no state change; nothing recorded beyond a failure log |
-| BL-02 | Valid webhook, allowlisted event, `captured` payment for our order with the correct amount | Entitlement extended by one period |
-| BL-03 | Same event delivered twice (same `x-razorpay-event-id`) | Second delivery is a no-op, 200 |
-| BL-04 | Different events for the same payment (`payment.captured` and `order.paid`), plus the verify route | Period applied exactly once |
-| BL-05 | Amount or currency mismatch | Rejected; flagged; no entitlement |
-| BL-06 | Order ID that is not in `billing_orders` | Ignored; no entitlement |
-| BL-07 | `payment.failed` | Recorded as failed; entitlement unchanged |
-| BL-08 | Payment `authorized` but not `captured` (verify route) | Pending; entitlement unchanged |
-| BL-09 | Unknown event type (for example `refund.created`) | 200, recorded as `ignored`, no state change |
-| BL-10 | Verify route with a bad signature | 400; no Razorpay fetch; no entitlement |
-| BL-11 | Verify route called by a user from another clinic for Clinic A's order | 403 / not found |
-| BL-12 | Client attempts to send an amount | Ignored; the server computes it |
-| BL-13 | Viewer, staff, or admin calls create-order | 403 (owner only) |
-
-## 6. OWASP Top 10:2025 mapping
+## 5. OWASP Top 10:2025 mapping
 
 | OWASP 2025 | Controls |
 |---|---|
@@ -116,13 +91,13 @@ Fixtures: **Clinic A** and **Clinic B**, each with an owner, an admin, a staff m
 | A03 Software Supply Chain Failures | Lockfile, minimal dependencies, Dependabot, `pnpm audit`, pinned Action SHAs, CodeQL, gitleaks |
 | A04 Cryptographic Failures | TLS everywhere (HSTS); HMAC-SHA256 with timing-safe comparison; no custom crypto; secrets only in managed stores |
 | A05 Injection | Parameterized queries, escaped `ilike`, no user input in `.or()` strings, Zod validation, no `eval` or shell |
-| A06 Insecure Design | Threat model at G0; pay-per-period billing designed around RBI limits; least data collected |
+| A06 Insecure Design | Threat model at G0; least data collected |
 | A07 Authentication Failures | Clerk (MFA available, bot protection, session management); server-side session verification on every request |
 | A08 Software or Data Integrity Failures | Webhook signature verification; idempotent processing; activity log that cannot be changed |
 | A09 Security Logging & Alerting Failures | Sentry with scrubbing; `webhook_events` status; activity events; incident runbook |
-| A10 Mishandling of Exceptional Conditions | Typed errors mapped to 401/403/404/422; fail-closed authorization; transactional billing apply; error boundaries |
+| A10 Mishandling of Exceptional Conditions | Typed errors mapped to 401/403/404/422; fail-closed authorization; error boundaries |
 
-## 7. AI-generated code review checklist (run at G5)
+## 6. AI-generated code review checklist
 
 The reviewer reads the actual source and test output and looks for:
 
@@ -137,7 +112,7 @@ The reviewer reads the actual source and test output and looks for:
 - unvalidated input;
 - over-broad `select('*')` returning fields a role should not see.
 
-## 8. Severity policy
+## 7. Severity policy
 
 - **Critical or high:** blocks production.
 - **Medium:** fix before release, or document a mitigation the owner specifically approves.

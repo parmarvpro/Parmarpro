@@ -24,9 +24,9 @@ export type WebsiteLeadInput = {
 };
 
 /**
- * The clinic behind an enquiry key, when the form is on, the clinic is not
- * archived and it has a running trial or paid period. Null in every other case,
- * so the caller cannot tell a wrong key from a switched-off form.
+ * The clinic behind an enquiry key, when the form is on and the clinic is not
+ * archived. Null in every other case, so the caller cannot tell a wrong key
+ * from a switched-off form.
  */
 export async function findEnquiryClinic(key: string): Promise<EnquiryClinic | null> {
   if (!KEY_PATTERN.test(key)) return null;
@@ -40,19 +40,7 @@ export async function findEnquiryClinic(key: string): Promise<EnquiryClinic | nu
   if (error) throw error;
   if (!settings || settings.clinics.archived_at !== null) return null;
 
-  const { data: entitlement, error: entitlementError } = await db
-    .from("clinic_entitlements")
-    .select("trial_ends_at, paid_through")
-    .eq("clinic_id", settings.clinic_id)
-    .maybeSingle();
-  if (entitlementError) throw entitlementError;
-  if (!entitlement || !isEntitled(entitlement, Date.now())) return null;
-
   return { clinicId: settings.clinic_id, clinicName: settings.clinics.name, aiEnquiryHelp: settings.ai_enquiry_help };
-}
-
-function isEntitled(entitlement: { trial_ends_at: string | null; paid_through: string | null }, now: number): boolean {
-  return [entitlement.trial_ends_at, entitlement.paid_through].some((end) => end !== null && Date.parse(end) > now);
 }
 
 /** Website enquiries the clinic has received today (IST), for the daily cap. */

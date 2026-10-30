@@ -3,7 +3,6 @@ import "server-only";
 import { publicEnv } from "@/lib/env";
 import { formatIstDate, formatIstDateTime } from "@/lib/ist";
 import { OPS_COUNT_KEYS, opsNeedsAttention, type OpsCountKey, type OpsCounts } from "@/lib/ops-counts";
-import { formatInr } from "@/lib/plans";
 import type { OpsNote } from "@/server/ai/features/ops-note";
 import type { EmailContent } from "@/server/email/send";
 
@@ -64,10 +63,6 @@ function greeting(name: string): string {
 
 function orDash(value: string | null | undefined): string {
   return value && value.trim() ? value : "—";
-}
-
-function days(count: number): string {
-  return count === 1 ? "1 day" : `${count} days`;
 }
 
 function assertHttpUrl(href: string): string {
@@ -213,101 +208,13 @@ export function enquiryAutoReplyEmail(input: { fullName: string }): EmailContent
   });
 }
 
-export function welcomeEmail(input: { firstName: string | null; clinicName: string; trialEndsAt: Date }): EmailContent {
+export function welcomeEmail(input: { firstName: string | null; clinicName: string }): EmailContent {
   return email({
     subject: "Welcome to ParmarPro",
     blocks: [
       { type: "paragraph", text: greeting(oneLine(input.firstName ?? "")) },
       { type: "paragraph", text: `Your clinic, ${input.clinicName}, is set up and ready to use.` },
-      { type: "paragraph", text: `Your free trial runs until ${formatIstDate(input.trialEndsAt)}.` },
       { type: "button", label: "Go to your dashboard", href: appUrl("/dashboard") },
-    ],
-  });
-}
-
-export type EntitlementNotice =
-  | "trial_reminder"
-  | "trial_ending"
-  | "trial_ended"
-  | "renewal_reminder"
-  | "renewal_due"
-  | "access_lapsed";
-
-function trialSubject(daysLeft: number): string {
-  return daysLeft <= 0 ? "Your ParmarPro trial ends today" : `Your ParmarPro trial ends in ${days(daysLeft)}`;
-}
-
-function entitlementCopy(
-  notice: EntitlementNotice,
-  daysLeft: number,
-  clinic: string,
-  date: string,
-): { subject: string; lead: string } {
-  const when = daysLeft <= 0 ? "today" : `on ${date}`;
-  switch (notice) {
-    case "trial_reminder":
-    case "trial_ending":
-      return { subject: trialSubject(daysLeft), lead: `The free trial for ${clinic} ends ${when}.` };
-    case "trial_ended":
-      return { subject: "Your ParmarPro trial has ended", lead: `The free trial for ${clinic} ended on ${date}.` };
-    case "renewal_reminder":
-      return { subject: `Your ParmarPro plan renews in ${days(daysLeft)}`, lead: `The plan for ${clinic} renews on ${date}.` };
-    case "renewal_due":
-      return {
-        subject:
-          daysLeft <= 0
-            ? "Renew today to keep editing"
-            : `Renew ${daysLeft === 1 ? "tomorrow" : `in ${days(daysLeft)}`} to keep editing`,
-        lead: `The plan for ${clinic} renews ${when}.`,
-      };
-    case "access_lapsed":
-      return { subject: "Your ParmarPro plan has lapsed", lead: `The plan for ${clinic} lapsed on ${date}.` };
-  }
-}
-
-export function entitlementNoticeEmail(input: {
-  notice: EntitlementNotice;
-  clinicName: string;
-  daysLeft: number;
-  endsAt: Date;
-}): EmailContent {
-  const copy = entitlementCopy(input.notice, input.daysLeft, oneLine(input.clinicName), formatIstDate(input.endsAt));
-  return email({
-    subject: copy.subject,
-    blocks: [
-      { type: "paragraph", text: copy.lead },
-      {
-        type: "paragraph",
-        text: "If access ends, your records stay readable. Adding and editing resumes once your plan is active.",
-      },
-      { type: "button", label: "Open billing settings", href: appUrl("/dashboard/settings/billing") },
-    ],
-  });
-}
-
-export function paymentReceiptEmail(input: {
-  clinicName: string;
-  amountPaise: number;
-  paidThrough: Date;
-  providerPaymentId: string;
-  paidAt: Date;
-}): EmailContent {
-  return email({
-    subject: `Payment received for ${oneLine(input.clinicName)}`,
-    blocks: [
-      { type: "heading", text: "Payment received" },
-      { type: "paragraph", text: `Thank you. We received your payment for ${input.clinicName}.` },
-      {
-        type: "fields",
-        rows: [
-          ["Amount paid", formatInr(input.amountPaise)],
-          ["Paid on", formatIstDateTime(input.paidAt)],
-          ["Paid through", formatIstDate(input.paidThrough)],
-          ["Payment reference", input.providerPaymentId],
-        ],
-      },
-      { type: "paragraph", text: "This is a payment confirmation, not a GST tax invoice." },
-      { type: "button", label: "Open billing settings", href: appUrl("/dashboard/settings/billing") },
     ],
   });
 }
@@ -427,10 +334,6 @@ export type DigestItem = {
 
 export type FounderMetrics = {
   clinics_created: number;
-  trials_active: number;
-  paid_active: number;
-  payments_captured: number;
-  revenue_paise: number;
   enquiries: number;
 };
 
@@ -451,7 +354,6 @@ const OPS_LABELS: Record<OpsCountKey, string> = {
   email_budget_hits: "Email budget reached",
   emails_sent_today: "Emails sent today",
   webhooks_failed: "Failed webhooks",
-  orders_unpaid_over_1h: "Unpaid orders over 1 hour",
   ai_calls: "AI calls",
   ai_calls_failed: "AI calls failed",
   ai_calls_rate_limited: "AI calls rate limited",
@@ -510,10 +412,6 @@ export function founderDigestEmail(input: {
         type: "fields",
         rows: [
           ["New clinics", String(m.clinics_created)],
-          ["Trials active", String(m.trials_active)],
-          ["Paid clinics active", String(m.paid_active)],
-          ["Payments captured", String(m.payments_captured)],
-          ["Revenue", formatInr(m.revenue_paise)],
           ["Enquiries", String(m.enquiries)],
         ],
       },

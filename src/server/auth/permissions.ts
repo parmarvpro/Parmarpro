@@ -35,8 +35,6 @@ export const PERMISSIONS = [
   "task:update",
   "task:delete",
   "activity:read",
-  "billing:read",
-  "billing:pay",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -71,26 +69,14 @@ const MANAGE: Permission[] = [
   "team:invite",
   "team:change_role",
   "team:remove",
-  "billing:read",
 ];
 
 const MATRIX: Record<Role, ReadonlySet<Permission>> = {
-  owner: new Set([...READ, ...OPERATE, ...MANAGE, "billing:pay"]),
+  owner: new Set([...READ, ...OPERATE, ...MANAGE]),
   admin: new Set([...READ, ...OPERATE, ...MANAGE]),
   staff: new Set([...READ, ...OPERATE]),
   viewer: new Set(READ),
 };
-
-/**
- * Writes to operational records need an active trial or paid period. Reads,
- * deletes, team management and billing itself never do, so a clinic can
- * always see its data, remove data and renew.
- */
-const ENTITLED: ReadonlySet<Permission> = new Set([...OPERATE, "patient:archive"]);
-
-export function requiresEntitlement(permission: Permission): boolean {
-  return ENTITLED.has(permission);
-}
 
 export function isRole(value: unknown): value is Role {
   return typeof value === "string" && (ROLES as readonly string[]).includes(value);

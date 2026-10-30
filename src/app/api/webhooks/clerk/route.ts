@@ -1,11 +1,12 @@
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest } from "next/server";
 
+import { isConfigured, supabaseSecretEnv } from "@/lib/env";
 import { reportError } from "@/lib/observability/report";
-import { sha256Hex } from "@/server/billing/signatures";
 import { errorResponse, jsonResponse, readTextBody } from "@/server/http";
-import { webhookStore } from "@/server/privileged/billing";
+import { webhookStore } from "@/server/privileged/webhooks";
 import { archiveClinicFromClerk, deactivateMembershipFromClerk, reconcileInvitedMembership } from "@/server/privileged/membership";
+import { sha256Hex } from "@/server/webhooks/hash";
 
 /**
  * Clerk webhook (Svix-signed). Lifecycle events can only remove access or
@@ -21,6 +22,9 @@ export async function POST(request: Request) {
       reportError(new Error("clerk_webhook_invalid_signature"), { area: "webhook.clerk" });
       return jsonResponse({ outcome: "invalid_signature" }, 400);
     }
+
+    // Signature first. Without the database nothing can be recorded, so answer 503 and let Clerk retry later.
+    if (!isConfigured(supabaseSecretEnv)) return jsonResponse({ outcome: "not_connected" }, 503);
 
     const eventId = request.headers.get("svix-id") ?? "";
     const store = webhookStore("clerk");

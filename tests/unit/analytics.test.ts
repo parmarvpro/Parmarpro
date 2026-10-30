@@ -7,7 +7,7 @@ describe("analytics event schema", () => {
     expect(validateEvent("lead_created", { source: "whatsapp" })).toEqual({ source: "whatsapp" });
     expect(validateEvent("lead_created", { source: "whatsapp", fullName: "Synthetic Patient" } as never)).toBeNull();
     expect(validateEvent("lead_created", { source: "not-a-source" } as never)).toBeNull();
-    expect(validateEvent("payment_verified", { plan: "parmarpro_clinic_monthly" })).not.toBeNull();
+    expect(validateEvent("payment_verified" as never, { plan: "parmarpro_clinic_monthly" } as never)).toBeNull();
     expect(validateEvent("page_viewed", { route: "/dashboard/leads?q=Synthetic" })).toBeNull();
   });
 

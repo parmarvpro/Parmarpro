@@ -47,7 +47,5 @@ test.describe("authenticated clinic journey", () => {
     await page.goto("/dashboard/leads");
     await expect(page.getByRole("heading", { name: "Leads & inquiries" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Add lead" })).toHaveCount(0);
-    await page.goto("/dashboard/settings/billing");
-    await expect(page.getByText(/Something went wrong|permission/i)).toBeVisible();
   });
 });

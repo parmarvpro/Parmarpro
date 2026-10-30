@@ -28,7 +28,6 @@ const COUNTS: OpsCounts = {
   email_budget_hits: 0,
   emails_sent_today: 4,
   webhooks_failed: 0,
-  orders_unpaid_over_1h: 0,
   ai_calls: 3,
   ai_calls_failed: 0,
   ai_calls_rate_limited: 0,

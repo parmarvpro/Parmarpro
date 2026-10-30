@@ -17,8 +17,8 @@ import { listTeam } from "@/server/dal/team";
 export const metadata: Metadata = { title: "Team" };
 
 const ROLE_SUMMARY = [
-  { role: "Owner", text: "Everything, including billing and managing administrators." },
-  { role: "Administrator", text: "Clinic operations and staff management. No billing payments." },
+  { role: "Owner", text: "Everything, including managing administrators." },
+  { role: "Administrator", text: "Clinic operations and staff management." },
   { role: "Staff", text: "Add and update leads, patients, appointments and tasks." },
   { role: "Read-only", text: "View records without making changes." },
 ];

@@ -41,7 +41,7 @@ export default defineConfig({
     ? undefined
     : {
         command: `pnpm start -p ${PORT}`,
-        url: `${baseURL}/pricing`,
+        url: `${baseURL}/`,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
         env: {
@@ -50,9 +50,6 @@ export default defineConfig({
           CLERK_WEBHOOK_SIGNING_SECRET: process.env.CLERK_WEBHOOK_SIGNING_SECRET || "whsec_ZTJlcGxhY2Vob2xkZXJzZWNyZXQ=",
           SUPABASE_URL: process.env.SUPABASE_URL || "http://127.0.0.1:1",
           SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY || "sb_publishable_e2e_placeholder",
-          RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID || "rzp_test_e2eplaceholder",
-          RAZORPAY_KEY_SECRET: process.env.RAZORPAY_KEY_SECRET || "e2e_placeholder_secret",
-          RAZORPAY_WEBHOOK_SECRET: process.env.RAZORPAY_WEBHOOK_SECRET || "whsec_e2e_placeholder",
         },
       },
 });

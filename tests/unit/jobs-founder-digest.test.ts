@@ -22,10 +22,6 @@ const MONDAY_UTC_TUESDAY_IST = new Date("2026-11-02T20:00:00Z");
 
 const METRICS = {
   clinics_created: 2,
-  trials_active: 5,
-  paid_active: 3,
-  payments_captured: 1,
-  revenue_paise: 8_850_000,
   enquiries: 7,
 };
 
@@ -98,7 +94,7 @@ describe("founder-digest", () => {
     expect(to?.toISOString()).toBe("2026-11-01T18:30:00.000Z");
     const [params] = deps.sendOnce.mock.calls[0] ?? [];
     expect(params?.content.text).toContain("Platform metrics");
-    expect(params?.content.text).toContain("Trials active: 5");
+    expect(params?.content.text).toContain("New clinics: 2");
   });
 
   it("on other days, sends no metrics", async () => {
@@ -205,7 +201,6 @@ describe("founder-digest, operations", () => {
     expect(text).toContain("Emails sent today: 12");
     expect(text).toContain("AI calls rate limited: 2");
     expect(text).toContain("Scheduled jobs that did not run: 0");
-    expect(text).toContain("Unpaid orders over 1 hour: 0");
   });
 
   it("adds the AI note as a plain paragraph, and asks for it only for a digest that is sent", async () => {

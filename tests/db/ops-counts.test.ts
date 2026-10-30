@@ -4,7 +4,7 @@
  * taken from the database clock, so earlier rows are never counted. The rows each test
  * seeds are deleted by id in afterAll; nothing else in the database is touched.
  */
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -18,7 +18,6 @@ const KEYS = [
   "email_budget_hits",
   "emails_sent_today",
   "webhooks_failed",
-  "orders_unpaid_over_1h",
   "ai_calls",
   "ai_calls_failed",
   "ai_calls_rate_limited",
@@ -33,7 +32,6 @@ let A: ClinicFixture;
 
 // Row ids seeded by these tests, deleted in afterAll.
 const seeded = { jobRuns: [] as string[], notifications: [] as string[], webhooks: [] as string[], aiCalls: [] as string[] };
-const seededOrders: string[] = [];
 
 beforeAll(async () => {
   A = await createClinicFixture("ops");
@@ -44,7 +42,6 @@ afterAll(async () => {
   await admin("delete from public.notification_log where id = any($1::bigint[])", [seeded.notifications]);
   await admin("delete from public.webhook_events where id = any($1::bigint[])", [seeded.webhooks]);
   await admin("delete from public.ai_calls where id = any($1::bigint[])", [seeded.aiCalls]);
-  await admin("delete from public.billing_orders where id = any($1::uuid[])", [seededOrders]);
   await deleteClinicFixture(A);
   await closePool();
 });
@@ -73,7 +70,7 @@ async function insertJobRun(job: string, ok: boolean, dryRun: boolean, result: R
 }
 
 describe("OPS-01 the function returns exactly the agreed keys", () => {
-  it("returns the eleven counts as integers, and no other key", async () => {
+  it("returns the ten counts as integers, and no other key", async () => {
     const counts = await countsSince(await dbNow());
     expect(Object.keys(counts).sort()).toEqual([...KEYS].sort());
     for (const key of KEYS) expect(Number.isInteger(counts[key])).toBe(true);
@@ -95,19 +92,19 @@ describe("OPS-02 scheduled job runs", () => {
 });
 
 describe("OPS-03 scheduled jobs that did not run", () => {
-  it("starts at five, and drops only for a real, successful run", async () => {
+  it("starts at three, and drops only for a real, successful run", async () => {
     const since = await dbNow();
-    expect((await countsSince(since)).jobs_not_run).toBe(5);
+    expect((await countsSince(since)).jobs_not_run).toBe(3);
 
     await insertJobRun("expire-invitations", true, true); // a dry run does not count
     await insertJobRun("staff-digest", false, false); // a failed run does not count
-    expect((await countsSince(since)).jobs_not_run).toBe(5);
+    expect((await countsSince(since)).jobs_not_run).toBe(3);
 
     await insertJobRun("expire-invitations", true, false);
-    expect((await countsSince(since)).jobs_not_run).toBe(4);
+    expect((await countsSince(since)).jobs_not_run).toBe(2);
 
     await insertJobRun("expire-invitations", true, false); // a second run changes nothing
-    expect((await countsSince(since)).jobs_not_run).toBe(4);
+    expect((await countsSince(since)).jobs_not_run).toBe(2);
   });
 });
 
@@ -151,42 +148,18 @@ describe("OPS-06 failed webhooks", () => {
     const since = await dbNow();
     const failed = await admin<{ id: string }>(
       `insert into public.webhook_events (provider, event_id, event_type, status, payload_sha256)
-       values ('razorpay', $1, 'payment.failed', 'failed', $2) returning id`,
+       values ('clerk', $1, 'organization.updated', 'failed', $2) returning id`,
       [`ops-test-${tag()}`, randomBytes(32).toString("hex")],
     );
     seeded.webhooks.push(failed.rows[0]!.id);
     const processed = await admin<{ id: string }>(
       `insert into public.webhook_events (provider, event_id, event_type, status, payload_sha256)
-       values ('razorpay', $1, 'payment.captured', 'processed', $2) returning id`,
+       values ('clerk', $1, 'organizationMembership.created', 'processed', $2) returning id`,
       [`ops-test-${tag()}`, randomBytes(32).toString("hex")],
     );
     seeded.webhooks.push(processed.rows[0]!.id);
 
     expect((await countsSince(since)).webhooks_failed).toBe(1);
-  });
-});
-
-describe("OPS-07 orders unpaid for more than an hour", () => {
-  async function insertOrder(status: string, createdAgo: string): Promise<void> {
-    const id = randomUUID();
-    await admin(
-      `insert into public.billing_orders (id, clinic_id, provider_order_id, plan_code, period_months, base_paise, gst_paise,
-                                          amount_paise, created_by, status, created_at)
-       values ($1, $2, $3, 'parmarpro_clinic_monthly', 1, 100, 18, 118, $4, $5, now() - $6::interval)`,
-      [id, A.id, `order_ops${tag()}`, A.owner.userId, status, createdAgo],
-    );
-    seededOrders.push(id);
-  }
-
-  it("counts created orders older than an hour, and no others", async () => {
-    const before = await countsSince(await dbNow());
-
-    await insertOrder("created", "2 hours"); // counted
-    await insertOrder("created", "10 minutes"); // too recent
-    await insertOrder("paid", "2 hours"); // not unpaid
-
-    const after = await countsSince(await dbNow());
-    expect(after.orders_unpaid_over_1h - before.orders_unpaid_over_1h).toBe(1);
   });
 });
 

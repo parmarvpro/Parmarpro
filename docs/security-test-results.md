@@ -9,7 +9,7 @@ Recorded 2026-10-28 on branch `claude/parmarpro-mvp`. Every result below comes f
 | ESLint (`--max-warnings=0`, security rules included) | local + CI | ✅ pass |
 | TypeScript strict (`next typegen && tsc --noEmit`) | local + CI | ✅ pass |
 | Unit tests (`pnpm test`) | local + CI | ✅ 186 / 186 |
-| SQL-level RLS, tenant-isolation and billing tests (`pnpm test:db`) | local + CI (`supabase/postgres:17.11.0.006` + PostgREST v16.5) | ✅ 94 / 94 |
+| SQL-level RLS and tenant-isolation tests (`pnpm test:db`) | local + CI (`supabase/postgres:17.11.0.006` + PostgREST v16.5) | ✅ 94 / 94 |
 | DAL → PostgREST → RLS integration tests (`pnpm test:integration`) | local (24 / 24) + CI at c70d0c2 (23 / 23; the extra test was added afterwards, §6 F-08) | ✅ |
 | Generated database types match the migrations | CI | ✅ |
 | Production build (`next build`) | local + CI | ✅ |
@@ -42,7 +42,7 @@ Fixtures: Clinic A and Clinic B, each with an owner, admin, staff and viewer. To
 | ID | Test location | Result |
 |---|---|---|
 | TI-01 … TI-17, TI-19 … TI-24 | `tests/db/tenant-isolation.test.ts` | ✅ pass |
-| TI-18 | `tests/db/tenant-isolation.test.ts`, `tests/db/billing.test.ts` | ✅ pass |
+| TI-18 | Removed with the payment system (§3) | — |
 | TI-01, TI-02, TI-04 (through the application code) | `tests/integration/dal-tenant-isolation.test.ts` | ✅ pass |
 | Cross-tenant via direct PostgREST calls with a user's own token (bypassing the app) | `tests/integration/dal-tenant-isolation.test.ts` | ✅ pass |
 
@@ -52,25 +52,10 @@ Two expectations were adjusted during G2, each with a written justification in t
 
 No security assertion was removed or weakened.
 
-## 3. Billing matrix (`docs/security-plan.md` §5)
+## 3. Payment removal (30 October 2026)
 
-| ID | Test location | Result |
-|---|---|---|
-| BL-01 invalid or missing webhook signature | `unit/billing-signatures`, `unit/billing-webhook`, E2E `api-security` | ✅ |
-| BL-02 valid captured payment extends the period | `unit/billing-reconcile`, `unit/billing-webhook`, `db/billing`, `integration/billing-webhook` | ✅ |
-| BL-03 duplicate event id is a no-op | `unit/billing-webhook`, `db/billing` | ✅ |
-| BL-04 webhook + verify route for the same payment apply once | `db/billing` | ✅ |
-| BL-05 amount or currency mismatch | `unit/billing-reconcile`, `unit/billing-webhook`, `db/billing` | ✅ |
-| BL-06 unknown order | `unit/billing-reconcile`, `db/billing` | ✅ |
-| BL-07 failed payment leaves the entitlement unchanged | `unit/billing-reconcile`, `db/billing` | ✅ |
-| BL-08 authorized but not captured stays pending | `unit/billing-reconcile` | ✅ |
-| BL-09 unknown event type is ignored | `unit/billing-webhook` | ✅ |
-| BL-10 verify route with a bad signature | `unit/billing-checkout` | ✅ |
-| BL-11 another clinic's order | `unit/billing-checkout`, `unit/billing-reconcile` | ✅ |
-| BL-12 client-supplied amount ignored | `unit/billing-checkout` | ✅ |
-| BL-13 only owners can create orders | `unit/billing-checkout`, plus the permission matrix in `unit/permissions` | ✅ |
+ParmarPro has no payment system. The Razorpay integration, the billing pages, the pricing page, the billing test matrix (BL-01 to BL-13) and their tests were removed. The results recorded before that change remain in git history. The removal is checked by migration `20261030140000_remove_payments.sql`, which drops the payment tables and functions, and by test `TI-17` in `tests/db/tenant-isolation.test.ts`.
 
-The Razorpay API is mocked in these tests. **No real Razorpay test-mode payment has been made yet** (§8).
 
 ## 4. Supabase advisors (staging, re-run 2026-10-28)
 
@@ -82,7 +67,7 @@ The Razorpay API is mocked in these tests. **No real Razorpay test-mode payment 
   - derives the clinic and role from the verified JWT plus `clinic_members`, never from parameters;
   - is covered by TI-08, TI-09, TI-10 and TI-23.
 
-  Privileged functions (`apply_verified_payment`, `accept_invitation_membership`, `record_payment_attempt`, and the Clerk lifecycle functions) are granted to `service_role` only and do **not** appear in this list.
+  Privileged functions (`accept_invitation_membership` and the Clerk lifecycle functions) are granted to `service_role` only and do **not** appear in this list.
 - **INFO `rls_enabled_no_policy` (2):** `webhook_events` and `contact_requests`. *Intentional deny-all.* There are no client policies and no grants. They are written only by `service_role` or the contact RPC.
 
 **Performance**
@@ -133,8 +118,7 @@ Severity summary: **0 critical, 0 high**. 3 medium, all fixed. 5 low: 4 fixed, 1
 - **Security headers present on public pages:**
   - HSTS, `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP;
   - a nonce-based CSP with `strict-dynamic`, `frame-ancestors 'none'` and `object-src 'none'`.
-- **Unauthenticated `POST /api/billing/verify`:** 401.
-- **Forged or unsigned Razorpay and Clerk webhooks:** 400.
+- **Forged or unsigned Clerk webhooks:** 400.
 - **Invalid, oversized or wrongly typed contact submissions:** 422.
 - **Server actions:**
   - called without a session: redirect to sign-in, no data;
@@ -146,7 +130,6 @@ Severity summary: **0 critical, 0 high**. 3 medium, all fixed. 5 low: 4 fixed, 1
 |---|---|---|
 | Authenticated E2E journeys (2 tests skipped) | No Clerk test credentials in CI or here | Owner adds `E2E_CLERK_*` secrets and test users (`docs/deployment.md` §2.2) |
 | End-to-end sign-in with real Clerk tokens against Supabase | The Clerk ↔ Supabase third-party auth is not activated yet. The connector configuration change was declined, so it is a manual owner step | `docs/deployment.md` §2.1–2.2 |
-| Razorpay test-mode payment and real webhook delivery | No Razorpay keys provided yet; Razorpay is unreachable from this container | `docs/deployment.md` §2.3, staging step 10–11 |
 | Sentry event delivery and server-side scrubbing | Sentry project and DSN not configured | `docs/deployment.md` §2.4 |
 | PostHog event delivery | No PostHog project or key | `docs/deployment.md` §2.4 |
 | Staging deployment on Vercel | Repository not yet linked; environment variables not set | `docs/deployment.md` §2.5 |

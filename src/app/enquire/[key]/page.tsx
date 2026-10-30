@@ -4,6 +4,7 @@ import { cache } from "react";
 
 import { EnquiryForm } from "@/components/enquiry/enquiry-form";
 import { Card, CardContent } from "@/components/ui/card";
+import { MissingConfigurationError } from "@/lib/env";
 import { reportError } from "@/lib/observability/report";
 import { submitEnquiryAction } from "@/server/actions/enquiry";
 import { findEnquiryClinic, type EnquiryClinic } from "@/server/privileged/enquiry";
@@ -21,7 +22,8 @@ const loadClinic = cache(async (key: string): Promise<EnquiryClinic | null> => {
   try {
     return await findEnquiryClinic(key);
   } catch (error) {
-    reportError(error, { area: "enquiry.page" });
+    // While the database is not connected the form is simply unavailable (404), which is expected, not a fault.
+    if (!(error instanceof MissingConfigurationError)) reportError(error, { area: "enquiry.page" });
     return null;
   }
 });

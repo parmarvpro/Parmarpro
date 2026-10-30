@@ -1,20 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import { publicEnv } from "@/lib/env";
-import { formatIstDate, formatIstDateTime } from "@/lib/ist";
-import { formatInr } from "@/lib/plans";
+import { formatIstDateTime } from "@/lib/ist";
 import {
   enquiryAlertEmail,
   enquiryAutoReplyEmail,
-  entitlementNoticeEmail,
   escapeHtml,
   founderDigestEmail,
-  paymentReceiptEmail,
   patientReminderEmail,
   staffDigestEmail,
   welcomeEmail,
   weeklySummaryEmail,
-  type EntitlementNotice,
   type StaffCounts,
 } from "@/server/email/templates";
 
@@ -124,71 +120,13 @@ describe("enquiry auto-reply", () => {
 });
 
 describe("welcome", () => {
-  it("states the trial end date in IST and links to the dashboard", () => {
-    const trialEndsAt = new Date("2026-11-11T18:29:00Z");
-    const email = welcomeEmail({ firstName: "Ravi", clinicName: "Smile Clinic", trialEndsAt });
+  it("greets by first name, names the clinic and links to the dashboard", () => {
+    const email = welcomeEmail({ firstName: "Ravi", clinicName: "Smile Clinic" });
     expect(email.subject).toBe("Welcome to ParmarPro");
     expect(email.text).toContain("Hi Ravi,");
-    expect(email.text).toContain(`free trial runs until ${formatIstDate(trialEndsAt)}`);
+    expect(email.text).toContain("Your clinic, Smile Clinic, is set up and ready to use.");
+    expect(email.text).not.toContain("trial");
     expect(email.text).toContain(`${APP}/dashboard`);
-  });
-});
-
-describe("entitlement notices", () => {
-  const endsAt = new Date("2026-11-03T18:30:00Z");
-  const cases: Array<[EntitlementNotice, number]> = [
-    ["trial_reminder", 5],
-    ["trial_ending", 1],
-    ["trial_ended", -1],
-    ["renewal_reminder", 3],
-    ["renewal_due", 0],
-    ["access_lapsed", -1],
-  ];
-
-  it("gives each notice a distinct subject", () => {
-    const subjects = cases.map(([notice, daysLeft]) =>
-      entitlementNoticeEmail({ notice, clinicName: "Smile Clinic", daysLeft, endsAt }).subject,
-    );
-    expect(new Set(subjects).size).toBe(cases.length);
-  });
-
-  it("uses the documented subjects", () => {
-    const subject = (notice: EntitlementNotice, daysLeft: number) =>
-      entitlementNoticeEmail({ notice, clinicName: "Smile Clinic", daysLeft, endsAt }).subject;
-    expect(subject("trial_reminder", 5)).toBe("Your ParmarPro trial ends in 5 days");
-    expect(subject("trial_ending", 0)).toBe("Your ParmarPro trial ends today");
-    expect(subject("trial_ending", 1)).toBe("Your ParmarPro trial ends in 1 day");
-    expect(subject("trial_ended", -1)).toBe("Your ParmarPro trial has ended");
-    expect(subject("renewal_reminder", 3)).toBe("Your ParmarPro plan renews in 3 days");
-    expect(subject("renewal_due", 0)).toBe("Renew today to keep editing");
-    expect(subject("renewal_due", 1)).toBe("Renew tomorrow to keep editing");
-    expect(subject("access_lapsed", -1)).toBe("Your ParmarPro plan has lapsed");
-  });
-
-  it("says records stay readable and links to billing settings in every notice", () => {
-    for (const [notice, daysLeft] of cases) {
-      const email = entitlementNoticeEmail({ notice, clinicName: "Smile Clinic", daysLeft, endsAt });
-      expect(email.text).toContain("your records stay readable");
-      expect(email.text).toContain(`${APP}/dashboard/settings/billing`);
-      expect(email.html).toContain(`${APP}/dashboard/settings/billing`);
-    }
-  });
-});
-
-describe("payment receipt", () => {
-  it("shows the amount and states that it is not a GST tax invoice", () => {
-    const email = paymentReceiptEmail({
-      clinicName: "Smile Clinic",
-      amountPaise: 8_850_000,
-      paidThrough: new Date("2026-11-29T18:30:00Z"),
-      providerPaymentId: "pay_ABC123",
-      paidAt: new Date("2026-10-29T05:00:00Z"),
-    });
-    expect(email.subject).toBe("Payment received for Smile Clinic");
-    expect(email.text).toContain(formatInr(8_850_000));
-    expect(email.text).toContain("pay_ABC123");
-    expect(email.text).toContain("This is a payment confirmation, not a GST tax invoice.");
-    expect(email.html).toContain("not a GST tax invoice");
   });
 });
 
@@ -289,22 +227,19 @@ describe("founder digest", () => {
     expect(email.text).not.toContain("Platform metrics");
   });
 
-  it("shows the metrics section with revenue formatted in rupees when metrics are given", () => {
+  it("shows the platform metrics section when metrics are given", () => {
     const email = founderDigestEmail({
       newEnquiries: [],
       dueFollowUps: [],
       unanswered: [],
       metrics: {
         clinics_created: 2,
-        trials_active: 5,
-        paid_active: 3,
-        payments_captured: 3,
-        revenue_paise: 26_550_000,
         enquiries: 9,
       },
     });
     expect(email.text).toContain("Platform metrics");
-    expect(email.text).toContain(`Revenue: ${formatInr(26_550_000)}`);
+    expect(email.text).toContain("New clinics: 2");
+    expect(email.text).toContain("Enquiries: 9");
   });
 
   it("says so when there is nothing to report", () => {
@@ -327,7 +262,6 @@ describe("founder digest", () => {
     email_budget_hits: 0,
     emails_sent_today: 4,
     webhooks_failed: 0,
-    orders_unpaid_over_1h: 2,
     ai_calls: 3,
     ai_calls_failed: 0,
     ai_calls_rate_limited: 1,
@@ -337,7 +271,7 @@ describe("founder digest", () => {
     const base = { newEnquiries: [], dueFollowUps: [], unanswered: [], metrics: null };
     const failing = founderDigestEmail({ ...base, operations: { counts: OPS_COUNTS, note: null } });
     expect(failing.subject).toBe("ParmarPro daily: 0 new enquiries, operations need attention");
-    const quiet = { ...OPS_COUNTS, job_runs_failed: 0, orders_unpaid_over_1h: 0 };
+    const quiet = { ...OPS_COUNTS, job_runs_failed: 0 };
     expect(founderDigestEmail({ ...base, operations: { counts: quiet, note: null } }).subject).toBe(
       "ParmarPro daily: 0 new enquiries",
     );
@@ -361,7 +295,6 @@ describe("founder digest", () => {
         "Email budget reached: 0",
         "Emails sent today: 4",
         "Failed webhooks: 0",
-        "Unpaid orders over 1 hour: 2",
         "AI calls: 3",
         "AI calls failed: 0",
         "AI calls rate limited: 1",
@@ -404,7 +337,7 @@ describe("every email", () => {
   it("has a plain-text part, a footer with the app URL, no images and no tracking pixels", () => {
     const emails = [
       enquiryAutoReplyEmail({ fullName: "Asha Rao" }),
-      welcomeEmail({ firstName: null, clinicName: "Smile Clinic", trialEndsAt: new Date("2026-11-11T00:00:00Z") }),
+      welcomeEmail({ firstName: null, clinicName: "Smile Clinic" }),
       staffDigestEmail({ clinicName: "Smile Clinic", isManager: true, counts: COUNTS, unsubscribeUrl: UNSUBSCRIBE }),
       founderDigestEmail({ newEnquiries: [], dueFollowUps: [], unanswered: [], metrics: null }),
     ];

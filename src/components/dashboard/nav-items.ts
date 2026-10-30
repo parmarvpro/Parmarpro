@@ -12,5 +12,4 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/team", label: "Team", icon: "users", permission: "team:read" },
   { href: "/dashboard/settings", label: "Settings", icon: "settings", permission: "clinic:read" },
   { href: "/dashboard/settings/automations", label: "Automations", icon: "zap", permission: "clinic:read" },
-  { href: "/dashboard/settings/billing", label: "Billing", icon: "credit-card", permission: "billing:read" },
 ];

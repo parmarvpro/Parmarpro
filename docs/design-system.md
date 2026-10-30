@@ -15,7 +15,7 @@ Tokens live in `src/app/globals.css`. Brand components live in `src/components/b
 | `ink-*` | `#f6f7f9` … `#0a0c10` | Neutral text and surfaces. Body `ink-900`, muted `ink-500` |
 | `paper` | `#f4f3ef` | Warm off-white section surface |
 | `hairline` | `#d3ddf5` | Card and divider borders |
-| `success` / `warning` / `destructive` | `#0e7a43` / `#9a4a08` / `#c4261a` | Status only (completed/converted, no-show/trial warnings, lost/cancelled/errors) |
+| `success` / `warning` / `destructive` | `#0e7a43` / `#9a4a08` / `#c4261a` | Status only (completed/converted, no-show warnings, lost/cancelled/errors) |
 
 ### Contrast
 
@@ -44,7 +44,7 @@ One family: **Archivo**, a single self-hosted variable file (`src/fonts/archivo-
 - **`eyebrow` utility:** 12px, weight 700, uppercase, tracking 0.1em, in `brand-600`. Above titles, table headers, stat labels.
 - **Dashboard titles:** sentence case, `text-2xl font-bold`. The app is calmer than the marketing site.
 - **Numerals:** lining by default; `tabular-nums` only in tables, stat numbers, step numbers and the animated count-up, never on a static display price.
-- **Monospace:** system stack, only for payment IDs.
+- **Monospace:** system stack, only for record IDs.
 
 ## Shape
 

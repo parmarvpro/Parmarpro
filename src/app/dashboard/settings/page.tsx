@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { ClinicSettingsForm } from "@/components/dashboard/clinic-settings-form";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/format";
 import { hasPermission } from "@/server/auth/permissions";
@@ -33,19 +31,6 @@ export default async function SettingsPage() {
               <CardDescription>All dates and times are shown and entered in India Standard Time (Asia/Kolkata).</CardDescription>
             </CardHeader>
           </Card>
-          {hasPermission(role, "billing:read") ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>Billing</CardTitle>
-                <CardDescription>Plan status, payments and history.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button asChild variant="outline">
-                  <Link href="/dashboard/settings/billing">Open billing</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          ) : null}
           <Card>
             <CardHeader>
               <CardTitle>Your account</CardTitle>

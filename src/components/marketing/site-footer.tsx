@@ -16,7 +16,6 @@ export function SiteFooter() {
           <p className="eyebrow">Product</p>
           <ul className="space-y-2 text-ink-600">
             <li><Link href="/features" className="hover:text-brand-600">Features</Link></li>
-            <li><Link href="/pricing" className="hover:text-brand-600">Pricing</Link></li>
             <li><Link href="/contact" className="hover:text-brand-600">Contact</Link></li>
           </ul>
         </div>

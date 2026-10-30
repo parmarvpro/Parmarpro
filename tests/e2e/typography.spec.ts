@@ -37,23 +37,8 @@ test("only one font file is downloaded for the home page", async ({ page }) => {
   expect(fonts[0]).toContain("/_next/static/");
 });
 
-test("the rupee price is set in Archivo, without tabular figures", async ({ page }) => {
-  await page.goto("/pricing");
-  const price = page.getByText("₹75,000", { exact: true });
-  await expect(price).toBeVisible();
-  const style = await price.evaluate((el) => {
-    const s = getComputedStyle(el);
-    return { family: s.fontFamily, weight: s.fontWeight, numeric: s.fontVariantNumeric };
-  });
-  expect(style.family.toLowerCase()).toContain("archivo");
-  expect(style.weight).toBe("800");
-  expect(style.numeric).not.toContain("tabular-nums");
-  // The font really loaded (a missing glyph or file would leave this unloaded).
-  expect(await page.evaluate(() => document.fonts.check("800 1em archivo", "₹"))).toBe(true);
-});
-
 test("no italics anywhere on the marketing pages", async ({ page }) => {
-  for (const path of ["/", "/features", "/pricing", "/contact"]) {
+  for (const path of ["/", "/features", "/contact"]) {
     await page.goto(path);
     const italics = await page.evaluate(() => [...document.querySelectorAll("body *")].filter((el) => getComputedStyle(el).fontStyle !== "normal").length);
     expect(italics, path).toBe(0);

@@ -11,7 +11,7 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
  *
  * Content-Security-Policy: Clerk generates a per-request nonce with
  * 'strict-dynamic'. Sentry (/monitoring) and PostHog (/ingest) are proxied
- * through this origin, so only Razorpay Checkout needs extra origins.
+ * through this origin, so no extra origins are needed.
  */
 const isAppPage = createRouteMatcher(["/dashboard(.*)", "/onboarding(.*)"]);
 
@@ -25,10 +25,7 @@ export default clerkMiddleware(
     contentSecurityPolicy: {
       strict: true,
       directives: {
-        "connect-src": ["https://api.razorpay.com", "https://lumberjack.razorpay.com"],
-        "frame-src": ["https://api.razorpay.com", "https://checkout.razorpay.com"],
-        "script-src": ["https://checkout.razorpay.com"],
-        "img-src": ["data:", "https://cdn.razorpay.com"],
+        "img-src": ["data:"],
         "base-uri": ["self"],
         "object-src": ["none"],
         "frame-ancestors": ["none"],
