@@ -2,13 +2,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { reportError } from "@/lib/observability/report";
 import { handleJobRequest } from "@/server/jobs/handler";
-import type { JobFn } from "@/server/jobs/registry";
+import type { JobFn, JobRunRecord } from "@/server/jobs/registry";
 
 vi.mock("@/lib/observability/report", () => ({ reportError: vi.fn() }));
 
 // Test-only value, not a real secret.
 const SECRET = "cron_test_secret_0123456789abcdef0123456789"; // gitleaks:allow synthetic test value
 const NOW = new Date("2026-10-29T20:00:00Z");
+
+type Recorded = (run: JobRunRecord) => Promise<void>;
+
+const recorder = () => vi.fn<Recorded>(async () => {});
 
 function request(path: string, authorization?: string): Request {
   return new Request(`https://app.example.test/api/jobs/${path}`, {
@@ -106,5 +110,101 @@ describe("handleJobRequest", () => {
     expect(response.status).toBe(500);
     expect(await response.text()).toBe(JSON.stringify({ error: "internal" }));
     expect(reportError).toHaveBeenCalledWith(expect.any(Error), { area: "jobs.broken" });
+  });
+});
+
+describe("handleJobRequest, recording runs", () => {
+  it("records a finished run with its result, its dry-run flag and its duration", async () => {
+    const { deps } = setup();
+    const record = recorder();
+
+    await handleJobRequest(request("echo", `Bearer ${SECRET}`), "echo", { ...deps, record });
+
+    expect(record).toHaveBeenCalledTimes(1);
+    expect(record).toHaveBeenCalledWith({
+      job: "echo",
+      ok: true,
+      dryRun: false,
+      result: { processed: 3, dryRun: false },
+      durationMs: expect.any(Number),
+    });
+    expect(record.mock.calls[0]?.[0].durationMs).toBeGreaterThanOrEqual(0);
+  });
+
+  it("records a dry run as a dry run", async () => {
+    const { deps } = setup();
+    const record = recorder();
+    const url = new Request("https://app.example.test/api/jobs/echo?dryRun=1", {
+      method: "POST",
+      headers: { authorization: `Bearer ${SECRET}` },
+    });
+
+    await handleJobRequest(url, "echo", { ...deps, record });
+
+    expect(record).toHaveBeenCalledWith(expect.objectContaining({ job: "echo", ok: true, dryRun: true }));
+  });
+
+  it("records a thrown job as not ok, with an empty result, and still answers 500 with no detail", async () => {
+    const { deps } = setup();
+    const record = recorder();
+
+    const response = await handleJobRequest(request("broken", `Bearer ${SECRET}`), "broken", { ...deps, record });
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({ error: "internal" });
+    expect(record).toHaveBeenCalledWith({
+      job: "broken",
+      ok: false,
+      dryRun: false,
+      result: {},
+      durationMs: expect.any(Number),
+    });
+  });
+
+  it("reports a failed record under jobs.record and leaves the success response unchanged", async () => {
+    const { deps } = setup();
+    const record = vi.fn<Recorded>(async () => {
+      throw new Error("insert failed for Synthetic Patient Meera");
+    });
+
+    const response = await handleJobRequest(request("echo", `Bearer ${SECRET}`), "echo", { ...deps, record });
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ job: "echo", ok: true, dryRun: false, result: { processed: 3, dryRun: false } });
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), { area: "jobs.record", code: "record" });
+  });
+
+  it("leaves the failure response unchanged when the record also fails", async () => {
+    const { deps } = setup();
+    const record = vi.fn<Recorded>(async () => {
+      throw new Error("insert failed");
+    });
+
+    const response = await handleJobRequest(request("broken", `Bearer ${SECRET}`), "broken", { ...deps, record });
+
+    expect(response.status).toBe(500);
+    expect(await response.text()).toBe(JSON.stringify({ error: "internal" }));
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), { area: "jobs.broken" });
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), { area: "jobs.record", code: "record" });
+  });
+
+  it("records nothing for an unknown job, a missing credential or a missing secret", async () => {
+    const { deps } = setup();
+    const record = recorder();
+
+    await handleJobRequest(request("missing", `Bearer ${SECRET}`), "missing", { ...deps, record });
+    await handleJobRequest(request("echo"), "echo", { ...deps, record });
+    await handleJobRequest(request("echo", `Bearer ${SECRET}`), "echo", { ...deps, record, secret: () => null });
+
+    expect(record).not.toHaveBeenCalled();
+  });
+
+  it("works without a record dependency, and records nothing", async () => {
+    const { deps } = setup();
+
+    const response = await handleJobRequest(request("echo", `Bearer ${SECRET}`), "echo", deps);
+
+    expect(response.status).toBe(200);
+    expect(reportError).not.toHaveBeenCalled();
   });
 });

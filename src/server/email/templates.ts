@@ -2,7 +2,9 @@ import "server-only";
 
 import { publicEnv } from "@/lib/env";
 import { formatIstDate, formatIstDateTime } from "@/lib/ist";
+import { OPS_COUNT_KEYS, opsNeedsAttention, type OpsCountKey, type OpsCounts } from "@/lib/ops-counts";
 import { formatInr } from "@/lib/plans";
+import type { OpsNote } from "@/server/ai/features/ops-note";
 import type { EmailContent } from "@/server/email/send";
 
 /**
@@ -440,11 +442,41 @@ function digestItemText(item: DigestItem): string {
   return parts.join(" · ");
 }
 
+/** Plain-words labels for the operations counts, keyed by count. Every key has one. */
+const OPS_LABELS: Record<OpsCountKey, string> = {
+  job_runs: "Job runs",
+  job_runs_failed: "Failed job runs",
+  jobs_not_run: "Scheduled jobs that did not run",
+  emails_failed: "Emails failed",
+  email_budget_hits: "Email budget reached",
+  emails_sent_today: "Emails sent today",
+  webhooks_failed: "Failed webhooks",
+  orders_unpaid_over_1h: "Unpaid orders over 1 hour",
+  ai_calls: "AI calls",
+  ai_calls_failed: "AI calls failed",
+  ai_calls_rate_limited: "AI calls rate limited",
+};
+
+/**
+ * The operations section of the digest. The note is model output: it is shown as plain
+ * text, escaped like every other value.
+ */
+export type OperationsSummary = { counts: OpsCounts; note: OpsNote | null };
+
+/** The digest's subject: the new-enquiry count, and a warning when operations need attention. */
+function digestSubject(newEnquiries: number, operations: OperationsSummary | null): string {
+  const enquiries = `${newEnquiries} new ${newEnquiries === 1 ? "enquiry" : "enquiries"}`;
+  const warning = operations !== null && opsNeedsAttention(operations.counts) ? ", operations need attention" : "";
+  return `ParmarPro daily: ${enquiries}${warning}`;
+}
+
 export function founderDigestEmail(input: {
   newEnquiries: ReadonlyArray<DigestItem>;
   dueFollowUps: ReadonlyArray<DigestItem>;
   unanswered: ReadonlyArray<DigestItem>;
   metrics: FounderMetrics | null;
+  /** Null when the counts could not be read, or were not requested. */
+  operations?: OperationsSummary | null;
 }): EmailContent {
   const blocks: Block[] = [{ type: "heading", text: "Daily digest" }];
 
@@ -459,6 +491,15 @@ export function founderDigestEmail(input: {
       { type: "section", text: `${title} (${items.length})` },
       { type: "list", items: items.map((item) => ({ text: digestItemText(item), href: item.url })) },
     );
+  }
+
+  if (input.operations) {
+    const { counts, note } = input.operations;
+    blocks.push(
+      { type: "section", text: "Operations (last 24 hours)" },
+      { type: "fields", rows: OPS_COUNT_KEYS.map((key) => [OPS_LABELS[key], String(counts[key])] as const) },
+    );
+    if (note) blocks.push({ type: "paragraph", text: `Suggested focus (AI): ${oneLine(note.note)}` });
   }
 
   if (input.metrics) {
@@ -484,7 +525,7 @@ export function founderDigestEmail(input: {
   }
 
   return email({
-    subject: `ParmarPro daily: ${input.newEnquiries.length} new enquiries`,
+    subject: digestSubject(input.newEnquiries.length, input.operations ?? null),
     blocks,
   });
 }

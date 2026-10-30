@@ -119,7 +119,7 @@ Everyone in the clinic can see these settings at **Dashboard → Settings → Au
 These go to ParmarPro's operator, not to clinics.
 
 - **Alert:** each enquiry sent through the marketing contact form at `/contact` sends the founder an alert. If the enquirer gave an email address, they also get an auto-reply: "Thanks for contacting ParmarPro". Auto-replies are capped at 50 per IST day. Founder alerts do not count against that cap.
-- **Digest:** 09:30 IST, every day, to `FOUNDER_ALERT_EMAIL`. It lists enquiries received in the last 24 hours, enquiries whose follow-up time has passed, and unanswered enquiries from 1 to 14 days ago. On Mondays it also gives the previous week's platform counts.
+- **Digest:** 09:30 IST, every day, to `FOUNDER_ALERT_EMAIL`. It lists enquiries received in the last 24 hours, enquiries whose follow-up time has passed, and unanswered enquiries from 1 to 14 days ago. On Mondays it also gives the previous week's platform counts. Every digest has an *Operations (last 24 hours)* section of counts only: job runs, failed or missing jobs, email failures, failed webhooks, unpaid orders and AI calls. A day with no enquiries gets a digest only when one of those counts needs attention. The *Suggested focus (AI)* line is written from those counts alone by the free Gemini key (`GEMINI_FREE_API_KEY`). It is left out when that key is not set or no model answers, and a dry run never asks for it.
 - The clinic website form (`/enquire/<key>`) does not send founder alerts.
 - **Stop:** unset `FOUNDER_ALERT_EMAIL` in Vercel. Without it, no founder email is sent.
 

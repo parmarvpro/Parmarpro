@@ -2,6 +2,7 @@ import { isConfigured, jobsEnv } from "@/lib/env";
 import { jsonResponse } from "@/server/http";
 import { handleJobRequest } from "@/server/jobs/handler";
 import { JOBS } from "@/server/jobs/registry";
+import { recordJobRun } from "@/server/privileged/ops";
 
 /** Scheduled job endpoint. Authenticated by the CRON_SECRET bearer token only. */
 export const dynamic = "force-dynamic";
@@ -13,6 +14,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ job
     registry: JOBS,
     secret: () => (isConfigured(jobsEnv) ? jobsEnv().CRON_SECRET : null),
     now: () => new Date(),
+    record: recordJobRun,
   });
 }
 

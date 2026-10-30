@@ -41,6 +41,18 @@ export default defineConfig({
           hookTimeout: 60_000,
         },
       },
+      {
+        // Live checks against the real APIs. Each test skips unless its key is set, and the
+        // unit project never includes these files.
+        resolve: { alias },
+        test: {
+          name: "smoke",
+          include: ["tests/smoke/**/*.test.ts"],
+          environment: "node",
+          testTimeout: 60_000,
+          hookTimeout: 60_000,
+        },
+      },
     ],
   },
 });

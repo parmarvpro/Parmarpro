@@ -312,6 +312,92 @@ describe("founder digest", () => {
     expect(email.subject).toBe("ParmarPro daily: 0 new enquiries");
     expect(email.text).toContain("Nothing needs attention today.");
   });
+
+  it("uses the singular for one new enquiry", () => {
+    const one = { fullName: "Synthetic Enquirer", clinicName: null, city: null, createdAt: new Date(), url: "https://app.example.test/x" };
+    const email = founderDigestEmail({ newEnquiries: [one], dueFollowUps: [], unanswered: [], metrics: null });
+    expect(email.subject).toBe("ParmarPro daily: 1 new enquiry");
+  });
+
+  const OPS_COUNTS = {
+    job_runs: 6,
+    job_runs_failed: 1,
+    jobs_not_run: 0,
+    emails_failed: 0,
+    email_budget_hits: 0,
+    emails_sent_today: 4,
+    webhooks_failed: 0,
+    orders_unpaid_over_1h: 2,
+    ai_calls: 3,
+    ai_calls_failed: 0,
+    ai_calls_rate_limited: 1,
+  };
+
+  it("says in the subject when operations need attention, and not otherwise", () => {
+    const base = { newEnquiries: [], dueFollowUps: [], unanswered: [], metrics: null };
+    const failing = founderDigestEmail({ ...base, operations: { counts: OPS_COUNTS, note: null } });
+    expect(failing.subject).toBe("ParmarPro daily: 0 new enquiries, operations need attention");
+    const quiet = { ...OPS_COUNTS, job_runs_failed: 0, orders_unpaid_over_1h: 0 };
+    expect(founderDigestEmail({ ...base, operations: { counts: quiet, note: null } }).subject).toBe(
+      "ParmarPro daily: 0 new enquiries",
+    );
+  });
+
+  it("shows the operations counts in plain words, in order, with the AI note as plain text", () => {
+    const email = founderDigestEmail({
+      newEnquiries: [item("A")],
+      dueFollowUps: [],
+      unanswered: [],
+      metrics: null,
+      operations: { counts: OPS_COUNTS, note: { attention: "high", note: "Check the job runs first." } },
+    });
+    expect(email.text).toContain("Operations (last 24 hours)");
+    expect(email.text).toContain(
+      [
+        "Job runs: 6",
+        "Failed job runs: 1",
+        "Scheduled jobs that did not run: 0",
+        "Emails failed: 0",
+        "Email budget reached: 0",
+        "Emails sent today: 4",
+        "Failed webhooks: 0",
+        "Unpaid orders over 1 hour: 2",
+        "AI calls: 3",
+        "AI calls failed: 0",
+        "AI calls rate limited: 1",
+      ].join("\n"),
+    );
+    expect(email.text).toContain("Suggested focus (AI): Check the job runs first.");
+    expect(email.html).toContain("Suggested focus (AI): Check the job runs first.");
+  });
+
+  it("omits the suggested focus when there is no note, and the section when there are no counts", () => {
+    const withoutNote = founderDigestEmail({
+      newEnquiries: [item("A")],
+      dueFollowUps: [],
+      unanswered: [],
+      metrics: null,
+      operations: { counts: OPS_COUNTS, note: null },
+    });
+    expect(withoutNote.text).toContain("Operations (last 24 hours)");
+    expect(withoutNote.text).not.toContain("Suggested focus");
+
+    const withoutCounts = founderDigestEmail({ newEnquiries: [item("A")], dueFollowUps: [], unanswered: [], metrics: null });
+    expect(withoutCounts.text).not.toContain("Operations (last 24 hours)");
+  });
+
+  it("escapes the AI note in HTML and keeps it as text in the plain-text part", () => {
+    const email = founderDigestEmail({
+      newEnquiries: [item("A")],
+      dueFollowUps: [],
+      unanswered: [],
+      metrics: null,
+      operations: { counts: OPS_COUNTS, note: { attention: "low", note: `<img src=x onerror="alert(1)"> & more` } },
+    });
+    expect(email.html).not.toContain("<img");
+    expect(email.html).toContain("&lt;img src=x onerror=&quot;alert(1)&quot;&gt; &amp; more");
+    expect(email.text).toContain(`Suggested focus (AI): <img src=x onerror="alert(1)"> & more`);
+  });
 });
 
 describe("every email", () => {

@@ -9,6 +9,10 @@ import { randomBytes } from "node:crypto";
 
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { istDateKey } from "@/lib/ist";
+import { OPS_COUNT_KEYS } from "@/lib/ops-counts";
+import type { GenerateRequest, GenerateResult, Transport } from "@/server/ai/types";
+
 import { admin, closePool, createClinicFixture, deleteClinicFixture, type ClinicFixture } from "../helpers/db";
 import { mintToken } from "../helpers/jwt";
 import { startRestProxy } from "../helpers/rest-proxy";
@@ -252,5 +256,158 @@ describe("trial notices, end to end", () => {
     sent = [];
     await runJob("trial-renewal");
     expect(sentTo(addressOf(B.owner.userId))).toHaveLength(0);
+  });
+});
+
+describe("job runs and the founder digest's operations section, end to end", () => {
+  let handler: typeof import("@/server/jobs/handler");
+  let ops: typeof import("@/server/privileged/ops");
+  let startedAt: Date;
+
+  beforeAll(async () => {
+    startedAt = new Date(Date.now() - 1000);
+    handler = await import("@/server/jobs/handler");
+    ops = await import("@/server/privileged/ops");
+  });
+
+  afterAll(async () => {
+    await admin("delete from public.job_runs where job in ('ops-string-test', 'ops-throw-test')");
+    await admin("delete from public.ai_calls where feature = 'ops_note' and created_at >= $1", [startedAt]);
+  });
+
+  async function runCount(job: string): Promise<number> {
+    const { rows } = await admin<{ n: string }>("select count(*)::text as n from public.job_runs where job = $1", [job]);
+    return Number(rows[0]!.n);
+  }
+
+  async function lastRun(job: string) {
+    const { rows } = await admin<{ ok: boolean; dry_run: boolean; result: Record<string, unknown>; duration_ms: number }>(
+      "select ok, dry_run, result, duration_ms from public.job_runs where job = $1 order by id desc limit 1",
+      [job],
+    );
+    return rows[0]!;
+  }
+
+  it("a run through the route records one job_runs row, with the counts and no other data", async () => {
+    const before = await runCount("staff-digest");
+    await runJob("staff-digest");
+
+    expect(await runCount("staff-digest")).toBe(before + 1);
+    const row = await lastRun("staff-digest");
+    expect(row).toMatchObject({ ok: true, dry_run: false });
+    expect(row.duration_ms).toBeGreaterThanOrEqual(0);
+    for (const value of Object.values(row.result)) expect(["number", "boolean"]).toContain(typeof value);
+  });
+
+  it("a dry run is recorded as a dry run", async () => {
+    await runJob("patient-reminders", { dryRun: true });
+    expect(await lastRun("patient-reminders")).toMatchObject({ ok: true, dry_run: true });
+  });
+
+  it("a job whose result has a string value is recorded without that value", async () => {
+    const response = await handler.handleJobRequest(
+      new Request("http://localhost/api/jobs/ops-string-test", {
+        method: "POST",
+        headers: { authorization: `Bearer ${cronSecret}` },
+      }),
+      "ops-string-test",
+      {
+        registry: {
+          "ops-string-test": async () => ({ processed: 2, failed: 1, ok: true, note: "Synthetic Patient Name" }),
+        },
+        secret: () => cronSecret,
+        now: () => new Date(),
+        record: ops.recordJobRun,
+      },
+    );
+
+    expect(response.status).toBe(200);
+    expect((await lastRun("ops-string-test")).result).toEqual({ processed: 2, failed: 1, ok: true });
+  });
+
+  it("a job that throws is recorded as not ok, with an empty result", async () => {
+    const response = await handler.handleJobRequest(
+      new Request("http://localhost/api/jobs/ops-throw-test", {
+        method: "POST",
+        headers: { authorization: `Bearer ${cronSecret}` },
+      }),
+      "ops-throw-test",
+      {
+        registry: {
+          "ops-throw-test": async () => {
+            throw new Error("connection to db.internal failed for Synthetic Patient");
+          },
+        },
+        secret: () => cronSecret,
+        now: () => new Date(),
+        record: ops.recordJobRun,
+      },
+    );
+
+    expect(response.status).toBe(500);
+    expect(await lastRun("ops-throw-test")).toMatchObject({ ok: false, dry_run: false, result: {} });
+  });
+
+  it("the founder digest carries the operations section and the AI note, from a fake free-lane transport", async () => {
+    const { createFounderDigestJob } = await import("@/server/jobs/founder-digest");
+    const { enquiryManageUrl } = await import("@/server/jobs/links");
+    const { founderEnquiries, founderMetrics } = await import("@/server/privileged/jobs");
+    const { notifier } = await import("@/server/privileged/notifications");
+    const { createOpsNote } = await import("@/server/ai/features/ops-note");
+    const { createAiRunner } = await import("@/server/ai/run");
+    const { reserveAiCall, settleAiCall } = await import("@/server/privileged/ai-usage");
+
+    // The model's input, as the fake transport received it.
+    const inputs: string[] = [];
+    const transport: Transport = {
+      async generate<T>(req: GenerateRequest<T>): Promise<GenerateResult<T>> {
+        inputs.push(req.input);
+        return {
+          ok: true,
+          value: req.parse.parse({ attention: "high", note: "Check the job runs first." }),
+          usage: null,
+        };
+      },
+    };
+    // The real reserve and settle run against the local database. Only the model is fake.
+    const runner = createAiRunner({
+      lane: "free",
+      transport,
+      reserve: reserveAiCall,
+      settle: settleAiCall,
+      clinicDailyCap: null,
+    });
+
+    const founder = `founder.${tag()}@example.test`;
+    const now = new Date();
+    await admin(
+      "delete from public.notification_log where kind = 'founder_digest' and subject_key = 'founder' and period_key = $1",
+      [istDateKey(now)],
+    );
+
+    const job = createFounderDigestJob({
+      to: () => founder,
+      enquiries: founderEnquiries,
+      metrics: founderMetrics,
+      ops: ops.opsCounts,
+      opsNote: createOpsNote({ runner }),
+      manageUrl: enquiryManageUrl,
+      sendOnce: (params) => notifier().sendOnce(params),
+    });
+
+    // The failed run recorded above is in the last 24 hours, so operations need attention and the
+    // digest is sent even on a day with no enquiries.
+    expect(await job({ now, dryRun: false })).toMatchObject({ sent: 1, ai_note: 1 });
+
+    const [email] = sentTo(founder);
+    expect(email?.text).toContain("Operations (last 24 hours)");
+    expect(email?.text).toContain("Suggested focus (AI): Check the job runs first.");
+    expect(email?.html).toContain("Suggested focus (AI): Check the job runs first.");
+
+    // The only text the free lane received: the fixed count keys, each with an integer.
+    expect(inputs).toHaveLength(1);
+    const sentToModel = JSON.parse(inputs[0]!) as Record<string, unknown>;
+    expect(Object.keys(sentToModel)).toEqual([...OPS_COUNT_KEYS]);
+    expect(Object.values(sentToModel).every((value) => Number.isInteger(value))).toBe(true);
   });
 });

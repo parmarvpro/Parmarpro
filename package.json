@@ -15,6 +15,7 @@
     "test": "vitest run --project unit",
     "test:db": "vitest run --project db",
     "test:integration": "vitest run --project integration",
+    "test:ai-smoke": "vitest run --project smoke",
     "test:all": "vitest run",
     "test:e2e": "playwright test",
     "check:secrets-guard": "node scripts/check-public-env.mjs",

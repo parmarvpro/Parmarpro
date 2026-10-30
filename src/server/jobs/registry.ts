@@ -14,6 +14,9 @@ export type JobResult = Record<string, number | string | boolean>;
 
 export type JobFn = (ctx: JobContext) => Promise<JobResult>;
 
+/** One finished job run, as it is written to job_runs. A failed run carries an empty result. */
+export type JobRunRecord = { job: string; ok: boolean; dryRun: boolean; result: JobResult; durationMs: number };
+
 /**
  * Scheduled jobs, keyed by the URL segment of POST /api/jobs/[job]. The job
  * modules import the types above with `import type`, so these value imports

@@ -1161,6 +1161,12 @@ export type Database = {
           paid_through: string;
         }[];
       };
+      ops_counts: {
+        Args: {
+          p_since: string;
+        };
+        Returns: Json;
+      };
       record_payment_attempt: {
         Args: {
           p_billing_order_id: string;
