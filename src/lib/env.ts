@@ -77,6 +77,14 @@ const linkSigningSchema = z.object({
   LINK_SIGNING_SECRET: z.string().min(32),
 });
 
+const geminiFreeSchema = z.object({
+  GEMINI_FREE_API_KEY: z.string().min(30),
+});
+
+const geminiPaidSchema = z.object({
+  GEMINI_PAID_API_KEY: z.string().min(30),
+});
+
 export class MissingConfigurationError extends Error {
   constructor(area: string, issues: string) {
     super(`Missing or invalid configuration for ${area}: ${issues}`);
@@ -138,6 +146,19 @@ export function jobsEnv() {
 /** Server-only: HMAC key for signed action and unsubscribe links. */
 export function linkSigningEnv() {
   return load("Signed links", linkSigningSchema);
+}
+
+/**
+ * Server-only: the free-tier Gemini key. It belongs to a Google Cloud project WITHOUT
+ * billing and may only receive our own non-personal data (see src/server/ai/free-lane.ts).
+ */
+export function geminiFreeEnv() {
+  return load("Gemini (free)", geminiFreeSchema);
+}
+
+/** Server-only: the paid Gemini key. It belongs to a separate Google Cloud project WITH billing. */
+export function geminiPaidEnv() {
+  return load("Gemini (paid)", geminiPaidSchema);
 }
 
 type ConfiguredArea = "supabase" | "razorpay" | "razorpayWebhook" | "clerk";
