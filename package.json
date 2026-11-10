@@ -1,0 +1,11 @@
+{
+  "name": "parmarpro",
+  "private": true,
+  "type": "module",
+  "description": "Parmarpro hub + per-clinic preview sites, built to static HTML for GitHub Pages.",
+  "scripts": {
+    "build": "node src/build.mjs",
+    "og": "node src/og.mjs",
+    "serve": "node src/serve.mjs 8080"
+  }
+}

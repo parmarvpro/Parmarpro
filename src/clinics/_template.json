@@ -1,0 +1,41 @@
+{
+  "slug": "clinic-name-area",
+  "showcase": false,
+  "preparedOn": "2026-11-10",
+  "name": "Exact clinic name as on Google Maps",
+  "shortName": "Shorter name for the logo",
+  "area": "Neighbourhood, e.g. Andheri West",
+  "city": "Mumbai",
+  "address": "Full address as on Google Maps",
+  "mapsUrl": "Paste the clinic's Google Maps share link",
+  "phone": "+91 98XXX XXXXX",
+  "whatsapp": "",
+  "rating": 4.5,
+  "reviewCount": 100,
+  "since": 2015,
+  "brandColor": "#0E7C86",
+  "headline": "",
+  "intro": "",
+  "doctors": [
+    { "name": "Dr. Full Name", "credentials": "BDS, MDS", "bio": "One or two factual lines, from their profile or website." }
+  ],
+  "hours": [
+    { "days": "Mon – Sat", "time": "10:00 am – 1:00 pm, 5:00 pm – 9:00 pm" },
+    { "days": "Sunday", "time": "Closed" }
+  ],
+  "services": ["Check-up & cleaning", "Fillings", "Root canal treatment"],
+  "reviews": [
+    { "author": "First name + initial", "text": "A short excerpt of a real Google review." }
+  ],
+  "faqs": [],
+  "audit": {
+    "website": "none",
+    "onlineBooking": false,
+    "repliesToReviews": false,
+    "photoCount": 10,
+    "competitors": [
+      { "name": "Nearby clinic", "rating": 4.8, "reviews": 300, "website": true }
+    ],
+    "notes": []
+  }
+}
