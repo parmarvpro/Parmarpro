@@ -1,213 +1,707 @@
-<!doctype html>
+```html
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Parmarpro — Growth systems for dental clinics</title>
-<meta name="description" content="New website and growth plan for your dental clinic, built before you pay. 70% free; we run the rest if you want.">
-<link rel="canonical" href="https://parmarpro.in/">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Parmarpro — Growth systems for dental clinics">
-<meta property="og:description" content="New website and growth plan for your dental clinic, built before you pay. 70% free; we run the rest if you want.">
-<meta property="og:url" content="https://parmarpro.in/">
-<meta property="og:image" content="https://parmarpro.in/assets/img/og.png?v=d0ed25d9">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#0D0F12">
-<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
-<script>document.documentElement.classList.add('js')</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap">
-<link rel="stylesheet" href="/assets/css/parmarpro.css?v=cad5bc96">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flying Movements Foundation | Empowering Mumbai</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- GSAP for Premium Scroll Animations (Flomio Studio Style) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        oswald: ['Oswald', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#050505',
+                            charcoal: '#121212',
+                            gray: '#242424',
+                            light: '#e5e5e5',
+                            orange: '#ff5500', // Strong flame orange
+                            orangeHover: '#e64d00'
+                        }
+                    },
+                    backgroundImage: {
+                        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for specialized effects -->
+    <style>
+        body {
+            background-color: #050505;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+
+        /* Noise Texture Overlay */
+        .noise-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Typography Utilities */
+        .text-outline {
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.8);
+        }
+        @media (min-width: 768px) {
+            .text-outline { -webkit-text-stroke: 2px rgba(255, 255, 255, 0.8); }
+        }
+
+        /* Form Styling */
+        .input-editorial {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            border-radius: 0;
+            padding: 1rem 0;
+            color: white;
+            transition: border-color 0.3s ease;
+        }
+        .input-editorial:focus {
+            outline: none;
+            border-bottom: 1px solid #ff5500;
+            box-shadow: none;
+        }
+        .input-editorial::placeholder {
+            color: #666;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff5500; }
+    </style>
 </head>
-<body>
+<body class="antialiased selection:bg-brand-orange selection:text-white">
 
-<header class="nav">
-  <div class="wrap nav-in">
-    <a class="logo" href="/" aria-label="Parmarpro home"><span class="logo-mark">P</span><span>Parmarpro</span></a>
-    <nav class="nav-links">
-      <a href="#how">How it works</a><a href="#free">What's free</a><a href="#systems">Systems</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a>
-    </nav>
-    <a class="btn btn-primary btn-sm" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg><span>Free preview</span></a>
-  </div>
-</header>
+    <div class="noise-bg"></div>
 
-<main>
-<section class="hero">
-  <div class="wrap hero-in">
-    <div class="hero-copy reveal">
-      <span class="eyebrow"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.5 3C5 3 3 5 3 7.6c0 2 .8 3.3 1.3 4.9.6 2 .8 4.3 1.4 6.3.4 1.4 1 2.2 1.9 2.2 1.5 0 1.6-2.8 2.4-4.8.4-1 1.1-1.6 2-1.6s1.6.6 2 1.6c.8 2 .9 4.8 2.4 4.8.9 0 1.5-.8 1.9-2.2.6-2 .8-4.3 1.4-6.3.5-1.6 1.3-2.9 1.3-4.9C21 5 19 3 16.5 3c-1.9 0-2.7 1-4.5 1S9.4 3 7.5 3z"/></svg> For dental clinics in Mumbai</span>
-      <h1>Your clinic's new website and growth plan. <span class="accent">Built before you pay.</span></h1>
-      <p class="lede">Send us your clinic's Google Maps link. Within 48 hours you get a private preview of your new website and a step-by-step plan to get more patients from Google. Keep the plan for free — or let us run it for you.</p>
-      <div class="cta-row">
-        <a class="btn btn-accent" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg>Get my free preview</a>
-        <a class="btn btn-ghost" href="/p/demo-dental/">See a sample <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>
-      <ul class="hero-ticks">
-        <li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>No call needed</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Private link, not indexed</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Yours to keep</li>
-      </ul>
-    </div>
-    <div class="hero-visual reveal" aria-hidden="true">
-      <div class="mock-browser">
-        <div class="mock-bar"><i></i><i></i><i></i><span>parmarpro.in/p/your-clinic</span></div>
-        <div class="mock-body">
-          <div class="mock-nav"><b></b><s></s><em></em></div>
-          <div class="mock-line w80 big"></div><div class="mock-line w55 big"></div>
-          <div class="mock-line w90"></div><div class="mock-line w70"></div>
-          <div class="mock-ctas"><em></em><s></s></div>
-          <div class="mock-cards"><i></i><i></i><i></i></div>
+    <!-- 1. TOP NAVIGATION -->
+    <nav class="fixed w-full z-40 top-0 border-b border-white/10 bg-brand-dark/80 backdrop-blur-md transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center group">
+                    <span class="font-oswald uppercase tracking-widest text-3xl font-bold text-white transition-colors duration-300 group-hover:text-brand-orange">FMF</span>
+                </a>
+
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center space-x-10">
+                    <a href="#services" class="text-sm uppercase tracking-widest text-gray-400 hover:text-white hover:border-b hover:border-brand-orange pb-1 transition-all">Services</a>
+                    <a href="#camp-services" class="text-sm uppercase tracking-widest text-gray-400 hover:text-white hover:border-b hover:border-brand-orange pb-1 transition-all">Camps</a>
+                    <a href="#societies" class="text-sm uppercase tracking-widest text-gray-400 hover:text-white hover:border-b hover:border-brand-orange pb-1 transition-all">Societies</a>
+                    <a href="#leadership" class="text-sm uppercase tracking-widest text-gray-400 hover:text-white hover:border-b hover:border-brand-orange pb-1 transition-all">About Us</a>
+                </div>
+
+                <!-- CTA -->
+                <div class="hidden md:block">
+                    <a href="#contact" class="px-6 py-3 border border-brand-orange text-brand-orange text-sm uppercase tracking-widest font-semibold hover:bg-brand-orange hover:text-white transition-colors duration-300">
+                        Get Support
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white focus:outline-none" id="mobile-menu-btn">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
         </div>
-      </div>
-      <div class="mock-plan">
-        <div class="mock-plan-head"><strong>Growth plan</strong><span class="pill">6 fixes found</span></div>
-        <ul>
-          <li class="bad"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>No website on Google profile</li>
-          <li class="bad"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Booking only by phone</li>
-          <li class="warn"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/></svg>74 reviews vs 412 nearby</li>
-          <li class="good"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>4.6★ rating</li>
-        </ul>
-        <div class="meter"><span style="width:70%"></span></div>
-        <small>70% done for you — free</small>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div class="strip">
-  <div class="wrap strip-in">
-    <span>Every preview includes</span>
-    <ul><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>New website</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Google profile audit</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Competitor check</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Review scripts</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>WhatsApp templates</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Recall plan</li></ul>
-  </div>
-</div>
-
-<section id="how">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">How it works</span>
-      <h2>Real work first. A conversation later — only if you want one.</h2>
-    </div>
-    <ol class="steps">
-      <li class="card step reveal"><span class="step-n">01</span><svg class="i step-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><h3>We find your clinic</h3><p class="muted">Send us your Google Maps link — or we may have already found you there.</p></li><li class="card step reveal"><span class="step-n">02</span><svg class="i step-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5a4 4 0 0 0 5 5L21 9a6 6 0 0 1-8.3 6.9L6 22.5 1.5 18l6.6-6.7A6 6 0 0 1 15 3z"/></svg><h3>We build your preview</h3><p class="muted">A new website for your clinic, plus a growth plan based on your Google profile, reviews and the clinics around you.</p></li><li class="card step reveal"><span class="step-n">03</span><svg class="i step-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><h3>You see everything first</h3><p class="muted">One private link. Not public, not indexed by Google, clearly marked as a concept. Use any of it.</p></li><li class="card step reveal"><span class="step-n">04</span><svg class="i step-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><h3>We switch it on — if you want</h3><p class="muted">We launch the site on your domain and run the systems every week. Month-to-month.</p></li>
-    </ol>
-  </div>
-</section>
-
-<section id="free" class="dark">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">What's free</span>
-      <h2>70% of the work is yours, free.</h2>
-      <p class="lede">We don't hide the strategy behind a sales call. The thinking, the design and the scripts are all in your preview. You only pay for the part that takes time every week: running it.</p>
-    </div>
-    <div class="split-bar reveal" role="img" aria-label="70% free, 30% paid">
-      <span style="width:70%">70% free<em> — in your preview</em></span><span style="width:30%">30%<em> done-for-you</em><i> paid</i></span>
-    </div>
-    <div class="grid g2 reveal">
-      <div class="glass">
-        <h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="5" rx="1"/><path d="M5 13v8h14v-8M12 8v13"/><path d="M12 8S10.5 3 8 3.8C6 4.4 7 8 12 8zM12 8s1.5-5 4-4.2C18 4.4 17 8 12 8z"/></svg>Yours free, in the preview</h3>
-        <ul class="ticks"><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>New website design and copy for your clinic</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Google profile audit + 10-point checklist</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Comparison with the clinics around you</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Review request and reply scripts</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>WhatsApp booking and reminder templates</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>6-month recall message</li></ul>
-      </div>
-      <div class="glass glass-accent">
-        <h3><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 5.5a4 4 0 0 0 5 5L21 9a6 6 0 0 1-8.3 6.9L6 22.5 1.5 18l6.6-6.7A6 6 0 0 1 15 3z"/></svg>Done for you, if you'd like</h3>
-        <ul class="ticks"><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Launch on your own domain, with hosting</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Every Google profile change made for you</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Automatic review requests after each visit</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>WhatsApp Business setup and reminders</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Monthly recall campaigns</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A one-page scoreboard every month</li></ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section id="systems">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">The systems</span>
-      <h2>Six simple systems. Together, they fill your calendar.</h2>
-      <p class="lede">Nothing fancy, nothing you have to learn. Each one fixes a specific leak between "dentist near me" and a patient in your chair.</p>
-    </div>
-    <div class="bento">
-      <div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/></svg><h3>A website that books</h3><p class="muted">Built for phones, written for patients, with WhatsApp booking on every screen.</p></div><div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><h3>Google profile tune-up</h3><p class="muted">Categories, services, photos and posts — where most new patients first see you.</p></div><div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg><h3>Review engine</h3><p class="muted">Every patient gets a polite review request after their visit. Every review gets a reply.</p></div><div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8M8 13h5"/></svg><h3>WhatsApp booking &amp; reminders</h3><p class="muted">Patients book when it suits them. Reminders the day before cut no-shows.</p></div><div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.6-4.5L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.6 4.5L20 16"/><path d="M20 20v-4h-4"/></svg><h3>Recall &amp; reactivation</h3><p class="muted">Bring back patients who are due for a check-up — they already trust you.</p></div><div class="card bento-card reveal"><svg class="i bento-i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V4M4 20h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg><h3>Monthly scoreboard</h3><p class="muted">One page: profile views, calls, chats, bookings, reviews. No guesswork.</p></div>
-    </div>
-  </div>
-</section>
-
-<section id="pricing" class="tint">
-  <div class="wrap">
-    <div class="section-head reveal">
-      <span class="kicker">Pricing</span>
-      <h2>Simple pricing. No long contracts.</h2>
-      <p class="lede">At an average of ₹2,500 per patient, Grow pays for itself with 2 new patients a month.</p>
-    </div>
-    <div class="grid g2 pricing">
-      <div class="card price reveal">
         
-        <h3>Launch</h3>
-        <p class="price-amt"><strong>₹9,999</strong><span>one-time</span></p>
-        <p class="muted">Everything in your preview, switched on in a week.</p>
-        <ul class="ticks"><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Your new website live on your own domain (domain at cost)</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Google profile fixed: all 10 checklist points</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>WhatsApp Business set up with booking quick replies</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Review QR card for your reception desk</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>30 days of free edits</li></ul>
-        <a class="btn btn-ghost btn-block" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg>Ask about Launch</a>
-      </div><div class="card price reveal featured">
-        <span class="pill pill-accent">Most clinics choose this</span>
-        <h3>Grow</h3>
-        <p class="price-amt"><strong>₹4,999</strong><span>/ month</span></p>
-        <p class="muted">We run the systems every week, so you can focus on patients. Month-to-month.</p>
-        <ul class="ticks"><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Review requests sent to your patients after their visits</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A drafted reply for every new review</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Weekly Google posts and fresh photos</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Appointment reminders and a monthly recall campaign</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>A one-page scoreboard every month</li><li><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Unlimited small website edits</li></ul>
-        <a class="btn btn-accent btn-block" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg>Ask about Grow</a>
-      </div>
-    </div>
-    <div class="guarantee reveal"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><p><strong>Our promise:</strong> your website goes live within 7 days of your go-ahead, or Launch is free. Grow is month-to-month — stop any time with one message.</p></div>
-  </div>
-</section>
-
-<section id="work">
-  <div class="wrap">
-    <div class="section-head reveal"><span class="kicker">Work</span><h2>Selected work</h2></div>
-    <div class="grid g3">
-      <a class="card work-card reveal" href="/work/flying-movements-foundation/"><span class="muted small">NGO website · Mumbai</span><h3>Flying Movements Foundation</h3><span class="link">View <svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
-    </div>
-  </div>
-</section>
-
-<section class="founder">
-  <div class="wrap founder-in reveal">
-    <div class="avatar">V</div>
-    <div>
-      <p class="quote">"I'd rather show you than pitch you. Every clinic we contact gets real, finished work up front. If it's useful, we'll work together. If not, you keep it — no hard feelings."</p>
-      <p class="muted">— Vivek, Founder, Parmarpro</p>
-    </div>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="wrap faq-wrap">
-    <div class="section-head reveal"><span class="kicker">FAQ</span><h2>Questions clinics ask us</h2></div>
-    <div class="faq">
-      <details class="reveal"><summary>Why is the preview free?</summary><p>Because showing beats telling. We&#39;d rather spend a few hours building something real for your clinic than ask you for a meeting. If it&#39;s good, some clinics ask us to run it. If it isn&#39;t useful, it cost you nothing.</p></details><details class="reveal"><summary>Is my preview public?</summary><p>No. It&#39;s on a private link that search engines are told not to index, and it&#39;s clearly marked as a concept by Parmarpro, not your official site. Ask and we&#39;ll remove it within 24 hours.</p></details><details class="reveal"><summary>Can I just use the plan myself?</summary><p>Yes. The scripts, the checklist and the website design are yours to use. If you&#39;d rather do it in-house, we&#39;re glad it helped.</p></details><details class="reveal"><summary>Do I own the website?</summary><p>Yes. The domain is registered in your clinic&#39;s name and the site is yours. If you ever stop working with us, you keep it.</p></details><details class="reveal"><summary>What do you need from me?</summary><p>A 15-minute call, any photos or logo you have, and manager access to your Google Business Profile — added from your own account. We never ask for passwords.</p></details><details class="reveal"><summary>Do you work with other kinds of businesses?</summary><p>Right now we focus only on dental clinics. Doing one thing well is the point.</p></details>
-    </div>
-  </div>
-</section>
-
-<section class="final">
-  <div class="wrap">
-    <div class="final-card reveal">
-      <h2>Want to see your clinic's preview?</h2>
-      <p class="lede">Send your Google Maps link on WhatsApp. Your private preview arrives within 48 hours.</p>
-      <a class="btn btn-accent" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg>Get my free preview</a>
-    </div>
-  </div>
-</section>
-</main>
-<footer class="pp-footer">
-  <div class="wrap pp-footer-in">
-    <div><a class="logo" href="/" aria-label="Parmarpro home"><span class="logo-mark">P</span><span>Parmarpro</span></a><p class="muted small">Growth systems for dental clinics · Mumbai</p></div>
-    <nav class="pp-footer-links">
-      <a href="/#how">How it works</a>
-      <a href="/#pricing">Pricing</a>
-      <a href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path fill="currentColor" stroke="none" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38a9.9 9.9 0 0 0 4.74 1.21c5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.8 14.02c-.25.69-1.44 1.32-2 1.4-.51.08-1.15.11-1.86-.12-.43-.13-.98-.32-1.68-.62-2.96-1.28-4.89-4.26-5.04-4.46-.15-.2-1.2-1.6-1.2-3.05s.76-2.17 1.03-2.46c.27-.3.59-.37.79-.37h.57c.18.01.42-.07.66.5.25.59.84 2.04.91 2.19.07.15.12.32.02.52-.1.2-.15.32-.3.49l-.44.52c-.15.15-.3.31-.13.6.17.3.76 1.26 1.64 2.04 1.13 1 2.08 1.32 2.37 1.47.3.15.47.12.64-.07.17-.2.74-.86.94-1.16.2-.3.39-.25.66-.15.27.1 1.72.81 2.02.96.3.15.49.22.57.34.07.12.07.71-.18 1.4z"/></svg>WhatsApp</a>
-      
+        <!-- Mobile Nav Menu -->
+        <div class="md:hidden hidden bg-brand-charcoal border-b border-white/10" id="mobile-menu">
+            <div class="px-6 pt-4 pb-6 space-y-4 flex flex-col">
+                <a href="#services" class="text-lg uppercase tracking-widest text-white border-b border-white/5 pb-2">Services</a>
+                <a href="#camp-services" class="text-lg uppercase tracking-widest text-white border-b border-white/5 pb-2">Camps</a>
+                <a href="#societies" class="text-lg uppercase tracking-widest text-white border-b border-white/5 pb-2">Societies</a>
+                <a href="#leadership" class="text-lg uppercase tracking-widest text-white border-b border-white/5 pb-2">About Us</a>
+                <a href="#contact" class="text-brand-orange uppercase tracking-widest font-bold pt-2">Get Support &rarr;</a>
+            </div>
+        </div>
     </nav>
-  </div>
-  <div class="wrap"><p class="muted small">© 2026 Parmarpro. Previews are concepts made by Parmarpro and are not affiliated with the businesses shown.</p></div>
-</footer>
-<script src="/assets/js/site.js?v=e3f2e29c" defer></script>
+
+    <!-- 2. HERO SECTION -->
+    <section class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-1/2 left-1/4 -translate-y-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-orange/10 rounded-full blur-[120px]"></div>
+            <div class="absolute right-0 top-0 w-1/2 h-full opacity-20" style="background-image: radial-gradient(#333 1px, transparent 1px); background-size: 40px 40px;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 relative z-10 w-full grid lg:grid-cols-12 gap-12 items-center">
+            <div class="lg:col-span-8 reveal">
+                <p class="text-brand-orange uppercase tracking-[0.2em] font-semibold text-sm mb-6 pl-1 flex items-center gap-4">
+                    <span class="w-8 h-[1px] bg-brand-orange"></span> Organized Civic Action
+                </p>
+                
+                <h1 class="font-oswald text-[12vw] lg:text-[9rem] leading-[0.85] uppercase mb-8">
+                    <span class="block text-white">Flying</span>
+                    <span class="block text-brand-orange">Movements</span>
+                    <span class="block text-outline mt-2">Foundation</span>
+                </h1>
+                
+                <p class="text-gray-400 text-lg md:text-xl max-w-2xl font-light leading-relaxed mb-10 pl-1 border-l-2 border-brand-orange/30 ml-1 pl-6">
+                    Direct support for middle-class societies and citizens. <br class="hidden md:block">
+                    We simplify government scheme access through organized camps, precise documentation guidance, and relentless follow-up support.
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 pl-1">
+                    <a href="#contact" class="bg-brand-orange text-white px-8 py-4 uppercase tracking-widest text-sm font-bold hover:bg-brand-orangeHover transition-colors flex items-center justify-center gap-3 group">
+                        Book Free Camp
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                    <a href="#contact" class="border border-white/20 text-white px-8 py-4 uppercase tracking-widest text-sm font-bold hover:border-white hover:bg-white/5 transition-colors flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.274.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.098.824z"></path></svg>
+                        WhatsApp Us
+                    </a>
+                </div>
+            </div>
+
+            <div class="hidden lg:block lg:col-span-4 reveal delay-200">
+                <div class="relative w-full aspect-[3/4] border border-white/10 p-4">
+                    <div class="w-full h-full border border-brand-orange/30 relative flex flex-col justify-end p-6 overflow-hidden">
+                        <div class="absolute inset-0 bg-gradient-to-t from-brand-orange/20 to-transparent"></div>
+                        <div class="w-full h-[1px] bg-brand-orange/50 mb-8 absolute top-1/4 left-0"></div>
+                        <div class="w-[1px] h-full bg-brand-orange/50 absolute left-1/3 top-0"></div>
+                        
+                        <div class="relative z-10 text-right">
+                            <span class="block font-oswald text-4xl text-white opacity-20 uppercase">Mumbai</span>
+                            <span class="block font-oswald text-6xl text-white opacity-40 uppercase -mt-2">HQ</span>
+                        </div>
+                    </div>
+                    <div class="absolute top-0 left-0 w-2 h-2 bg-brand-orange"></div>
+                    <div class="absolute bottom-0 right-0 w-2 h-2 bg-brand-orange"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. STATISTICS STRIP -->
+    <section class="border-y border-brand-orange/20 bg-brand-charcoal py-12 relative z-20">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 divide-x-0 md:divide-x divide-white/10 text-center">
+                <div class="reveal">
+                    <p class="font-oswald text-5xl lg:text-6xl text-brand-orange mb-2">450<span class="text-white">+</span></p>
+                    <p class="text-xs uppercase tracking-[0.2em] text-gray-400">Societies Reached</p>
+                </div>
+                <div class="reveal delay-100">
+                    <p class="font-oswald text-5xl lg:text-6xl text-brand-orange mb-2">12K<span class="text-white">+</span></p>
+                    <p class="text-xs uppercase tracking-[0.2em] text-gray-400">Cards Issued</p>
+                </div>
+                <div class="reveal delay-200">
+                    <p class="font-oswald text-5xl lg:text-6xl text-brand-orange mb-2">24/7</p>
+                    <p class="text-xs uppercase tracking-[0.2em] text-gray-400">Field Support</p>
+                </div>
+                <div class="reveal delay-300">
+                    <p class="font-oswald text-5xl lg:text-6xl text-brand-orange mb-2">0<span class="text-white">%</span></p>
+                    <p class="text-xs uppercase tracking-[0.2em] text-gray-400">Bureaucracy Friction</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. CORE SERVICES & MEDICAL CAMPS (Static part) -->
+    <section id="services" class="py-24 lg:py-32 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            
+            <div class="mb-16 md:mb-24 reveal">
+                <h2 class="font-oswald text-5xl md:text-7xl uppercase text-white mb-4">Core <span class="text-brand-orange">Initiatives</span></h2>
+                <p class="text-gray-400 text-lg uppercase tracking-widest">End-to-end society and health welfare</p>
+            </div>
+
+            <!-- Full-Width Medical Camp Card -->
+            <div class="group bg-brand-charcoal border border-white/5 hover:border-brand-orange/50 transition-colors duration-500 reveal relative overflow-hidden p-8 lg:p-12">
+                <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <svg class="w-48 h-48 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="1" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                </div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row md:items-start md:justify-between gap-10">
+                    <div class="md:w-1/3">
+                        <div class="text-brand-orange mb-6">
+                            <span class="text-sm font-oswald uppercase tracking-widest border border-brand-orange px-3 py-1">Health Initiative</span>
+                        </div>
+                        <h3 class="font-oswald text-4xl uppercase text-white mb-4">Free Medical <br>Check-up Camps</h3>
+                        <p class="text-gray-400 font-light leading-relaxed">
+                            Comprehensive diagnostic and preventative healthcare camps organized directly within your society premises. We bring the essential medical infrastructure to your doorstep.
+                        </p>
+                    </div>
+                    
+                    <div class="md:w-2/3 lg:pl-12 md:border-l md:border-white/10">
+                        <p class="text-sm uppercase tracking-widest text-brand-orange mb-6 font-bold">Camp Inclusions</p>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Blood Pressure</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Blood Sugar</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">BMI Test</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Eye Check Up</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Doctor's Consultation</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Bone Density Test</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <span class="w-1.5 h-1.5 bg-brand-orange rounded-full"></span>
+                                <span class="text-gray-300 uppercase tracking-wide text-sm font-medium">Breathing Test</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4.5 FLOMIO-STYLE HORIZONTAL SCROLL FOR CAMP SERVICES -->
+    <!-- This section pins during scroll and slides the cards horizontally -->
+    <section id="camp-services" class="bg-brand-charcoal border-y border-white/5 relative z-20">
+        <div id="horizontal-wrapper" class="h-[100vh] w-full overflow-hidden bg-brand-charcoal relative">
+            
+            <!-- Fixed Left Panel (Overlays the track) -->
+            <div class="absolute top-0 left-0 w-full md:w-[35vw] h-[35vh] md:h-full px-6 lg:px-12 flex flex-col justify-end md:justify-center pb-8 md:pb-0 border-b md:border-b-0 md:border-r border-white/5 bg-brand-charcoal z-20 shadow-[10px_0_30px_rgba(0,0,0,0.5)] md:shadow-none">
+                <div class="text-brand-orange mb-4 md:mb-6">
+                    <span class="text-xs md:text-sm font-oswald uppercase tracking-widest border border-brand-orange px-3 py-1">Society Expertise</span>
+                </div>
+                <h2 class="font-oswald text-4xl md:text-6xl uppercase leading-tight text-white mb-4 md:mb-6">
+                    Services <br class="hidden md:block">Provided <br><span class="text-brand-orange">Via Camps</span>
+                </h2>
+                <div class="hidden md:flex items-center gap-4 text-brand-orange opacity-50 uppercase tracking-widest text-xs font-bold">
+                    <span>Scroll to explore</span>
+                    <svg class="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </div>
+
+            <!-- Horizontally Scrolling Track -->
+            <div class="h-full flex items-end md:items-center absolute top-0 left-0 z-10 w-max" id="horizontal-track">
+                
+                <!-- Spacer to push cards past the static left panel on desktop -->
+                <div class="w-0 md:w-[35vw] h-full flex-shrink-0 pointer-events-none"></div>
+
+                <!-- Cards Container -->
+                <div class="flex flex-row gap-6 md:gap-10 px-6 md:px-10 pb-[10vh] md:pb-0 pt-[35vh] md:pt-0 items-center h-full">
+                    
+                    <!-- Square Block 1 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">01</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Ayushman <br>Bharat <br>Yojna</h3>
+                        </div>
+                    </div>
+
+                    <!-- Square Block 2 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">02</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Vay <br>Vandana <br>Yojna</h3>
+                        </div>
+                    </div>
+
+                    <!-- Square Block 3 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">03</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Senior <br>Citizen <br>Card</h3>
+                        </div>
+                    </div>
+
+                    <!-- Square Block 4 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">04</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Voter <br>Id</h3>
+                        </div>
+                    </div>
+
+                    <!-- Square Block 5 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">05</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Senior Citizen <br>Pension Yojna <br>Guidance.</h3>
+                        </div>
+                    </div>
+
+                    <!-- Square Block 6 -->
+                    <div class="w-[75vw] md:w-[40vw] lg:w-[32vw] aspect-square bg-brand-dark border border-white/10 p-8 flex flex-col justify-between group hover:border-brand-orange transition-colors duration-500 relative flex-shrink-0 overflow-hidden cursor-default pr-12">
+                        <div class="absolute left-8 top-1/2 w-[150%] h-[1px] bg-white/5 -translate-y-1/2 group-hover:bg-brand-orange/20 transition-colors transform -rotate-45 origin-left"></div>
+                        <div class="text-brand-orange font-oswald text-6xl md:text-7xl opacity-40 group-hover:opacity-100 transition-opacity">06</div>
+                        <div class="relative z-10 border-l-2 border-brand-orange pl-6">
+                            <h3 class="font-oswald text-3xl md:text-4xl lg:text-5xl text-white uppercase leading-tight">Widow <br>Pension Yojna <br>Guidance</h3>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. SOCIETY PARTNERSHIP / INFRASTRUCTURE -->
+    <section id="societies" class="py-24 lg:py-32 bg-brand-charcoal overflow-hidden border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left: Visual -->
+                <div class="relative reveal">
+                    <div class="aspect-square md:aspect-[4/3] bg-brand-dark border border-white/10 relative p-8 flex items-end">
+                        <div class="absolute inset-0 opacity-30" style="background-image: linear-gradient(#333 1px, transparent 1px), linear-gradient(90deg, #333 1px, transparent 1px); background-size: 20px 20px;"></div>
+                        <div class="relative z-10 flex items-end gap-4 w-full h-full opacity-80">
+                            <div class="w-1/3 bg-white/5 h-3/4 border-t border-r border-white/20"></div>
+                            <div class="w-1/3 bg-brand-orange h-full border-t border-r border-brand-orange/50 flex items-center justify-center relative overflow-hidden">
+                                <div class="absolute inset-0 bg-black/20 mix-blend-multiply"></div>
+                                <span class="font-oswald transform -rotate-90 text-brand-dark text-4xl uppercase tracking-widest font-bold whitespace-nowrap">Infrastructure</span>
+                            </div>
+                            <div class="w-1/3 bg-white/5 h-1/2 border-t border-l border-white/20"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Content -->
+                <div class="reveal delay-200">
+                    <h2 class="font-oswald text-5xl md:text-6xl uppercase leading-tight mb-6">
+                        Building Societal <br>
+                        <span class="text-outline">Infrastructure</span>
+                    </h2>
+                    <p class="text-xl text-gray-300 font-light mb-10 border-l-2 border-brand-orange pl-6">
+                        We help housing societies bring vital government benefits directly to residents, transforming committees into proactive enablers without adding administrative overhead.
+                    </p>
+
+                    <ul class="space-y-6 mb-12">
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center border border-brand-orange">
+                                <svg class="w-3 h-3 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-semibold uppercase tracking-wider text-sm mb-1">We Handle Setup</h4>
+                                <p class="text-gray-400 text-sm">From permissions to physical desk arrangement.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 flex-shrink-0 w-6 h-6 rounded-full bg-brand-orange/20 flex items-center justify-center border border-brand-orange">
+                                <svg class="w-3 h-3 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-semibold uppercase tracking-wider text-sm mb-1">We Manage Flow</h4>
+                                <p class="text-gray-400 text-sm">Organized token systems ensuring zero chaos for residents.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a href="#contact" class="inline-block bg-white text-brand-dark px-8 py-4 uppercase tracking-widest text-sm font-bold hover:bg-gray-200 transition-colors">
+                        Join as Society Partner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. WHY CHOOSE US / USP -->
+    <section id="why-us" class="py-24 lg:py-32 bg-brand-dark border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-16 md:mb-24 reveal">
+                <h2 class="font-oswald text-4xl md:text-6xl uppercase text-white mb-6">Why Societies Choose <br><span class="text-brand-orange">Flying Movements</span></h2>
+                <div class="max-w-3xl mx-auto border border-brand-orange/30 bg-brand-orange/5 p-6 md:p-8 relative">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-dark px-4">
+                        <svg class="w-6 h-6 text-brand-orange" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
+                    </div>
+                    <p class="font-oswald text-xl md:text-3xl text-white uppercase tracking-wide leading-snug">
+                        "We do not stop after the camp. We stay with the family and the society until the benefit is actually used."
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-y-12 md:gap-x-8 lg:gap-x-12 relative before:absolute before:top-0 before:bottom-0 before:left-1/3 before:hidden md:before:block before:w-[1px] before:bg-white/10 after:absolute after:top-0 after:bottom-0 after:right-1/3 after:hidden md:after:block after:w-[1px] after:bg-white/10">
+                <div class="reveal relative z-10 bg-brand-dark md:px-6">
+                    <span class="block text-brand-orange font-oswald text-5xl mb-4 opacity-50">01</span>
+                    <h3 class="text-white font-bold uppercase tracking-wider mb-3">End-to-End Management</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">From initial awareness circulars to final document delivery, we handle the entire lifecycle within your premises.</p>
+                </div>
+                <div class="reveal delay-100 relative z-10 bg-brand-dark md:px-6">
+                    <span class="block text-brand-orange font-oswald text-5xl mb-4 opacity-50">02</span>
+                    <h3 class="text-white font-bold uppercase tracking-wider mb-3">Clear Guidance</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">No ambiguous instructions. We provide exact checklists tailored for middle-class demographic requirements.</p>
+                </div>
+                <div class="reveal delay-200 relative z-10 bg-brand-dark md:px-6">
+                    <span class="block text-brand-orange font-oswald text-5xl mb-4 opacity-50">03</span>
+                    <h3 class="text-white font-bold uppercase tracking-wider mb-3">Trusted & Scalable</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">Operating with institutional discipline. We treat society data and resident privacy with absolute strictest protocols.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. LEADERSHIP -->
+    <section id="leadership" class="py-24 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="mb-16 md:mb-20 text-center reveal">
+                <h2 class="font-oswald text-4xl md:text-5xl uppercase text-white mb-4">Foundation <span class="text-brand-orange">Leadership</span></h2>
+                <p class="text-gray-400 text-sm uppercase tracking-widest">Driving the movement forward</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 lg:gap-16 max-w-4xl mx-auto">
+                <!-- Profile 1: Founder -->
+                <div class="group border border-white/10 bg-brand-charcoal p-8 relative overflow-hidden reveal">
+                    <div class="absolute inset-0 bg-brand-orange/5 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700"></div>
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="w-24 h-24 border border-brand-orange/30 rounded-full mb-6 flex items-center justify-center bg-brand-dark">
+                            <span class="font-oswald text-2xl text-white">DP</span>
+                        </div>
+                        <h3 class="font-oswald text-3xl text-white uppercase mb-2">Dipesh Pandadia</h3>
+                        <p class="text-brand-orange text-sm uppercase tracking-[0.2em] font-bold mb-4">Founder</p>
+                        <div class="w-12 h-[1px] bg-white/20"></div>
+                    </div>
+                </div>
+
+                <!-- Profile 2: Co-founder -->
+                <div class="group border border-white/10 bg-brand-charcoal p-8 relative overflow-hidden reveal delay-100">
+                    <div class="absolute inset-0 bg-brand-orange/5 transform translate-x-full group-hover:translate-x-0 transition-transform duration-700"></div>
+                    <div class="relative z-10 flex flex-col items-center text-center">
+                        <div class="w-24 h-24 border border-brand-orange/30 rounded-full mb-6 flex items-center justify-center bg-brand-dark">
+                            <span class="font-oswald text-2xl text-white">AS</span>
+                        </div>
+                        <h3 class="font-oswald text-3xl text-white uppercase mb-2">Adv. Arvind Singhal</h3>
+                        <p class="text-brand-orange text-sm uppercase tracking-[0.2em] font-bold mb-4">Co-Founder</p>
+                        <div class="w-12 h-[1px] bg-white/20"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. CONTACT / REQUEST CAMP FORM -->
+    <section id="contact" class="py-24 lg:py-32 bg-brand-dark border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid lg:grid-cols-5 gap-16">
+                <!-- Info Side -->
+                <div class="lg:col-span-2 reveal">
+                    <h2 class="font-oswald text-5xl uppercase mb-8">Connect with <br><span class="text-brand-orange">The Foundation</span></h2>
+                    <p class="text-gray-400 mb-12 font-light">
+                        Request a camp for your housing society, seek citizen support, or inquire about hospital partnerships. Our ground team responds within 24 hours.
+                    </p>
+                    <div class="space-y-8">
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-brand-orange mb-2 font-bold">Headquarters</p>
+                            <p class="text-white font-light">Mumbai, Maharashtra<br>Operating across MMR region.</p>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-brand-orange mb-2 font-bold">Direct Line</p>
+                            <p class="text-white font-light">+91 97694 12521<br>WhatsApp Support Available</p>
+                        </div>
+                        <div>
+                            <p class="text-xs uppercase tracking-widest text-brand-orange mb-2 font-bold">Digital</p>
+                            <p class="text-white font-light">CEO@flyingmovementfoundation.in</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Side -->
+                <div class="lg:col-span-3 reveal delay-200">
+                    <div class="border border-white/10 p-8 md:p-12 bg-brand-charcoal">
+                        <form action="#" method="POST" class="space-y-8">
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <label class="sr-only">Full Name</label>
+                                    <input type="text" placeholder="Full Name" required class="input-editorial w-full">
+                                </div>
+                                <div>
+                                    <label class="sr-only">Phone Number</label>
+                                    <input type="tel" placeholder="Phone Number (WhatsApp)" required class="input-editorial w-full">
+                                </div>
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-8">
+                                <div>
+                                    <label class="sr-only">Society Name</label>
+                                    <input type="text" placeholder="Society Name" required class="input-editorial w-full">
+                                </div>
+                                <div>
+                                    <label class="sr-only">Area / Locality</label>
+                                    <input type="text" placeholder="Area / Locality (e.g., Andheri West)" required class="input-editorial w-full">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="sr-only">Request Type</label>
+                                <select class="input-editorial w-full appearance-none cursor-pointer" required style="color: #666; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em;">
+                                    <option value="" disabled selected>Select Request Type</option>
+                                    <option value="society_camp">Book Society Camp</option>
+                                    <option value="medical_camp">Book Medical Check-up Camp</option>
+                                    <option value="citizen_support">Individual Citizen Support</option>
+                                    <option value="hospital">Hospital Partnership</option>
+                                    <option value="other">Other Inquiry</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="sr-only">Message</label>
+                                <textarea rows="3" placeholder="Message or specific requirements" class="input-editorial w-full resize-none"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-brand-orange text-white py-5 uppercase tracking-widest text-sm font-bold hover:bg-brand-orangeHover transition-colors mt-4">
+                                Submit Request
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 9. FOOTER -->
+    <footer class="bg-brand-dark border-t border-white/10 pt-16 pb-8 text-center md:text-left">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid md:grid-cols-3 gap-8 items-center mb-12">
+                <div>
+                    <span class="font-oswald uppercase tracking-widest text-xl font-bold text-white block mb-2">Flying Movements Foundation</span>
+                    <span class="text-gray-500 text-sm">Empowering Mumbai. Organizing access.</span>
+                </div>
+                <div class="flex justify-center gap-6">
+                    <a href="#" class="text-gray-500 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest">Privacy</a>
+                    <a href="#" class="text-gray-500 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest">Terms</a>
+                    <a href="#contact" class="text-gray-500 hover:text-brand-orange transition-colors text-sm uppercase tracking-widest">Contact</a>
+                </div>
+                <div class="flex justify-center md:justify-end gap-4">
+                    <a href="#" class="w-10 h-10 border border-white/10 rounded-full flex items-center justify-center text-gray-500 hover:text-white hover:border-brand-orange transition-all">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="border-t border-white/5 pt-8 text-center">
+                <p class="text-xs text-gray-600 uppercase tracking-widest">&copy; <span id="year"></span> Flying Movements Foundation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript for Interactions -->
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const navbar = document.getElementById('navbar');
+
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Navbar blur effect on scroll
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-lg', 'bg-brand-dark/95');
+                navbar.classList.remove('bg-brand-dark/80');
+            } else {
+                navbar.classList.remove('shadow-lg', 'bg-brand-dark/95');
+                navbar.classList.add('bg-brand-dark/80');
+            }
+        });
+
+        // Basic Intersection Observer for standard reveals
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+        const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => revealOnScroll.observe(el));
+
+        // --- GSAP HORIZONTAL SCROLL ANIMATION (FLOMIO STYLE) ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const horizontalTrack = document.getElementById('horizontal-track');
+        const horizontalWrapper = document.getElementById('horizontal-wrapper');
+        
+        function getScrollAmount() {
+            let trackWidth = horizontalTrack.scrollWidth;
+            let viewportWidth = window.innerWidth;
+            // The exact distance the track needs to slide to show the last card
+            return trackWidth - viewportWidth;
+        }
+
+        const tween = gsap.to(horizontalTrack, {
+            x: () => -getScrollAmount(),
+            ease: "none"
+        });
+
+        ScrollTrigger.create({
+            trigger: horizontalWrapper,
+            start: "top top",
+            end: () => `+=${getScrollAmount()}`, 
+            pin: true,
+            animation: tween,
+            scrub: 1,
+            invalidateOnRefresh: true 
+        });
+    </script>
 </body>
 </html>
+
+
+```
