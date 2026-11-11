@@ -1,6 +1,6 @@
 # Parmarpro
 
-The Parmarpro website at **parmarpro.com**. It does three jobs:
+The Parmarpro website at **parmarpro.in**. It does three jobs:
 
 | Page | URL | Who sees it |
 |---|---|---|
@@ -23,7 +23,7 @@ assets/                  ← CSS, JS, favicon
 work/flying-movements-foundation/  ← the FMF site that used to be the homepage
 ```
 
-> Everything in this repo is public on parmarpro.com, including `src/`. **Never put private notes in a clinic file** (e.g. what the dentist said on a call or their prices). Keep your pipeline in a spreadsheet.
+> Everything in this repo is public on parmarpro.in, including `src/`. **Never put private notes in a clinic file** (e.g. what the dentist said on a call or their prices). Keep your pipeline in a spreadsheet.
 
 ---
 
@@ -34,7 +34,7 @@ work/flying-movements-foundation/  ← the FMF site that used to be the homepage
    - `contact.email` (optional).
    - `founder`, `market`, `turnaround`, `offer.packages` (prices), `offer.guarantee`, `faq`. These are all plain text, so change anything.
 2. Run `node src/build.mjs`. It prints warnings if something's missing.
-3. Merge this branch into `main`. GitHub Pages publishes from `main` with the existing `CNAME` (parmarpro.com).
+3. Merge this branch into `main`. GitHub Pages publishes from `main` with the existing `CNAME` (parmarpro.in).
 
 ## Add a dentist
 
@@ -48,8 +48,8 @@ work/flying-movements-foundation/  ← the FMF site that used to be the homepage
 2. Fill in the fields (see below). Only `name`, `area`, `city`, `address` and `phone` are required.
 3. Run `node src/build.mjs`. To also make the WhatsApp link-preview image, run `node src/og.mjs`.
 4. Commit and push. The links are:
-   - `https://parmarpro.com/p/<slug>/` → send this one (their new site)
-   - `https://parmarpro.com/p/<slug>/plan/` → the plan (linked from the preview)
+   - `https://parmarpro.in/p/<slug>/` → send this one (their new site)
+   - `https://parmarpro.in/p/<slug>/plan/` → the plan (linked from the preview)
 
 ### Clinic fields
 
