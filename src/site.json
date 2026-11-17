@@ -1,0 +1,59 @@
+{
+  "brand": "Parmarpro",
+  "baseUrl": "https://parmarpro.in",
+  "tagline": "Growth systems for dental clinics",
+  "market": "Mumbai",
+  "turnaround": "48 hours",
+  "founder": { "name": "Vivek", "role": "Founder" },
+  "contact": {
+    "whatsapp": "",
+    "email": "",
+    "waMessage": "Hi Parmarpro, I'd like a free preview for my clinic. Here's our Google Maps link: "
+  },
+  "freeShare": 70,
+  "offer": {
+    "avgPatientValue": 2500,
+    "packages": [
+      {
+        "name": "Launch",
+        "amount": 9999,
+        "cadence": "one-time",
+        "blurb": "Everything in your preview, switched on in a week.",
+        "items": [
+          "Your new website live on your own domain (domain at cost)",
+          "Google profile fixed: all 10 checklist points",
+          "WhatsApp Business set up with booking quick replies",
+          "Review QR card for your reception desk",
+          "30 days of free edits"
+        ]
+      },
+      {
+        "name": "Grow",
+        "amount": 4999,
+        "cadence": "month",
+        "featured": true,
+        "blurb": "We run the systems every week, so you can focus on patients. Month-to-month.",
+        "items": [
+          "Review requests sent to your patients after their visits",
+          "A drafted reply for every new review",
+          "Weekly Google posts and fresh photos",
+          "Appointment reminders and a monthly recall campaign",
+          "A one-page scoreboard every month",
+          "Unlimited small website edits"
+        ]
+      }
+    ],
+    "guarantee": "your website goes live within 7 days of your go-ahead, or Launch is free. Grow is month-to-month — stop any time with one message."
+  },
+  "faq": [
+    { "q": "Why is the preview free?", "a": "Because showing beats telling. We'd rather spend a few hours building something real for your clinic than ask you for a meeting. If it's good, some clinics ask us to run it. If it isn't useful, it cost you nothing." },
+    { "q": "Is my preview public?", "a": "No. It's on a private link that search engines are told not to index, and it's clearly marked as a concept by Parmarpro, not your official site. Ask and we'll remove it within 24 hours." },
+    { "q": "Can I just use the plan myself?", "a": "Yes. The scripts, the checklist and the website design are yours to use. If you'd rather do it in-house, we're glad it helped." },
+    { "q": "Do I own the website?", "a": "Yes. The domain is registered in your clinic's name and the site is yours. If you ever stop working with us, you keep it." },
+    { "q": "What do you need from me?", "a": "A 15-minute call, any photos or logo you have, and manager access to your Google Business Profile — added from your own account. We never ask for passwords." },
+    { "q": "Do you work with other kinds of businesses?", "a": "Right now we focus only on dental clinics. Doing one thing well is the point." }
+  ],
+  "extraWork": [
+    { "title": "Flying Movements Foundation", "kind": "NGO website · Mumbai", "url": "/work/flying-movements-foundation/" }
+  ]
+}
