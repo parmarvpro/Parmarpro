@@ -20,7 +20,6 @@ src/og.mjs               ← link-preview images for WhatsApp / email (needs Pla
 src/export.mjs           ← turns a preview into the clinic's real website for their domain
 src/serve.mjs            ← local preview at http://localhost:8080
 assets/                  ← CSS, JS, favicon
-work/flying-movements-foundation/  ← the FMF site that used to be the homepage
 ```
 
 > Everything in this repo is public on parmarpro.in, including `src/`. **Never put private notes in a clinic file** (e.g. what the dentist said on a call or their prices). Keep your pipeline in a spreadsheet.
@@ -98,4 +97,3 @@ Node 18+ is the only requirement. `og.mjs` also needs Playwright (`npm i -D play
 ## Notes
 
 - `index.html`, `p/`, `work/index.html` and `404.html` are **generated**. Edit `src/`, not those files, or your changes get overwritten on the next build.
-- `Index.html2` and `None.1.` are old leftovers (a duplicate of the FMF page and an early placeholder). It's safe to delete them.

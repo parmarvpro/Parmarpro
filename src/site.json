@@ -53,7 +53,5 @@
     { "q": "What do you need from me?", "a": "A 15-minute call, any photos or logo you have, and manager access to your Google Business Profile — added from your own account. We never ask for passwords." },
     { "q": "Do you work with other kinds of businesses?", "a": "Right now we focus only on dental clinics. Doing one thing well is the point." }
   ],
-  "extraWork": [
-    { "title": "Flying Movements Foundation", "kind": "NGO website · Mumbai", "url": "/work/flying-movements-foundation/" }
-  ]
+  "extraWork": []
 }
